@@ -18,31 +18,33 @@ export default function AdminPage() {
     })
 
     if (response.ok) {
+      // alert("ok")
       setIsAuthenticated(true)
       setError('')
     } else {
+      // alert("error")
       setError('Mot de passe incorrect')
     }
   }
-
+  // alert(isAuthenticated)
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
-          <h2 className="text-2xl font-bold text-center">Administration</h2>
+          <h2 className="text-2xl font-bold text-center text-gray-800">Administration</h2>
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-800">
                 Mot de passe
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-800"
               />
             </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-red-600 text-sm">{error}</p>}
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
@@ -75,36 +77,36 @@ function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Dashboard Administration</h1>
+        <h1 className="text-3xl font-bold mb-8 text-gray-800">Dashboard Administration</h1>
         
         {/* Formulaire d'ajout de section */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Ajouter une nouvelle section</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Ajouter une nouvelle section</h2>
           <form onSubmit={handleAddSection} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Titre</label>
+              <label className="block text-sm font-medium text-gray-800">Titre</label>
               <input
                 type="text"
                 value={newSection.title}
                 onChange={(e) => setNewSection({...newSection, title: e.target.value})}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-800"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Contenu</label>
+              <label className="block text-sm font-medium text-gray-800">Contenu</label>
               <textarea
                 value={newSection.content}
                 onChange={(e) => setNewSection({...newSection, content: e.target.value})}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-800"
                 rows={4}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Type</label>
+              <label className="block text-sm font-medium text-gray-800">Type</label>
               <select
                 value={newSection.type}
                 onChange={(e) => setNewSection({...newSection, type: e.target.value})}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-800"
               >
                 <option value="card">Carte</option>
                 <option value="section">Section</option>
@@ -121,9 +123,9 @@ function AdminDashboard() {
 
         {/* Liste des sections existantes */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Sections existantes</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Sections existantes</h2>
           {sections.length === 0 ? (
-            <p className="text-gray-500">Aucune section pour le moment</p>
+            <p className="text-gray-700">Aucune section pour le moment</p>
           ) : (
             <div className="space-y-4">
               {/* Mapping des sections ici */}
