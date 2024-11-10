@@ -1,3 +1,5 @@
+'use client'
+
 import { HiOutlineDocumentSearch , HiOutlineCog,HiDocumentAdd, HiOutlineAcademicCap } from "react-icons/hi";
 import { HiOutlineEnvelope,HiOutlineWrenchScrewdriver,HiOutlineDocumentArrowUp   } from "react-icons/hi2";
 import { FaLinkedin } from "react-icons/fa";
@@ -5,8 +7,11 @@ import { HiOutlineDocumentArrowDown } from "react-icons/hi2";
 import { HiOutlineChartBar } from "react-icons/hi2";
 import { HiOutlineCircleStack } from "react-icons/hi2";
 import Image from 'next/image';
+import { useState } from 'react';
 
 export default function Home() {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
@@ -17,6 +22,13 @@ export default function Home() {
             <p className="text-gray-600 dark:text-gray-400">Consultant GED</p>
           </div>
           <div className="flex gap-6">
+            <button
+              onClick={() => setIsLoginModalOpen(true)}
+              className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
+            >
+              <HiOutlineCog className="text-xl" />
+              Connexion
+            </button>
             <a
               href="/path-to-your-cv.pdf"
               className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
@@ -38,6 +50,53 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Login Modal */}
+      {isLoginModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 relative">
+            <button
+              onClick={() => setIsLoginModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              ✕
+            </button>
+            
+            <h2 className="text-2xl font-bold mb-6">Connexion</h2>
+            
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="votre@email.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Mot de passe
+                </label>
+                <input
+                  type="password"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="••••••••"
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Se connecter
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="pt-32 px-8">
