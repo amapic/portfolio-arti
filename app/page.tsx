@@ -18,6 +18,7 @@ import { Experience } from './types/experience';
 import { api } from './services/api';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { EditExperienceModal } from './components/modals/EditExperienceModal';
+import { DarkModeToggle } from './components/DarkModeToggle';
 
 interface Card {
   id: string;
@@ -481,6 +482,7 @@ export default function Home() {
       {/* Header */}
       <header className="w-full px-8 py-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm fixed top-0 z-50 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
+        
           <div>
             {isLoggedIn && !editingStates.headerName ? (
               <div className="group relative">
@@ -669,6 +671,7 @@ export default function Home() {
                 )}
               </div>
             )}
+            {isLoggedIn && <DarkModeToggle />}
           </div>
         </div>
       </header>
