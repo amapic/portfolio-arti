@@ -12,6 +12,12 @@ import { IconType } from 'react-icons';
 import * as Hi2Icons from 'react-icons/hi2';
 import { HiOutlinePlusCircle } from 'react-icons/hi2';
 import { HiOutlineTrash } from "react-icons/hi2";
+import { ExperienceSection } from './components/experience/ExperienceSection';
+import { AddExperienceModal } from './components/modals/AddExperienceModal';
+import { Experience } from './types/experience';
+import { api } from './services/api';
+import { HiOutlinePencil } from 'react-icons/hi2';
+import { EditExperienceModal } from './components/modals/EditExperienceModal';
 
 interface Card {
   id: string;
@@ -102,6 +108,17 @@ const IconSelectorModal = ({
   );
 };
 
+// Modifiez l'interface des textes pour inclure cvUrl et linkedInUrl
+interface Texts {
+  mainTitle: string;
+  subtitle: string;
+  documentumText: string;
+  headerName: string;
+  headerRole: string;
+  cvUrl: string;
+  linkedInUrl: string;
+}
+
 export default function Home() {
   // Définition des longueurs maximales pour chaque champ
   const MAX_LENGTHS = {
@@ -112,16 +129,19 @@ export default function Home() {
     headerRole: 20
   };
 
-  const [texts, setTexts] = useState({
+  // Modifiez l'état initial des textes
+  const [texts, setTexts] = useState<Texts>({
     mainTitle: "",
     subtitle: "",
     documentumText: "",
     headerName: "",
-    headerRole: ""
+    headerRole: "",
+    cvUrl: "/path-to-your-cv.pdf",
+    linkedInUrl: "https://www.linkedin.com/in/amaurypichat/"
   });
   const [titleError, setTitleError] = useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [editingStates, setEditingStates] = useState({
     mainTitle: false,
     headerName: false,
@@ -132,6 +152,14 @@ export default function Home() {
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [cardToDelete, setCardToDelete] = useState<string | null>(null);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [isAddExperienceModalOpen, setIsAddExperienceModalOpen] = useState(false);
+  const [isDeleteExperienceModalOpen, setIsDeleteExperienceModalOpen] = useState(false);
+  const [experienceToDelete, setExperienceToDelete] = useState<string | null>(null);
+  const [isEditingCvUrl, setIsEditingCvUrl] = useState(false);
+  const [isEditingLinkedInUrl, setIsEditingLinkedInUrl] = useState(false);
+  const [isEditingExperience, setIsEditingExperience] = useState(false);
+  const [experienceToEdit, setExperienceToEdit] = useState<Experience | null>(null);
 
   // Au début du composant, ajoutez une constante pour l'URL de l'API
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -149,6 +177,11 @@ export default function Home() {
       .then(res => res.json())
       .then(data => setCards(data))
       .catch(error => console.error('Error loading cards:', error));
+  }, []);
+
+  // Charger les expériences au démarrage
+  useEffect(() => {
+    api.experiences.getAll().then(setExperiences);
   }, []);
 
   // Fonction helper pour vérifier la longueur
@@ -348,6 +381,101 @@ export default function Home() {
     );
   };
 
+  const handleDeleteExperience = (id: string) => {
+    setExperienceToDelete(id);
+    setIsDeleteExperienceModalOpen(true);
+  };
+
+  const handleConfirmDeleteExperience = async () => {
+    if (!experienceToDelete) return;
+    
+    try {
+      await api.experiences.delete(experienceToDelete);
+      setExperiences(prev => prev.filter(exp => exp.id !== experienceToDelete));
+      setIsDeleteExperienceModalOpen(false);
+      setExperienceToDelete(null);
+    } catch (error) {
+      console.error('Error deleting experience:', error);
+      alert('Failed to delete experience');
+    }
+  };
+
+  const handleAddExperience = async (newExperience: Omit<Experience, 'id'>) => {
+    try {
+      const experience = await api.experiences.add(newExperience);
+      setExperiences(prev => [...prev, experience]);
+      setIsAddExperienceModalOpen(false);
+    } catch (error) {
+      console.error('Error adding experience:', error);
+      alert('Failed to add experience');
+    }
+  };
+
+  // Modifiez la fonction handleCvUrlUpdate
+  const handleCvUrlUpdate = async (newUrl: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/texts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: 'cvUrl', value: newUrl }),
+      });
+      
+      if (!response.ok) throw new Error('Failed to update CV URL');
+      
+      setTexts(prev => ({ ...prev, cvUrl: newUrl }));
+      setIsEditingCvUrl(false);
+    } catch (error) {
+      console.error('Error updating CV URL:', error);
+      alert('Failed to update CV URL');
+    }
+  };
+
+  const handleLinkedInUrlUpdate = async (newUrl: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/texts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ key: 'linkedInUrl', value: newUrl }),
+      });
+      
+      if (!response.ok) throw new Error('Failed to update LinkedIn URL');
+      
+      setTexts(prev => ({ ...prev, linkedInUrl: newUrl }));
+      setIsEditingLinkedInUrl(false);
+    } catch (error) {
+      console.error('Error updating LinkedIn URL:', error);
+      alert('Failed to update LinkedIn URL');
+    }
+  };
+
+  const handleEditExperience = async (updatedExperience: Experience) => {
+    try {
+      const response = await fetch(`${API_URL}/api/experiences/${updatedExperience.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedExperience),
+      });
+
+      if (!response.ok) throw new Error('Failed to update experience');
+
+      const updated = await response.json();
+      setExperiences(prev => 
+        prev.map(exp => exp.id === updated.id ? updated : exp)
+      );
+      setIsEditingExperience(false);
+      setExperienceToEdit(null);
+    } catch (error) {
+      console.error('Error updating experience:', error);
+      alert('Failed to update experience');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
@@ -439,24 +567,108 @@ export default function Home() {
               <HiOutlineCog className="text-xl" />
               Connexion & {isLoggedIn ? "✅" : "❌"}
             </button>
-            <a
-              href="/path-to-your-cv.pdf"
-              className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <HiOutlineDocumentArrowDown className="text-xl" />
-              CV
-            </a>
-            <a
-              href="https://www.linkedin.com/in/amaurypichat/"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaLinkedin className="text-xl" />
-              LinkedIn
-            </a>
+            {isLoggedIn && isEditingCvUrl ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={texts.cvUrl}
+                  onChange={(e) => setTexts(prev => ({ ...prev, cvUrl: e.target.value }))}
+                  className="px-4 py-2 rounded-lg border border-blue-500 dark:border-blue-400 
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  placeholder="URL du CV"
+                />
+                <button
+                  onClick={() => handleCvUrlUpdate(texts.cvUrl)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditingCvUrl(false);
+                    setTexts(prev => ({ ...prev, cvUrl: prev.cvUrl })); // Reset to previous value
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <a
+                  href={texts.cvUrl}
+                  className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 
+                    hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors 
+                    flex items-center gap-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <HiOutlineDocumentArrowDown className="text-xl" />
+                  CV
+                </a>
+                {isLoggedIn && (
+                  <button
+                    onClick={() => setIsEditingCvUrl(true)}
+                    className="p-2 text-blue-500 hover:text-blue-700 
+                      rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                    aria-label="Modifier l'URL du CV"
+                  >
+                    <HiOutlinePencil className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            )}
+            {isLoggedIn && isEditingLinkedInUrl ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={texts.linkedInUrl}
+                  onChange={(e) => setTexts(prev => ({ ...prev, linkedInUrl: e.target.value }))}
+                  className="px-4 py-2 rounded-lg border border-blue-500 dark:border-blue-400 
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  placeholder="URL LinkedIn"
+                />
+                <button
+                  onClick={() => handleLinkedInUrlUpdate(texts.linkedInUrl)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditingLinkedInUrl(false);
+                    setTexts(prev => ({ ...prev, linkedInUrl: prev.linkedInUrl })); // Reset to previous value
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <a
+                  href={texts.linkedInUrl}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaLinkedin className="text-xl" />
+                  LinkedIn
+                </a>
+                {isLoggedIn && (
+                  <button
+                    onClick={() => setIsEditingLinkedInUrl(true)}
+                    className="p-2 text-white hover:text-blue-100 
+                      rounded-full hover:bg-blue-700"
+                    aria-label="Modifier l'URL LinkedIn"
+                  >
+                    <HiOutlinePencil className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -815,113 +1027,41 @@ export default function Home() {
       </main>
 
       {/* Professional Experience Section */}
-      <section id="experience" className="py-20 px-8 bg-gray-50 dark:bg-gray-800/50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12">Expérience Professionnelle</h2>
-          
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg">
-            <div className="flex flex-col md:flex-row justify-between mb-6">
-              <div>
-                <h3 className="text-2xl font-semibold mb-2">Administrateur National</h3>
-                <div className="flex items-center gap-2">
-                  <p className="text-xl text-blue-600 dark:text-blue-400">EDF et Coexya</p>
-                  <Image 
-                    src="/edf.png"
-                    alt="Logo EDF"
-                    width={30}
-                    height={30}
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-              <div className="text-gray-600 dark:text-gray-400">
-                <p>Villeurbanne - Lyon</p>
-                <p>5 années</p>
-              </div>
-            </div>
+      <ExperienceSection
+        experiences={experiences}
+        isLoggedIn={isLoggedIn}
+        onDelete={handleDeleteExperience}
+        onAdd={() => setIsAddExperienceModalOpen(true)}
+      />
 
-            <div className="prose dark:prose-invert max-w-none">
-              <p className="">
-                Développement et traitement de données en autonomie pour la GED du nucléaire
-              </p>
-              <p className="mb-6">
-                <span className="text-blue-600 font-semibold">➜</span> 10 000 ingénieur du nucléaires, 8 millions de documents
-              </p>
+      {isAddExperienceModalOpen && (
+        <AddExperienceModal
+          onClose={() => setIsAddExperienceModalOpen(false)}
+          onAdd={handleAddExperience}
+        />
+      )}
 
-              <h4 className="text-lg font-semibold mb-4">Réalisations principales :</h4>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
-                  <span>Refonte majeure de la base documentaire : migration et restructuration de 4 millions de documents</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
-                  <span>Pilotage du projet de dématérialisation : conversion de 100 000+ documents physiques en format numérique</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
-                  <span>Développement d'une interface web moderne pour l'accès à la GED, améliorant l'expérience utilisateur</span>
-                </li>
-               
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
-                  <span>Gestion de projet agile : Product Owner sur une application web stratégique, coordination d'une équipe de 4 développeurs</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
-                  <span>Accompagnement des utilisateurs lors du déploiement de nouvelles solutions</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
-                  <span>Gestion des incidents critiques : support niveau 2, résolution des problèmes complexes</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
-                  <span>Formation des autres administrateurs</span>
-                </li>
-              </ul>
+      {isDeleteExperienceModalOpen && (
+        <DeleteConfirmationModal
+          onConfirm={handleConfirmDeleteExperience}
+          onCancel={() => {
+            setIsDeleteExperienceModalOpen(false);
+            setExperienceToDelete(null);
+          }}
+          message="Êtes-vous sûr de vouloir supprimer cette expérience ?"
+        />
+      )}
 
-              <h4 className="text-lg font-semibold mt-6 mb-4">Technologies et outils utilisés :</h4>
-              <div className="flex flex-wrap gap-2">
-                {['Documentum', 'VBA', 'Web (Js, React)', 'Python'].map((tech) => (
-                  <span 
-                    key={tech}
-                    className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Formation Section */}
-      <section id="formation" className="py-20 px-8 bg-white dark:bg-gray-900">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12">Formation</h2>
-          
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-8 shadow-lg">
-            <div className="flex flex-col md:flex-row justify-between mb-6">
-              <div>
-                <h3 className="text-2xl font-semibold mb-2">Diplôme d'Ingénieur Généraliste</h3>
-                <p className="text-xl text-blue-600 dark:text-blue-400 mb-2">ECAM Lyon</p>
-              </div>
-              <div className="text-gray-600 dark:text-gray-400">
-                <p>2017 - 2022</p>
-                <p>Lyon</p>
-              </div>
-            </div>
-
-            <div className="prose dark:prose-invert max-w-none">
-              <p className="mb-6">
-                Formation d'ingénieur généraliste avec une spécialisation en informatique et systèmes d'information.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {isEditingExperience && experienceToEdit && (
+        <EditExperienceModal
+          experience={experienceToEdit}
+          onClose={() => {
+            setIsEditingExperience(false);
+            setExperienceToEdit(null);
+          }}
+          onSave={handleEditExperience}
+        />
+      )}
 
       {/* Floating Menu */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
