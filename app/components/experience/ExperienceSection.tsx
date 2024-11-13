@@ -7,9 +7,11 @@ interface ExperienceSectionProps {
   isLoggedIn: boolean;
   onDelete: (id: string) => void;
   onAdd: () => void;
+  setExperienceToEdit: (experience: Experience | null) => void;
+  setIsEditingExperience: (isEditing: boolean) => void;
 }
 
-export const ExperienceSection = ({ experiences, isLoggedIn, onDelete, onAdd }: ExperienceSectionProps) => {
+export const ExperienceSection = ({ experiences, isLoggedIn, onDelete, onAdd, setExperienceToEdit,setIsEditingExperience }: ExperienceSectionProps) => {
   return (
     <section id="experience" className="py-20 px-8 bg-gray-50 dark:bg-gray-800/50">
       <div className="max-w-6xl mx-auto">

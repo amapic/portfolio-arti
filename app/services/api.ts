@@ -37,6 +37,7 @@ export const api = {
     },
 
     delete: async (id: string): Promise<void> => {
+      alert("rr")
       const response = await fetch(`${API_URL}/api/experiences/${id}`, {
         ...fetchConfig,
         method: 'DELETE',

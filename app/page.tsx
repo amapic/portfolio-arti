@@ -382,6 +382,42 @@ export default function Home() {
     );
   };
 
+  const DeleteExperienceConfirmationModal = ({ 
+    onConfirm, 
+    onCancel, 
+    message 
+  }: { 
+    onConfirm: () => void;
+    onCancel: () => void;
+    message: string;
+  }) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Confirmer la suppression</h2>
+          <p className="mb-6 text-gray-600 dark:text-gray-300">{message}</p>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 
+                dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={onConfirm}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 
+                transition-colors"
+            >
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Ajoutez ces fonctions de gestion
   const handleDeleteExperience = (id: string) => {
     setExperienceToDelete(id);
     setIsDeleteExperienceModalOpen(true);
@@ -391,7 +427,12 @@ export default function Home() {
     if (!experienceToDelete) return;
     
     try {
-      await api.experiences.delete(experienceToDelete);
+      const response = await fetch(`${API_URL}/api/experiences/${experienceToDelete}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete experience');
+      
       setExperiences(prev => prev.filter(exp => exp.id !== experienceToDelete));
       setIsDeleteExperienceModalOpen(false);
       setExperienceToDelete(null);
@@ -1035,17 +1076,20 @@ export default function Home() {
         isLoggedIn={isLoggedIn}
         onDelete={handleDeleteExperience}
         onAdd={() => setIsAddExperienceModalOpen(true)}
+        setExperienceToEdit={setExperienceToEdit}
+        setIsEditingExperience={setIsEditingExperience}
       />
 
       {isAddExperienceModalOpen && (
         <AddExperienceModal
           onClose={() => setIsAddExperienceModalOpen(false)}
           onAdd={handleAddExperience}
+         
         />
       )}
 
       {isDeleteExperienceModalOpen && (
-        <DeleteConfirmationModal
+        <DeleteExperienceConfirmationModal
           onConfirm={handleConfirmDeleteExperience}
           onCancel={() => {
             setIsDeleteExperienceModalOpen(false);
