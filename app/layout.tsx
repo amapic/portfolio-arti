@@ -1,9 +1,9 @@
 'use client';
 
-import type { Metadata } from "next";
+import { ThemeProvider } from './components/ThemeProvider';
+// import { Metadata } from 'next';
 import localFont from "next/font/local";
 import "./globals.css";
-import { useEffect } from 'react';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,38 +17,63 @@ const geistMono = localFont({
 });
 
 // export const metadata: Metadata = {
-//   title: "Amaury PICHAT - Consultant GED",
-//   description: "Expert en gestion électronique des documents",
-//   icons: {
-//     icon: "/icon.ico",
+//   title: 'Amaury Pichat - Consultant GED',
+//   description: 'Expert en gestion électronique de documents (GED) et solutions documentaires. Consultant indépendant spécialisé en OpenText Documentum.',
+//   keywords: ['GED', 'Documentum', 'OpenText', 'consultant', 'gestion documentaire', 'ECM'],
+//   authors: [{ name: 'Amaury Pichat' }],
+//   creator: 'Amaury Pichat',
+//   publisher: 'Amaury Pichat',
+//   robots: 'index, follow',
+//   openGraph: {
+//     type: 'website',
+//     locale: 'fr_FR',
+//     url: 'https://www.amaurypichat.fr',
+//     siteName: 'Amaury Pichat - Consultant GED',
+//     title: 'Amaury Pichat - Expert GED & Documentum',
+//     description: 'Consultant indépendant spécialisé en solutions GED et Documentum',
+//     images: [
+//       {
+//         url: '/images/og-image.jpg', // Créez une image attractive pour les réseaux sociaux
+//         width: 1200,
+//         height: 630,
+//         alt: 'Amaury Pichat - Consultant GED',
+//       },
+//     ],
 //   },
-// };
+//   twitter: {
+//     card: 'summary_large_image',
+//     title: 'Amaury Pichat - Expert GED & Documentum',
+//     description: 'Consultant indépendant spécialisé en solutions GED et Documentum',
+//     images: ['/images/og-image.jpg'],
+//   }
+// }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  useEffect(() => {
-    // Vérifie la préférence système et le thème stocké
-    if (typeof window !== 'undefined') {
-      const theme = localStorage.getItem('theme') || 
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  }, []);
-
+}) {
   return (
     <html lang="fr" className="scroll-smooth">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark')
+                } else {
+                  document.documentElement.classList.remove('dark')
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
