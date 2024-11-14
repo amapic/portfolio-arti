@@ -5,9 +5,13 @@ import {
   HiOutlineCog,
   HiDocumentAdd,
   HiOutlineAcademicCap,
+  HiOutlineLogout,
+  HiOutlineCheck,
+  HiOutlineX
 } from "react-icons/hi";
 import {
   HiOutlineEnvelope,
+  
   HiOutlineWrenchScrewdriver,
   HiOutlineDocumentArrowUp,
 } from "react-icons/hi2";
@@ -127,6 +131,7 @@ interface Texts {
   headerRole: string;
   cvUrl: string;
   linkedInUrl: string;
+  contactEmail: string;
 }
 
 export default function Home() {
@@ -137,6 +142,7 @@ export default function Home() {
     documentumText: 40,
     headerName: 30,
     headerRole: 20,
+    contactEmail: 100,
   };
 
   // Modifiez l'état initial des textes
@@ -148,6 +154,7 @@ export default function Home() {
     headerRole: "",
     cvUrl: "/path-to-your-cv.pdf",
     linkedInUrl: "https://www.linkedin.com/in/amaurypichat/",
+    contactEmail: "",
   });
   const [titleError, setTitleError] = useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -157,6 +164,7 @@ export default function Home() {
     headerName: false,
     subtitle: false,
     documentumText: false,
+    contactEmail: false,
   });
   const [cards, setCards] = useState<Card[]>([]);
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
@@ -176,6 +184,7 @@ export default function Home() {
   const [experienceToEdit, setExperienceToEdit] = useState<Experience | null>(
     null
   );
+  const [isEditingContact, setIsEditingContact] = useState(false);
 
   // Au début du composant, ajoutez une constante pour l'URL de l'API
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -561,6 +570,21 @@ export default function Home() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
@@ -647,13 +671,28 @@ export default function Home() {
             )}
           </div>
           <div className="flex gap-6">
-            <button
-              onClick={() => setIsLoginModalOpen(true)}
-              className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
-            >
-              <HiOutlineCog className="text-xl" />
-              Connexion & {isLoggedIn ? "✅" : "❌"}
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 
+                  hover:bg-red-50 dark:hover:bg-red-900/20 
+                  text-red-600 dark:text-red-400
+                  transition-colors flex items-center gap-2"
+              >
+                <HiOutlineLogout className="text-xl" />
+                Déconnexion
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 
+                  hover:bg-gray-100 dark:hover:bg-gray-800 
+                  transition-colors flex items-center gap-2"
+              >
+                <HiOutlineCog className="text-xl" />
+                Connexion
+              </button>
+            )}
             {isLoggedIn && isEditingCvUrl ? (
               <div className="flex items-center gap-2">
                 <input
@@ -1089,13 +1128,77 @@ export default function Home() {
                 Contactez-moi pour discuter de vos besoins en gestion
                 documentaire.
               </p>
-              <a
-                href="mailto:amaury.pichat@gmail.com"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <HiOutlineEnvelope className="text-xl" />
-                Me contacter
-              </a>
+              
+              {isLoggedIn && editingStates.contactEmail ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="email"
+                    value={texts.contactEmail}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      setTexts(prev => ({ ...prev, contactEmail: newValue }));
+                      if (newValue.length > MAX_LENGTHS.contactEmail) {
+                        setTitleError(
+                          `L'email ne doit pas dépasser ${MAX_LENGTHS.contactEmail} caractères`
+                        );
+                      } else {
+                        setTitleError("");
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg border 
+                      ${titleError ? "border-red-500" : "border-gray-300"} 
+                      dark:border-gray-600 dark:bg-gray-700 dark:text-white 
+                      focus:ring-2 focus:ring-blue-500`}
+                    placeholder="Adresse email"
+                  />
+                  <button
+                    onClick={() => {
+                      handleTextUpdate("contactEmail", texts.contactEmail);
+                      toggleEditing("contactEmail", false);
+                    }}
+                    className={`p-2 ${
+                      titleError
+                        ? "text-gray-400 cursor-not-allowed"
+                        : "text-green-600 hover:text-green-700"
+                    } dark:text-green-500 dark:hover:text-green-400`}
+                    disabled={!!titleError}
+                    title="Sauvegarder"
+                  >
+                    <HiOutlineCheck className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => toggleEditing("contactEmail", false)}
+                    className="p-2 text-red-600 hover:text-red-700 
+                      dark:text-red-500 dark:hover:text-red-400"
+                    title="Annuler"
+                  >
+                    <HiOutlineX className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`mailto:${texts.contactEmail}`}
+                    className="inline-flex items-center gap-2 px-6 py-3 
+                      bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                      transition-colors"
+                  >
+                    <HiOutlineEnvelope className="text-xl" />
+                    Me contacter
+                  </a>
+                  {isLoggedIn && (
+                    <button
+                    // setEditingStates((prev) => ({ ...prev, [field]: value }));
+                      onClick={() => setEditingStates((prev) => ({ ...prev, ["contactEmail"]: true }))}
+                      className="p-2 text-gray-600 hover:text-gray-700 
+                        dark:text-gray-400 dark:hover:text-gray-300"
+                      title="Modifier l'email"
+                    >
+                      <HiOutlinePencil className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </section>
         </div>

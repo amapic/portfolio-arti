@@ -134,6 +134,36 @@ export const EditExperienceModal = ({ experience, onClose, onSave }: EditExperie
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Réalisations</label>
+            {editedExperience.achievements.map((achievement, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <input
+                  type="text"
+                  value={achievement}
+                  onChange={(e) => handleAchievementChange(index, e.target.value)}
+                  className="flex-grow p-2 border rounded-lg text-gray-800 dark:text-white bg-white dark:bg-gray-700"
+                  placeholder="Entrez une réalisation"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeAchievement(index)}
+                  className="ml-2 p-2 text-red-500 hover:text-red-700"
+                >
+                  <HiOutlineX className="w-5 h-5" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addAchievement}
+              className="mt-2 flex items-center text-blue-500 hover:text-blue-700"
+            >
+              <HiOutlinePlusCircle className="w-5 h-5 mr-1" />
+              Ajouter une réalisation
+            </button>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Technologies</label>
             {editedExperience.technologies.map((tech, index) => (
               <div key={index} className="flex items-center mb-2">
@@ -163,35 +193,7 @@ export const EditExperienceModal = ({ experience, onClose, onSave }: EditExperie
             </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Réalisations</label>
-            {editedExperience.achievements.map((achievement, index) => (
-              <div key={index} className="flex items-center mb-2">
-                <input
-                  type="text"
-                  value={achievement}
-                  onChange={(e) => handleAchievementChange(index, e.target.value)}
-                  className="flex-grow p-2 border rounded-lg text-gray-800 dark:text-white bg-white dark:bg-gray-700"
-                  placeholder="Entrez une réalisation"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeAchievement(index)}
-                  className="ml-2 p-2 text-red-500 hover:text-red-700"
-                >
-                  <HiOutlineX className="w-5 h-5" />
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addAchievement}
-              className="mt-2 flex items-center text-blue-500 hover:text-blue-700"
-            >
-              <HiOutlinePlusCircle className="w-5 h-5 mr-1" />
-              Ajouter une réalisation
-            </button>
-          </div>
+          
 
           <div className="flex gap-2 justify-end pt-4">
             <button
