@@ -1,6 +1,10 @@
-import Image from 'next/image';
-import { Experience } from '../../types/experience';
-import { HiOutlinePlusCircle, HiOutlineTrash, HiOutlinePencil } from 'react-icons/hi2';
+import Image from "next/image";
+import { Experience } from "../../types/experience";
+import {
+  HiOutlinePlusCircle,
+  HiOutlineTrash,
+  HiOutlinePencil,
+} from "react-icons/hi2";
 
 interface ExperienceSectionProps {
   experiences: Experience[];
@@ -11,15 +15,28 @@ interface ExperienceSectionProps {
   setIsEditingExperience: (isEditing: boolean) => void;
 }
 
-export const ExperienceSection = ({ experiences, isLoggedIn, onDelete, onAdd, setExperienceToEdit,setIsEditingExperience }: ExperienceSectionProps) => {
+export const ExperienceSection = ({
+  experiences,
+  isLoggedIn,
+  onDelete,
+  onAdd,
+  setExperienceToEdit,
+  setIsEditingExperience,
+}: ExperienceSectionProps) => {
   return (
-    <section id="experience" className="py-20 px-8 bg-gray-50 dark:bg-gray-800/50">
+    <section
+      id="experience"
+      className="py-20 px-8 bg-gray-50 dark:bg-gray-800/50"
+    >
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold mb-12">Expérience Professionnelle</h2>
-        
+
         <div className="space-y-8">
           {experiences.map((experience) => (
-            <div key={experience.id} className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg relative">
+            <div
+              key={experience.id}
+              className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg relative"
+            >
               {/* {isLoggedIn && (
                 <button
                   onClick={() => onDelete(experience.id)}
@@ -34,7 +51,9 @@ export const ExperienceSection = ({ experiences, isLoggedIn, onDelete, onAdd, se
               <div className="flex flex-col md:flex-row justify-between mb-6">
                 <div>
                   <div className="flex items-center">
-                    <h3 className="text-2xl font-semibold mb-2">{experience.title}</h3>
+                    <h3 className="text-2xl font-semibold mb-2">
+                      {experience.title}
+                    </h3>
                     {isLoggedIn && (
                       <>
                         <button
@@ -58,16 +77,23 @@ export const ExperienceSection = ({ experiences, isLoggedIn, onDelete, onAdd, se
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <p className="text-xl text-blue-600 dark:text-blue-400">{experience.company}</p>
-                    {/* {experience.logoUrl && (
-                      <Image 
+                    <p className="text-xl text-blue-600 dark:text-blue-400">
+                      {experience.company}
+                    </p>
+                    {experience.logoUrl && (
+                      <img
                         src={experience.logoUrl}
                         alt={`Logo ${experience.company}`}
-                        width={30}
-                        height={30}
-                        className="object-contain"
+                        className="w-[30px] h-[30px] object-contain"
                       />
-                    )} */}
+                      // <Image
+                      //   src={experience.logoUrl}
+                      //   alt={`Logo ${experience.company}`}
+                      //   width={30}
+                      //   height={30}
+                      //   className="object-contain"
+                      // />
+                    )}
                   </div>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">
@@ -78,11 +104,15 @@ export const ExperienceSection = ({ experiences, isLoggedIn, onDelete, onAdd, se
 
               <div className="prose dark:prose-invert max-w-none">
                 <p>{experience.description}</p>
-                <p className="mb-6">
-                  <span className="text-blue-600 font-semibold">➜</span> {experience.highlight}
-                </p>
+                {experience.highlight!='' && <p className="mb-6">
+                  <span className="text-blue-600 font-semibold">➜</span>{" "}
+                    {experience.highlight}
+                  </p>
+                }
 
-                <h4 className="text-lg font-semibold mb-4">Réalisations principales :</h4>
+                <h4 className="text-lg font-semibold mb-4">
+                  Réalisations principales :
+                </h4>
                 <ul className="space-y-3">
                   {experience.achievements.map((achievement, index) => (
                     <li key={index} className="flex items-start gap-2">
@@ -92,17 +122,23 @@ export const ExperienceSection = ({ experiences, isLoggedIn, onDelete, onAdd, se
                   ))}
                 </ul>
 
-                <h4 className="text-lg font-semibold mt-6 mb-4">Technologies et outils utilisés :</h4>
-                <div className="flex flex-wrap gap-2">
-                  {experience.technologies.map((tech) => (
-                    <span 
-                      key={tech}
-                      className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
+                {experience.technologies[0]!=''  && (
+                  <>
+                    <h4 className="text-lg font-semibold mt-6 mb-4">
+                      Technologies et outils utilisés :
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {experience.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -123,4 +159,4 @@ export const ExperienceSection = ({ experiences, isLoggedIn, onDelete, onAdd, se
       </div>
     </section>
   );
-}; 
+};

@@ -12,12 +12,15 @@ export const DarkModeToggle = () => {
   }, []);
 
   const toggleDarkMode = () => {
+    
     if (document.documentElement.classList.contains('dark')) {
+      document.body.style.setProperty('--foreground', '#444444');
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
       setIsDarkMode(false);
     } else {
       document.documentElement.classList.add('dark');
+      document.body.style.setProperty('--foreground', '#ededed');
       localStorage.setItem('theme', 'dark');
       setIsDarkMode(true);
     }

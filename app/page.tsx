@@ -11,7 +11,6 @@ import {
 } from "react-icons/hi";
 import {
   HiOutlineEnvelope,
-  
   HiOutlineWrenchScrewdriver,
   HiOutlineDocumentArrowUp,
 } from "react-icons/hi2";
@@ -31,8 +30,8 @@ import { Experience } from "./types/experience";
 import { api } from "./services/api";
 import { HiOutlinePencil } from "react-icons/hi2";
 import { LoginModal } from "./components/modals/LoginModal";
-// import { EditExperienceModal } from './components/modals/EditExperienceModal';
-// import { DarkModeToggle } from './components/DarkModeToggle';
+import { EditExperienceModal } from './components/modals/EditExperienceModal';
+import { DarkModeToggle } from './components/DarkModeToggle';
 
 interface Card {
   id: string;
@@ -805,7 +804,7 @@ export default function Home() {
                 )}
               </div>
             )}
-            {/* {isLoggedIn && <DarkModeToggle />} */}
+            <DarkModeToggle />
           </div>
         </div>
       </header>

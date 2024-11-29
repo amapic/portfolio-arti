@@ -6,6 +6,8 @@ interface LoginModalProps {
   onLogin: (success: boolean) => void;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL_LOGIN;
+
 export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,15 +19,15 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
+        // credentials: 'include',
         body: JSON.stringify({ password }),
       });
-
+      // console.log(`${API_URL}:4010/login`);
       if (!response.ok) {
         throw new Error('Mot de passe incorrect');
       }

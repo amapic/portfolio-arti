@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 /* Ajoutez une transition douce pour les changements de thème */
-* {
+/* * {
   transition-property: color, background-color, border-color;
   transition-duration: 200ms;
   transition-timing-function: ease-in-out;
-}
+} */
 
 /* Évitez la transition sur les éléments qui ne devraient pas en avoir */
-.no-transition {
+/* .no-transition {
   transition: none !important;
-}
+} */
 
 :root {
   --background: #ffffff;
@@ -23,6 +23,13 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ff0000;
   }
 }
 

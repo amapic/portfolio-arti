@@ -8,7 +8,7 @@ import * as Hi from 'react-icons/hi';
 import * as Hi2 from 'react-icons/hi2';
 import ConfirmationModal from './../components/ConfirmationModal';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ;
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
