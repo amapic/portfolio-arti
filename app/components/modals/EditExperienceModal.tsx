@@ -15,7 +15,7 @@ export const EditExperienceModal = ({ experience, onClose, onSave }: EditExperie
   const [editedExperience, setEditedExperience] = useState<Experience>(experience);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(experience.logoUrl || "");
-  const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL ;
+  const IMAGE_API_URL:string = process.env.NEXT_PUBLIC_IMAGE_API_URL ;
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(editedExperience);

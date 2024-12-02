@@ -4,10 +4,11 @@ import {
   HiOutlineX,
   HiOutlinePhotograph,
 } from "react-icons/hi";
-const IMAGE_API_URL =
+const IMAGE_API_URL:string =
   process.env.NEXT_PUBLIC_IMAGE_API_URL ;
 import Image from "next/image";
-export const AddExperienceModal = ({ onClose, onAdd }) => {
+import { Experience } from "app/types/experience";
+export const AddExperienceModal = ({ onClose, onAdd }: { onClose: () => void, onAdd: (experience: Experience) => void }) => {
   const [experience, setExperience] = useState({
     title: "",
     company: "",
@@ -22,12 +23,12 @@ export const AddExperienceModal = ({ onClose, onAdd }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAdd(experience);
   };
 
-  const handleTechnologyChange = (index, value) => {
+  const handleTechnologyChange = (index: number, value: string) => {
     const newTechnologies = [...experience.technologies];
     newTechnologies[index] = value;
     setExperience((prev) => ({ ...prev, technologies: newTechnologies }));
@@ -40,7 +41,7 @@ export const AddExperienceModal = ({ onClose, onAdd }) => {
     }));
   };
 
-  const removeTechnology = (index) => {
+  const removeTechnology = (index: number) => {
     const newTechnologies = experience.technologies.filter(
       (_, i) => i !== index
     );
@@ -252,7 +253,7 @@ export const AddExperienceModal = ({ onClose, onAdd }) => {
                 }))
               }
               className="w-full p-2 border rounded-lg text-gray-800 dark:text-white bg-white dark:bg-gray-700"
-              rows="3"
+              // rows={3}  
               // required
             ></textarea>
           </div>
