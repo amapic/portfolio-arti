@@ -577,9 +577,9 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout?projectId=${PROJECT_ID}`, {
+      const response = await fetch(`${API_URL}/api/logout?projectId=${PROJECT_ID}`, {
         method: 'POST',
-        credentials: 'include',
+        // credentials: 'include', // Retiré temporairement pour éviter l'erreur CORS
       });
 
       if (response.ok) {
