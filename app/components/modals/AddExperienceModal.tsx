@@ -4,8 +4,9 @@ import {
   HiOutlineX,
   HiOutlinePhotograph,
 } from "react-icons/hi";
-const IMAGE_API_URL:string =
+const IMAGE_API_URL =
   process.env.NEXT_PUBLIC_IMAGE_API_URL ;
+const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
 import Image from "next/image";
 import { Experience } from "app/types/experience";
 export const AddExperienceModal = ({ onClose, onAdd }: { onClose: () => void, onAdd: (experience: Experience) => void }) => {
@@ -92,7 +93,7 @@ export const AddExperienceModal = ({ onClose, onAdd }: { onClose: () => void, on
 
       // Envoyer l'image au serveur
       console.log("IMAGE_API_URL",IMAGE_API_URL)
-      const response = await fetch(IMAGE_API_URL, {
+      const response = await fetch(`${IMAGE_API_URL}?projectId=${PROJECT_ID}`, {
         method: "POST",
         body: formData,
       });
@@ -103,10 +104,17 @@ export const AddExperienceModal = ({ onClose, onAdd }: { onClose: () => void, on
       // const data=file
       // console.log("fhdgfgf", data);
       // Mettre à jour l'URL du logo et l'aperçu
-      setExperience((prev) => ({ ...prev, logoUrl: data.url.replace("http://amaurypichat.fr:4001","http://amaurypichat.fr:5001") }));
+      setExperience((prev) => ({ ...prev, logoUrl: data.url.replace("http://","https://") }));
       setPreviewUrl(
-        data.url.replace("http://amaurypichat.fr:4001","http://amaurypichat.fr:5001")
+        data.url.replace("http://46.101.250.41","https://dev2site.net")
       );
+
+      // setExperience((prev) => ({ ...prev, logoUrl: data.url }));
+      // setPreviewUrl(
+      //   data.url
+      // );
+
+      
     } catch (error) {
       console.error("Erreur upload:", error);
       alert("Erreur lors de l'upload de l'image");

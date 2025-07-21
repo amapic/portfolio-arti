@@ -7,6 +7,7 @@ interface LoginModalProps {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL_LOGIN;
+const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
 
 export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
   const [password, setPassword] = useState('');
@@ -19,7 +20,7 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/login`, {
+      const response = await fetch(`${API_URL}/login?projectId=${PROJECT_ID}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

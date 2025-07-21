@@ -2,6 +2,7 @@ import { Card } from '../types/card';
 import { Experience } from '../types/experience';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
 
 const defaultHeaders = {
   'Content-Type': 'application/json',
@@ -17,7 +18,7 @@ export const api = {
 
   experiences: {
     getAll: async (): Promise<Experience[]> => {
-      const response = await fetch(`${API_URL}/api/experiences`, {
+      const response = await fetch(`${API_URL}/api/experiences?projectId=${PROJECT_ID}`, {
         ...fetchConfig,
         method: 'GET',
       });
@@ -27,7 +28,7 @@ export const api = {
 
     add: async (experience: Omit<Experience, 'id'>): Promise<Experience> => {
       console.log(experience)
-      const response = await fetch(`${API_URL}/api/experiences`, {
+      const response = await fetch(`${API_URL}/api/experiences?projectId=${PROJECT_ID}`, {
         ...fetchConfig,
         method: 'POST',
         body: JSON.stringify(experience),
@@ -38,7 +39,7 @@ export const api = {
 
     delete: async (id: string): Promise<void> => {
       
-      const response = await fetch(`${API_URL}/api/experiences/${id}`, {
+      const response = await fetch(`${API_URL}/api/experiences/${id}?projectId=${PROJECT_ID}`, {
         ...fetchConfig,
         method: 'DELETE',
       });

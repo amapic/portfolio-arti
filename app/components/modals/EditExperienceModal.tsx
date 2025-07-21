@@ -15,7 +15,8 @@ export const EditExperienceModal = ({ experience, onClose, onSave }: EditExperie
   const [editedExperience, setEditedExperience] = useState<Experience>(experience);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(experience.logoUrl || "");
-  const IMAGE_API_URL:string = process.env.NEXT_PUBLIC_IMAGE_API_URL ;
+  const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL ;
+  const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(editedExperience);
@@ -79,7 +80,7 @@ export const EditExperienceModal = ({ experience, onClose, onSave }: EditExperie
       const formData = new FormData();
       formData.append("file", file);
       console.log("IMAGE_API_URL",IMAGE_API_URL)
-      const response = await fetch(IMAGE_API_URL, {
+      const response = await fetch(`${IMAGE_API_URL}?projectId=${PROJECT_ID}`, {
         method: "POST",
         body: formData,
       });
@@ -87,11 +88,15 @@ export const EditExperienceModal = ({ experience, onClose, onSave }: EditExperie
       if (!response.ok) throw new Error("Erreur lors de l'upload");
 
       const data = await response.json();
-      console.log("data",data.url)
+      // console.log("data",data.url)
      
-      // console.log("data",data.url.replace("http://amaurypichat.fr:4001","http://amaurypichat.fr:5001"))
-      setEditedExperience(prev => ({ ...prev, logoUrl: data.url.replace("http://amaurypichat.fr:4001","http://amaurypichat.fr:5001") }));
-      setPreviewUrl(data.url.replace("http://amaurypichat.fr:4001","http://amaurypichat.fr:5001"));
+      // console.log("data",data.url)
+      // aremettre is besoin
+      setEditedExperience(prev => ({ ...prev, logoUrl: data.url.replace("http://","https://") }));
+      setPreviewUrl(data.url.replace("http://","https://"));
+
+      // setEditedExperience(prev => ({ ...prev, logoUrl: data.url }));
+      // setPreviewUrl(data.url);
     } catch (error) {
       console.error("Erreur upload:", error);
       alert("Erreur lors de l'upload de l'image");

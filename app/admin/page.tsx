@@ -9,6 +9,7 @@ import * as Hi2 from 'react-icons/hi2';
 import ConfirmationModal from './../components/ConfirmationModal';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ;
+const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
@@ -87,7 +88,7 @@ function AdminDashboard() {
 
   const fetchSections = async () => {
     try {
-      const response = await fetch(`${API_URL}/sections`);
+      const response = await fetch(`${API_URL}/sections?projectId=${PROJECT_ID}`);
       const data = await response.json();
       setSections(data);
     } catch (error) {
@@ -99,7 +100,7 @@ function AdminDashboard() {
     console.log(newSection)
     e.preventDefault()
     try {
-      const response = await fetch(`${API_URL}/sections`, {
+      const response = await fetch(`${API_URL}/sections?projectId=${PROJECT_ID}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +119,7 @@ function AdminDashboard() {
 
   const handleDeleteSection = async (id: string) => {
     try {
-      const response = await fetch(`${API_URL}/sections/${id}`, {
+      const response = await fetch(`${API_URL}/sections/${id}?projectId=${PROJECT_ID}`, {
         method: 'DELETE',
       });
 

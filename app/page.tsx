@@ -32,6 +32,9 @@ import { HiOutlinePencil } from "react-icons/hi2";
 import { LoginModal } from "./components/modals/LoginModal";
 import { EditExperienceModal } from './components/modals/EditExperienceModal';
 import { DarkModeToggle } from './components/DarkModeToggle';
+import { HeroSection } from './components/HeroSection';
+import CardPerso from './components/Card';
+import { ContactSection } from './components/ContactSection';
 
 interface Card {
   id: string;
@@ -187,9 +190,12 @@ export default function Home() {
 
   // Au début du composant, ajoutez une constante pour l'URL de l'API
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
 
   useEffect(() => {
-    fetch(`${API_URL}/api/texts`)
+  
+  alert("En restant connecté, modifiez et créez n'importe quel champ ou valeur. Les valeurs sont réinitialisées toutes les 10 minutes")
+    fetch(`${API_URL}/api/texts?projectId=${PROJECT_ID}`)
       .then((res) => res.json())
       .then((data) => setTexts(data))
       .catch((error) => console.error("Error loading texts:", error));
@@ -197,7 +203,7 @@ export default function Home() {
 
   // Charger les cartes au démarrage
   useEffect(() => {
-    fetch(`${API_URL}/api/cards`)
+    fetch(`${API_URL}/api/cards?projectId=${PROJECT_ID}`)
       .then((res) => res.json())
       .then((data) => setCards(data))
       .catch((error) => console.error("Error loading cards:", error));
@@ -233,7 +239,7 @@ export default function Home() {
     if (checkLength(value, key)) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/texts`, {
+      const response = await fetch(`${API_URL}/api/texts?projectId=${PROJECT_ID}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -265,7 +271,7 @@ export default function Home() {
       e.preventDefault();
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/cards`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/cards?projectId=${PROJECT_ID}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -395,7 +401,7 @@ export default function Home() {
                 if (!cardToDelete) return;
                 try {
                   const response = await fetch(
-                    `${API_URL}/api/cards/${cardToDelete}`,
+                    `${API_URL}/api/cards/${cardToDelete}?projectId=${PROJECT_ID}`,
                     {
                       method: "DELETE",
                     }
@@ -471,7 +477,7 @@ export default function Home() {
 
     try {
       const response = await fetch(
-        `${API_URL}/api/experiences/${experienceToDelete}`,
+        `${API_URL}/api/experiences/${experienceToDelete}?projectId=${PROJECT_ID}`,
         {
           method: "DELETE",
         }
@@ -504,7 +510,7 @@ export default function Home() {
   // Modifiez la fonction handleCvUrlUpdate
   const handleCvUrlUpdate = async (newUrl: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/texts`, {
+      const response = await fetch(`${API_URL}/api/texts?projectId=${PROJECT_ID}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -524,7 +530,7 @@ export default function Home() {
 
   const handleLinkedInUrlUpdate = async (newUrl: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/texts`, {
+      const response = await fetch(`${API_URL}/api/texts?projectId=${PROJECT_ID}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -545,7 +551,7 @@ export default function Home() {
   const handleEditExperience = async (updatedExperience: Experience) => {
     try {
       const response = await fetch(
-        `${API_URL}/api/experiences/${updatedExperience.id}`,
+        `${API_URL}/api/experiences/${updatedExperience.id}?projectId=${PROJECT_ID}`,
         {
           method: "PUT",
           headers: {
@@ -571,7 +577,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout?projectId=${PROJECT_ID}`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -825,283 +831,35 @@ export default function Home() {
       {/* Main Content */}
       <main className="pt-32 px-8">
         <div className="max-w-6xl mx-auto">
-          {/* Hero Section */}
-          <section className="mb-20">
-            {isLoggedIn && !editingStates.mainTitle ? (
-              <div className="group relative">
-                <h2 className="text-4xl font-bold mb-6">{texts.mainTitle}</h2>
-                <button
-                  onClick={() => toggleEditing("mainTitle", true)}
-                  className="absolute -right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  ✏️
-                </button>
-              </div>
-            ) : isLoggedIn && editingStates.mainTitle ? (
-              <div className="space-y-2">
-                <div className="flex gap-2 items-start">
-                  <input
-                    type="text"
-                    value={texts.mainTitle}
-                    onChange={(e) => {
-                      const newTitle = e.target.value;
-                      setTexts((prev) => ({ ...prev, mainTitle: newTitle }));
-                      if (newTitle.length > MAX_LENGTHS.mainTitle) {
-                        setTitleError(
-                          `Le titre ne doit pas dépasser ${MAX_LENGTHS.mainTitle} caractères`
-                        );
-                      } else {
-                        setTitleError("");
-                      }
-                    }}
-                    className={`text-4xl font-bold bg-transparent border-b-2 
-                      ${titleError ? "border-red-500" : "border-blue-500"} 
-                      focus:outline-none focus:border-blue-700 w-full`}
-                    autoFocus
-                  />
-                  <button
-                    onClick={() => {
-                      handleTextUpdate("mainTitle", texts.mainTitle);
-                      toggleEditing("mainTitle", false);
-                    }}
-                    className={`px-4 py-2 ${
-                      titleError
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
-                    } text-white rounded-lg transition-colors`}
-                    disabled={!!titleError}
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => toggleEditing("mainTitle", false)}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-
-                {titleError && (
-                  <div className="text-red-500 text-sm">{titleError}</div>
-                )}
-
-                <div
-                  className={`text-sm ${
-                    texts.mainTitle.length > MAX_LENGTHS.mainTitle
-                      ? "text-red-500"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {texts.mainTitle.length}/{MAX_LENGTHS.mainTitle} caractères
-                </div>
-              </div>
-            ) : (
-              <h2 className="text-4xl font-bold mb-6">{texts.mainTitle}</h2>
-            )}
-
-            {isLoggedIn && !editingStates.subtitle ? (
-              <div className="group relative">
-                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mb-4">
-                  {texts.subtitle}
-                </p>
-                <button
-                  onClick={() => toggleEditing("subtitle", true)}
-                  className="absolute -right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  ✏️
-                </button>
-              </div>
-            ) : isLoggedIn && editingStates.subtitle ? (
-              <div className="space-y-2">
-                <div className="flex gap-2 items-start">
-                  <input
-                    type="text"
-                    value={texts.subtitle}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setTexts((prev) => ({ ...prev, subtitle: newValue }));
-                      if (newValue.length > MAX_LENGTHS.subtitle) {
-                        setTitleError(
-                          `Le texte ne doit pas dépasser ${MAX_LENGTHS.subtitle} caractères`
-                        );
-                      } else {
-                        setTitleError("");
-                      }
-                    }}
-                    className={`text-xl text-gray-600 dark:text-gray-400 bg-transparent border-b-2 
-                      ${titleError ? "border-red-500" : "border-blue-500"} 
-                      focus:outline-none focus:border-blue-700 w-full`}
-                    autoFocus
-                  />
-                  <button
-                    onClick={() => {
-                      handleTextUpdate("subtitle", texts.subtitle);
-                      toggleEditing("subtitle", false);
-                    }}
-                    className={`px-4 py-2 ${
-                      titleError
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
-                    } text-white rounded-lg transition-colors`}
-                    disabled={!!titleError}
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => toggleEditing("subtitle", false)}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-
-                {titleError && (
-                  <div className="text-red-500 text-sm">{titleError}</div>
-                )}
-
-                <div
-                  className={`text-sm ${
-                    texts.subtitle.length > MAX_LENGTHS.subtitle
-                      ? "text-red-500"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {texts.subtitle.length}/{MAX_LENGTHS.subtitle} caractères
-                </div>
-              </div>
-            ) : (
-              <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mb-4">
-                {texts.subtitle}
-              </p>
-            )}
-
-            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-              <HiOutlineAcademicCap className="text-xl" />
-              {isLoggedIn && !editingStates.documentumText ? (
-                <div className="group relative">
-                  <p className="text-lg">{texts.documentumText}</p>
-                  <button
-                    onClick={() => toggleEditing("documentumText", true)}
-                    className="absolute -right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    ✏️
-                  </button>
-                </div>
-              ) : isLoggedIn && editingStates.documentumText ? (
-                <div className="space-y-2">
-                  <div className="flex gap-2 items-start">
-                    <input
-                      type="text"
-                      value={texts.documentumText}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setTexts((prev) => ({
-                          ...prev,
-                          documentumText: newValue,
-                        }));
-                        if (newValue.length > MAX_LENGTHS.documentumText) {
-                          setTitleError(
-                            `Le texte ne doit pas dépasser ${MAX_LENGTHS.documentumText} caractères`
-                          );
-                        } else {
-                          setTitleError("");
-                        }
-                      }}
-                      className={`text-lg bg-transparent border-b-2 
-                        ${titleError ? "border-red-500" : "border-blue-500"} 
-                        focus:outline-none focus:border-blue-700 w-full`}
-                      autoFocus
-                    />
-                    <button
-                      onClick={() => {
-                        handleTextUpdate(
-                          "documentumText",
-                          texts.documentumText
-                        );
-                        toggleEditing("documentumText", false);
-                      }}
-                      className={`px-4 py-2 ${
-                        titleError
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 hover:bg-blue-700"
-                      } text-white rounded-lg transition-colors`}
-                      disabled={!!titleError}
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => toggleEditing("documentumText", false)}
-                      className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-
-                  {titleError && (
-                    <div className="text-red-500 text-sm">{titleError}</div>
-                  )}
-
-                  <div
-                    className={`text-sm ${
-                      texts.documentumText.length > MAX_LENGTHS.documentumText
-                        ? "text-red-500"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {texts.documentumText.length}/{MAX_LENGTHS.documentumText}{" "}
-                    caractères
-                  </div>
-                </div>
-              ) : (
-                <p className="text-lg">{texts.documentumText}</p>
-              )}
-            </div>
-          </section>
+          <HeroSection
+            texts={texts}
+            isLoggedIn={isLoggedIn}
+            editingStates={editingStates}
+            titleError={titleError}
+            MAX_LENGTHS={MAX_LENGTHS}
+            toggleEditing={toggleEditing}
+            handleTextUpdate={handleTextUpdate}
+            setTexts={setTexts}
+            setTitleError={setTitleError}
+          />
 
           {/* Services Section */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            {cards.map((card) => {
-              const IconComponent = Hi2Icons[
-                card.icon as keyof typeof Hi2Icons
-              ] as IconType;
-              return (
-                <div
-                  key={card.id}
-                  className="p-6 rounded-xl border border-gray-200 dark:border-gray-700 
-                    transition-all duration-500 ease-out
-                    transform perspective-1000 hover:scale-105 hover:shadow-xl
-                    relative group
-                    before:absolute before:inset-0 before:z-[-1] before:transition-all before:duration-500
-                    before:bg-gradient-to-r before:from-blue-50 before:to-blue-100 dark:before:from-blue-900/20 dark:before:to-blue-800/20
-                    before:opacity-0 hover:before:opacity-100 before:rounded-xl"
-                >
-                  {/* Bouton de suppression */}
-                  {isLoggedIn && (
-                    <button
-                      onClick={() => {
-                        setCardToDelete(card.id);
-                        setIsDeleteModalOpen(true);
-                      }}
-                      className="absolute top-2 right-2 p-2 text-red-500 opacity-0 group-hover:opacity-100 
-                        transition-opacity hover:text-red-700 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50"
-                      aria-label="Supprimer la carte"
-                    >
-                      <HiOutlineTrash className="w-5 h-5" />
-                    </button>
-                  )}
+            {cards.map((card) => (
+              <CardPerso
+                key={card.id}
+                id={card.id}
+                icon={card.icon}
+                title={card.title}
+                content={card.content}
+                isLoggedIn={isLoggedIn}
+                onDelete={(id) => {
+                  setCardToDelete(id);
+                  setIsDeleteModalOpen(true);
+                }}
+              />
+            ))}
 
-                  <div className="text-blue-600 mb-4">
-                    <IconComponent className="text-4xl" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-4">{card.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {card.content}
-                  </p>
-                </div>
-              );
-            })}
-
-            {/* Bouton d'ajout pour l'admin */}
             {isLoggedIn && (
               <button
                 onClick={() => setIsAddCardModalOpen(true)}
@@ -1118,88 +876,17 @@ export default function Home() {
           </section>
 
           {/* Contact Section */}
-          <section className="mb-20">
-            <div className="p-8 rounded-xl bg-gray-100 dark:bg-gray-800">
-              <h2 className="text-2xl font-bold mb-4">
-                Démarrons votre projet
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Contactez-moi pour discuter de vos besoins en gestion
-                documentaire.
-              </p>
-              
-              {isLoggedIn && editingStates.contactEmail ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="email"
-                    value={texts.contactEmail}
-                    onChange={(e) => {
-                      const newValue = e.target.value;
-                      setTexts(prev => ({ ...prev, contactEmail: newValue }));
-                      if (newValue.length > MAX_LENGTHS.contactEmail) {
-                        setTitleError(
-                          `L'email ne doit pas dépasser ${MAX_LENGTHS.contactEmail} caractères`
-                        );
-                      } else {
-                        setTitleError("");
-                      }
-                    }}
-                    className={`px-4 py-2 rounded-lg border 
-                      ${titleError ? "border-red-500" : "border-gray-300"} 
-                      dark:border-gray-600 dark:bg-gray-700 dark:text-white 
-                      focus:ring-2 focus:ring-blue-500`}
-                    placeholder="Adresse email"
-                  />
-                  <button
-                    onClick={() => {
-                      handleTextUpdate("contactEmail", texts.contactEmail);
-                      toggleEditing("contactEmail", false);
-                    }}
-                    className={`p-2 ${
-                      titleError
-                        ? "text-gray-400 cursor-not-allowed"
-                        : "text-green-600 hover:text-green-700"
-                    } dark:text-green-500 dark:hover:text-green-400`}
-                    disabled={!!titleError}
-                    title="Sauvegarder"
-                  >
-                    <HiOutlineCheck className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => toggleEditing("contactEmail", false)}
-                    className="p-2 text-red-600 hover:text-red-700 
-                      dark:text-red-500 dark:hover:text-red-400"
-                    title="Annuler"
-                  >
-                    <HiOutlineX className="w-5 h-5" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <a
-                    href={`mailto:${texts.contactEmail}`}
-                    className="inline-flex items-center gap-2 px-6 py-3 
-                      bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                      transition-colors"
-                  >
-                    <HiOutlineEnvelope className="text-xl" />
-                    Me contacter
-                  </a>
-                  {isLoggedIn && (
-                    <button
-                    // setEditingStates((prev) => ({ ...prev, [field]: value }));
-                      onClick={() => setEditingStates((prev) => ({ ...prev, ["contactEmail"]: true }))}
-                      className="p-2 text-gray-600 hover:text-gray-700 
-                        dark:text-gray-400 dark:hover:text-gray-300"
-                      title="Modifier l'email"
-                    >
-                      <HiOutlinePencil className="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          </section>
+          <ContactSection
+            texts={texts}
+            isLoggedIn={isLoggedIn}
+            editingStates={editingStates}
+            titleError={titleError}
+            MAX_LENGTHS={MAX_LENGTHS}
+            handleTextUpdate={handleTextUpdate}
+            toggleEditing={toggleEditing}
+            setTexts={setTexts}
+            setTitleError={setTitleError}
+          />
         </div>
       </main>
 
@@ -1251,19 +938,19 @@ export default function Home() {
           <HiOutlineDocumentSearch className="text-xl text-blue-600" />
           <span className="pr-2">Expérience</span>
         </a>
-        <a
+        {/* <a
           href="#formation"
           className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 flex items-center gap-2 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
         >
           <HiOutlineAcademicCap className="text-xl text-blue-600" />
           <span className="pr-2">Formation</span>
-        </a>
+        </a> */}
       </div>
 
       {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-gray-700 py-8 px-8">
         <div className="max-w-6xl mx-auto text-center text-gray-600 dark:text-gray-400">
-          © {new Date().getFullYear()} Amaury PICHAT - Consultant GED
+          {/* © {new Date().getFullYear()} Amaury PICHAT - Consultant GED */}
         </div>
       </footer>
 

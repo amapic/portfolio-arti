@@ -57,26 +57,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className="scroll-smooth">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <script
-          // dangerouslySetInnerHTML={{
-          //   __html: `
-          //     try {
-          //       if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          //         document.documentElement.classList.add('dark')
-          //       } else {
-          //         document.documentElement.classList.remove('dark')
-          //       }
-          //     } catch (_) {}
-          //   `,
-          // }}
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const theme = localStorage.getItem('theme') || 
+                  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                
+                if (theme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                }
+              })()
+            `,
+          }}
         />
       </head>
       <body>
-         <ThemeProvider> 
-          {children}
-         </ThemeProvider> 
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
