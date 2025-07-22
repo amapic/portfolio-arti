@@ -1,0 +1,11 @@
+{
+  "name": "download-picsum-images",
+  "version": "1.0.0",
+  "description": "Script pour télécharger des images depuis Picsum",
+  "main": "downloadImages.js",
+  "scripts": {
+    "download": "node downloadImages.js"
+  },
+  "keywords": ["picsum", "images", "download"],
+  "author": "Portfolio Project"
+}
