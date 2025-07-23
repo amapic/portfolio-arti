@@ -1,0 +1,141 @@
+{
+  "images": [
+    
+    {
+      "id": "1753209266946uep5bx6ek",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753209266703-196198538.PNG",
+      "position": 5,
+      "selected": false,
+      "category": "Opera",
+      "alt": "Image Dance",
+      "titre": "Danse Artistique",
+      "sousTitre": "Mouvement et grâce en harmonie",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T18:34:26.946Z",
+      "updated_at": "2025-07-22T18:47:50.339Z"
+    },
+    {
+      "id": "17532109210440kb1si00r",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753210920911-953557526.jpg",
+      "position": 6,
+      "selected": true,
+      "category": "Theater",
+      "alt": "tulipe",
+      "titre": "Tulipe Éclatante",
+      "sousTitre": "Beauté printanière en fleur",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T19:02:01.044Z",
+      "updated_at": "2025-07-22T21:34:02.701Z"
+    },
+    {
+      "id": "17532109580314l1yv1s5b",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753210957902-850515857.jpg",
+      "position": 7,
+      "selected": true,
+      "category": "Theater",
+      "alt": "arbre",
+      "titre": "Arbre Majestueux",
+      "sousTitre": "Symbole de force et d'ancrage",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T19:02:38.031Z",
+      "updated_at": "2025-07-22T19:04:36.015Z"
+    },
+    {
+      "id": "1753210985228f5vqsjjk2",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753210985090-545045453.jpg",
+      "position": 8,
+      "selected": true,
+      "category": "Theater",
+      "alt": "ciel",
+      "titre": "Ciel Infini",
+      "sousTitre": "Immensité et liberté céleste",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T19:03:05.228Z",
+      "updated_at": "2025-07-22T21:34:25.008Z"
+    },
+    {
+      "id": "1753210999111eq1970wdj",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753210998991-233580877.jpg",
+      "position": 9,
+      "selected": true,
+      "category": "Dance",
+      "alt": "ciel 2",
+      "titre": "Ciel Dramatique",
+      "sousTitre": "Nuances et contrastes atmosphériques",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T19:03:19.111Z",
+      "updated_at": "2025-07-22T19:04:31.269Z"
+    },
+    {
+      "id": "1753211019969xlfg8qch4",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753211019856-976378714.jpg",
+      "position": 10,
+      "selected": true,
+      "category": "Theater",
+      "alt": "aurore boréale",
+      "titre": "Aurore Boréale",
+      "sousTitre": "Magie lumineuse du grand nord",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T19:03:39.969Z",
+      "updated_at": "2025-07-22T19:04:32.275Z"
+    },
+    {
+      "id": "1753211043390rdf0nzbeq",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753211043276-741400421.jpg",
+      "position": 11,
+      "selected": true,
+      "category": "Theater",
+      "alt": "mer1",
+      "titre": "Mer Apaisante",
+      "sousTitre": "Vagues et sérénité marine",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T19:04:03.390Z",
+      "updated_at": "2025-07-22T19:04:34.026Z"
+    },
+    {
+      "id": "175321106393084n5dqeiw",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753211063806-117415232.jpg",
+      "position": 12,
+      "selected": true,
+      "category": "Circus",
+      "alt": "brouillard",
+      "titre": "Brouillard Mystérieux",
+      "sousTitre": "Voile de mystère et d'émotion",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T19:04:23.930Z",
+      "updated_at": "2025-07-22T19:04:37.536Z"
+    }
+  ]
+}

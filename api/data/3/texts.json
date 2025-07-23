@@ -1,0 +1,28 @@
+{
+  "id": "texts_3_default",
+  "projet": "3",
+  "contact": {
+    "email": "contact@romaindelagarde.fr",
+    "phone": "+336 22 42 23 32",
+    "address": "1 rue Dumont d'Urville",
+    "name": "Romain de Lagarde",
+    "city": "69004 - Lyon",
+    "country": "France"
+  },
+  "about": {
+    "image_url": "/placeholder-portrait.jpg",
+    "image_alt": "Portrait de Romain de Lagarde",
+    "main_text": "Refléter, éblouir, éteindre, estomper, suggérer, diffracter, découper, briller, brouiller : la lumière est l'outil qui me permet de sculpter un volume, une expression artistique, dans un dialogue attentif et continu avec ses utilisations : scénographie, chorégraphie, danse, théâtre, musique et chant mais aussi installation événementielle, espace public et habitat.\n\nDepuis 2007, pour chacun des projets qui me sont confiés, je m'interroge avec empathie et sensibilité sur le langage propre de la lumière, sur la façon dont elle interagit avec nos sens et notre perception de l'espace ou encore comment elle influence notre imagination, nos souvenirs vécus, comment elle sublime et singularise notre environnement pour nous conduire à un émerveillement et provoquer une émotion.",
+    "quote": "Le monde y recommençait tous les jours dans une lumière toujours neuve. Ô lumière ! C'est le cri de tous les personnages placés (...) devant leur destin.",
+    "quote_author": "Albert Camus, L'été.",
+    "links": {
+      "instagram": "https://instagram.com/rdelagarde",
+      "facebook": "https://facebook.com/romain.delagarde",
+      "linkedin": "https://linkedin.com/in/romain-delagarde",
+      "website1": "https://lesarchivesduspectacle.net",
+      "website2": "https://theatre-contemporain.net"
+    }
+  },
+  "created_at": "2025-07-23T10:00:00.000Z",
+  "updated_at": "2025-07-23T10:00:00.000Z"
+}

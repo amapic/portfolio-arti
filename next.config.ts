@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
+  // Supprime les erreurs d'hydration en production
+  reactStrictMode: false,
   // generateRobotsTxt: false,
   // generateManifest: false
 };

@@ -1,0 +1,20 @@
+{
+  "images": [
+    
+    {
+      "id": "1753209266946uep5bx6ek",
+      "projet": "3",
+      "image_url": "https://dev2site.net:4001/uploads/3/1753209266703-196198538.PNG",
+      "position": 5,
+      "selected": true,
+      "category": "Opera",
+      "alt": "Image Dance",
+      "dimension": [
+        1,
+        1
+      ],
+      "created_at": "2025-07-22T18:34:26.946Z",
+      "updated_at": "2025-07-22T18:40:20.706Z"
+    }
+  ]
+}
