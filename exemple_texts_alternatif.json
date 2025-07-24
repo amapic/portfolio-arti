@@ -1,0 +1,30 @@
+{
+  "id": "texts_3_exemple_alternatif",
+  "projet": "3",
+  "contact": {
+    "email": "romain@lightingdesign.fr",
+    "phone": "+33 7 89 12 34 56",
+    "address": "15 avenue de la République",
+    "name": "Romain de Lagarde",
+    "city": "75011 - Paris",
+    "country": "France",
+    "image_url": "/images/contact-studio.jpg",
+    "image_alt": "Romain de Lagarde au téléphone dans son bureau, entouré d'équipements d'éclairage"
+  },
+  "about": {
+    "image_url": "/images/portrait-studio.jpg",
+    "image_alt": "Romain de Lagarde travaillant sur un projet d'éclairage théâtral",
+    "main_text": "Créateur lumière passionné depuis plus de 15 ans, je conçois et réalise des éclairages pour le spectacle vivant, l'événementiel et l'architecture.\n\nMa démarche artistique s'inspire de la poésie de la lumière naturelle pour créer des ambiances uniques qui révèlent l'essence de chaque projet. Que ce soit pour une pièce de théâtre intimiste ou un concert en plein air, chaque installation lumineuse raconte une histoire.\n\nFormé aux Beaux-Arts et diplômé en éclairage scénique, j'accompagne artistes, architectes et organisateurs d'événements dans la concrétisation de leurs visions créatives.",
+    "quote": "La lumière ne révèle pas seulement ce qui est, elle transfigure ce qui pourrait être.",
+    "quote_author": "Jean Nouvel, architecte",
+    "links": {
+      "instagram": "https://instagram.com/romaindelagarde_light",
+      "facebook": "https://facebook.com/romain.delagarde.lighting",
+      "linkedin": "https://linkedin.com/in/romain-delagarde-lighting",
+      "website1": "https://lightingdesign-portfolio.com",
+      "website2": "https://spectacle-lumiere.fr"
+    }
+  },
+  "created_at": "2025-07-23T08:00:00.000Z",
+  "updated_at": "2025-07-23T16:45:00.000Z"
+}

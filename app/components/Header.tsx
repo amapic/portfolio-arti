@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { DarkModeToggle } from './DarkModeToggle';
+import { usePathname } from 'next/navigation';
 import { CategoryNavigation } from './CategoryNavigation';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
 
 export const Header = () => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+  const pathname = usePathname();
+  const isAdminPage = pathname?.startsWith('/admin');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 shadow-md">
@@ -18,37 +20,45 @@ export const Header = () => {
             Portfolio Artistique
           </Link>
           
-          {/* Menu Admin */}
-          <div className="relative">
-            <button
-              onClick={() => setShowCategoryMenu(!showCategoryMenu)}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 
-                hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 
-                rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              Admin Images
-              {showCategoryMenu ? <HiOutlineX className="w-4 h-4" /> : <HiOutlineMenu className="w-4 h-4" />}
-            </button>
-            
-            {/* Dropdown menu avec catégories */}
-            {showCategoryMenu && (
-              <div className="absolute top-full left-0 mt-2 p-4 bg-white dark:bg-gray-800 border border-gray-200 
-                dark:border-gray-700 rounded-lg shadow-lg min-w-[300px] z-50">
-                <div className="text-sm font-medium text-gray-900 dark:text-white mb-3">
-                  Filtrer par catégorie :
-                </div>
-                <CategoryNavigation 
-                  variant="vertical"
-                  className="w-full"
-                  showAllOption={true}
-                />
-              </div>
-            )}
-          </div>
+          {/* Menu Admin - Navigation entre pages admin */}
+          {isAdminPage && (
+            <nav className="flex items-center gap-2 ml-6">
+              <Link
+                href="/admin/images"
+                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                  pathname === '/admin/images' 
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-medium'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                }`}
+              >
+                Images
+              </Link>
+              <Link
+                href="/admin/about"
+                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                  pathname === '/admin/about' 
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-medium'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                }`}
+              >
+                À propos
+              </Link>
+              <Link
+                href="/admin/contact"
+                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                  pathname === '/admin/contact' 
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-medium'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                }`}
+              >
+                Contact
+              </Link>
+            </nav>
+          )}
         </div>
         
         <div className="flex items-center gap-4">
-          <DarkModeToggle />
+          {/* Espace réservé pour d'autres éléments d'interface si nécessaire */}
         </div>
       </div>
       

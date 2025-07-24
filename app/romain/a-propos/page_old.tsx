@@ -58,8 +58,7 @@ const AboutPage: React.FC = () => {
       {/* Header */}
       <PortfolioHeader 
         title="Romain de Lagarde"
-        subtitle="Lighting Designer"
-        currentPage="about"
+        showNavigation={true}
       />
 
       {/* Contenu principal */}

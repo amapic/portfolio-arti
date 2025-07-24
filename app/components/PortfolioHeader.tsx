@@ -33,7 +33,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
           </a>
           <span className="text-gray-400 font-light">|</span>
           <a 
-            href="#contact" 
+            href="/romain/contact" 
             className="w-[100px] text-black no-underline text-lg font-semibold opacity-70 tracking-wide hover:opacity-100 transition-opacity duration-200"
           >
             contact

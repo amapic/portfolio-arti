@@ -1,0 +1,30 @@
+{
+  "id": "texts_3_minimal",
+  "projet": "3",
+  "contact": {
+    "email": "contact@exemple.fr",
+    "phone": "+33 1 23 45 67 89",
+    "address": "123 rue Exemple",
+    "name": "Nom Prénom",
+    "city": "75000 - Paris",
+    "country": "France",
+    "image_url": "/images/contact-photo.jpg",
+    "image_alt": "Photo de contact - description"
+  },
+  "about": {
+    "image_url": "/images/photo.jpg",
+    "image_alt": "Description de l'image",
+    "main_text": "Texte principal de présentation.\n\nDeuxième paragraphe avec plus de détails.",
+    "quote": "Citation inspirante",
+    "quote_author": "Auteur de la citation",
+    "links": {
+      "instagram": "https://instagram.com/username",
+      "facebook": "https://facebook.com/username",
+      "linkedin": "https://linkedin.com/in/username",
+      "website1": "https://site1.com",
+      "website2": "https://site2.com"
+    }
+  },
+  "created_at": "2025-07-23T12:00:00.000Z",
+  "updated_at": "2025-07-23T12:00:00.000Z"
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { ThemeProvider } from './components/ThemeProvider';
+import { AuthProvider } from './components/AuthProvider';
 import { Metadata } from 'next';
 import localFont from "next/font/local";
 import "./globals.css";
@@ -75,7 +76,11 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

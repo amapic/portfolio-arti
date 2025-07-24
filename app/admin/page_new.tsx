@@ -6,7 +6,6 @@ import { Header } from '../components/Header';
 import { useAuth } from '../components/AuthProvider';
 import AdminLayout from '../components/AdminLayout';
 import NoSSR from '../components/NoSSR';
-import PortfolioFooter from '../components/PortfolioFooter';
 
 const AdminHomePage: React.FC = () => {
   const { logout } = useAuth();
@@ -119,12 +118,11 @@ const AdminHomePage: React.FC = () => {
                 >
                   <div className="text-2xl font-bold text-gray-600">🌐</div>
                   <div className="text-sm text-gray-600 mt-1">Voir le site</div>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
         </AdminLayout>
-        <PortfolioFooter />
       </div>
     </NoSSR>
   );

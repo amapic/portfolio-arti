@@ -19,7 +19,6 @@ function getProjectPaths(projectId) {
     textsPath: path.join(projectDir, 'texts.json'),
     experiencePath: path.join(projectDir, 'experience.json'),
     imagesPath: path.join(projectDir, 'images.json'), // Ajout du chemin pour les images
-    aboutPath: path.join(projectDir, 'about.json'), // Ajout du chemin pour les données à propos
     projectDir: projectDir
   };
 }
@@ -97,47 +96,6 @@ async function writeImagesData(projectId, data) {
   }
 }
 
-// Fonctions utilitaires pour les données "à propos"
-async function readAboutData(projectId) {
-  try {
-    const { aboutPath } = getProjectPaths(projectId);
-    const data = await fs.readFile(aboutPath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error reading about data:', error);
-    // Retourner des données par défaut si le fichier n'existe pas
-    return {
-      id: generateUniqueId(),
-      projet: projectId,
-      image_url: "/placeholder-portrait.jpg",
-      image_alt: "Portrait de Romain de Lagarde",
-      main_text: "Texte de présentation à configurer...",
-      quote: "Citation à configurer...",
-      quote_author: "Auteur à configurer...",
-      links: {
-        instagram: "",
-        facebook: "",
-        linkedin: "",
-        website1: "",
-        website2: ""
-      },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-  }
-}
-
-async function writeAboutData(projectId, data) {
-  try {
-    await ensureProjectDirectory(projectId);
-    const { aboutPath } = getProjectPaths(projectId);
-    await fs.writeFile(aboutPath, JSON.stringify(data, null, 2), 'utf8');
-  } catch (error) {
-    console.error('Error writing about data:', error);
-    throw error;
-  }
-}
-
 // Fonction pour générer un ID unique
 function generateUniqueId() {
   return Date.now().toString() + Math.random().toString(36).substr(2, 9);
@@ -145,57 +103,56 @@ function generateUniqueId() {
 
 // Routes pour les textes
 app.get('/api/texts', async (req, res) => {
-  
+  console.log("get text");
   try {
     const projectId = req.query.projectId;
     if (!projectId) {
       return res.status(400).json({ error: 'ProjectId manquant' });
     }
 
-    await ensureProjectDirectory(projectId);
     const { textsPath } = getProjectPaths(projectId);
-    
-    // Créer le fichier par défaut s'il n'existe pas
-    try {
-      await fs.access(textsPath);
-    } catch {
-      const defaultTexts = {
-        texts: {
-          contact: {
-            id: `contact_${projectId}_default`,
-            projet: projectId,
-            type: "contact",
-            nom: "Romain de Lagarde",
-            email: "contact@romaindelagarde.fr",
-            telephone: "+336 22 42 23 32",
-            adresse: "1 rue Dumont d'Urville\n69004 - Lyon\nFrance",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          },
-          about: {
-            id: `about_${projectId}_default`,
-            projet: projectId,
-            type: "about",
-            main_text: "Refléter, éblouir, éteindre, estomper, suggérer, diffracter, découper, briller, brouiller : la lumière est l'outil qui me permet de sculpter un volume, une expression artistique...",
-            quote: "Le monde y recommençait tous les jours dans une lumière toujours neuve. Ô lumière ! C'est le cri de tous les personnages placés (...) devant leur destin.",
-            quote_author: "Albert Camus, L'été.",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        }
-      };
-      await fs.writeFile(textsPath, JSON.stringify(defaultTexts, null, 2), 'utf8');
-    }
-
     const data = await fs.readFile(textsPath, 'utf8');
     const jsonData = JSON.parse(data);
-    console.log("get text", jsonData.texts,textsPath);
+    // Log pour débogage
+    // console.log("get text", jsonData, textsPath);
     res.json(jsonData.texts);
   } catch (error) {
     console.error('Error reading texts:', error);
     res.status(500).json({ error: 'Failed to read texts' });
   }
 });
+
+// Fonction pour définir une propriété imbriquée ou plate
+function setProperty(obj, key, value) {
+  // Si la clé existe directement (clé plate), l'utiliser
+  if (key in obj) {
+    obj[key] = value;
+    return true;
+  }
+  
+  // Sinon, essayer de naviguer dans l'objet imbriqué (ancien format)
+  if (key.includes('.')) {
+    const keys = key.split('.');
+    let current = obj;
+    
+    // Naviguer jusqu'à l'avant-dernière clé
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (current[keys[i]] === undefined || current[keys[i]] === null) {
+        return false; // Chemin inexistant
+      }
+      current = current[keys[i]];
+    }
+    
+    // Définir la valeur finale
+    const lastKey = keys[keys.length - 1];
+    if (current && typeof current === 'object') {
+      current[lastKey] = value;
+      return true;
+    }
+  }
+  
+  return false;
+}
 
 app.post('/api/texts', async (req, res) => {
   console.log("post text");
@@ -210,17 +167,18 @@ app.post('/api/texts', async (req, res) => {
     
     const { key, value } = req.body;
     
-    // Créer le fichier par défaut s'il n'existe pas
-    let jsonData;
-    try {
-      const data = await fs.readFile(textsPath, 'utf8');
-      jsonData = JSON.parse(data);
-    } catch {
-      jsonData = { texts: {} };
+    const data = await fs.readFile(textsPath, 'utf8');
+    const jsonData = JSON.parse(data);
+    console.log("update text", textsPath, key, value);
+    console.log("jsonData.texts",jsonData.texts);
+    
+    // Utiliser la fonction intelligente pour définir la propriété
+    const success = setProperty(jsonData.texts, key, value);
+    
+    if (!success) {
+      return res.status(400).json({ error: 'Invalid text key: ' + key });
     }
     
-    // Mettre à jour ou créer la clé
-    jsonData.texts[key] = value;
     await fs.writeFile(textsPath, JSON.stringify(jsonData, null, 2), 'utf8');
     
     res.json(jsonData.texts);
@@ -633,51 +591,6 @@ app.post('/api/logout', async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Failed to logout' });
-  }
-});
-
-// Routes pour les données "à propos"
-
-// GET /api/about - Récupérer les données à propos d'un projet
-app.get('/api/about', async (req, res) => {
-  try {
-    const projectId = req.query.projectId;
-    if (!projectId) {
-      return res.status(400).json({ error: 'ProjectId manquant' });
-    }
-
-    const data = await readAboutData(projectId);
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching about data:', error);
-    res.status(500).json({ error: 'Failed to fetch about data' });
-  }
-});
-
-// PUT /api/about - Mettre à jour les données à propos d'un projet
-app.put('/api/about', async (req, res) => {
-  try {
-    const projectId = req.query.projectId;
-    if (!projectId) {
-      return res.status(400).json({ error: 'ProjectId manquant' });
-    }
-
-    const updates = req.body;
-    const currentData = await readAboutData(projectId);
-    
-    // Fusionner les nouvelles données avec les existantes
-    const updatedData = {
-      ...currentData,
-      ...updates,
-      projet: projectId,
-      updated_at: new Date().toISOString()
-    };
-
-    await writeAboutData(projectId, updatedData);
-    res.json(updatedData);
-  } catch (error) {
-    console.error('Error updating about data:', error);
-    res.status(500).json({ error: 'Failed to update about data' });
   }
 });
 

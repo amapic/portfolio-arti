@@ -6,9 +6,8 @@ import { Header } from '../../components/Header';
 import { useAuth } from '../../components/AuthProvider';
 import AdminLayout from '../../components/AdminLayout';
 import NoSSR from '../../components/NoSSR';
-import PortfolioFooter from '../../components/PortfolioFooter';
 
-const AboutAdmin: React.FC = () => {
+const ContactAdmin: React.FC = () => {
   const { logout } = useAuth();
   
   const [textData, setTextData] = useState<TextData>({
@@ -139,22 +138,20 @@ const AboutAdmin: React.FC = () => {
       if (selectedImageFile) {
         const newImageUrl = await handleImageUpload();
         if (newImageUrl) {
-          finalData.about.image_url = newImageUrl;
+          finalData.contact.image_url = newImageUrl;
         }
       }
 
       // Préparer les champs à sauvegarder
       const allFields = [
-        { key: 'about.image_url', current: finalData.about.image_url, original: originalTextData.about.image_url },
-        { key: 'about.image_alt', current: finalData.about.image_alt, original: originalTextData.about.image_alt },
-        { key: 'about.main_text', current: finalData.about.main_text, original: originalTextData.about.main_text },
-        { key: 'about.quote', current: finalData.about.quote, original: originalTextData.about.quote },
-        { key: 'about.quote_author', current: finalData.about.quote_author, original: originalTextData.about.quote_author },
-        { key: 'about.links.instagram', current: finalData.about.links.instagram, original: originalTextData.about.links.instagram },
-        { key: 'about.links.facebook', current: finalData.about.links.facebook, original: originalTextData.about.links.facebook },
-        { key: 'about.links.linkedin', current: finalData.about.links.linkedin, original: originalTextData.about.links.linkedin },
-        { key: 'about.links.website1', current: finalData.about.links.website1, original: originalTextData.about.links.website1 },
-        { key: 'about.links.website2', current: finalData.about.links.website2, original: originalTextData.about.links.website2 }
+        { key: 'contact.image_url', current: finalData.contact.image_url, original: originalTextData.contact.image_url },
+        { key: 'contact.image_alt', current: finalData.contact.image_alt, original: originalTextData.contact.image_alt },
+        { key: 'contact.name', current: finalData.contact.name, original: originalTextData.contact.name },
+        { key: 'contact.email', current: finalData.contact.email, original: originalTextData.contact.email },
+        { key: 'contact.phone', current: finalData.contact.phone, original: originalTextData.contact.phone },
+        { key: 'contact.address', current: finalData.contact.address, original: originalTextData.contact.address },
+        { key: 'contact.city', current: finalData.contact.city, original: originalTextData.contact.city },
+        { key: 'contact.country', current: finalData.contact.country, original: originalTextData.contact.country }
       ];
 
       // Filtrer uniquement les champs qui ont changé
@@ -212,28 +209,11 @@ const AboutAdmin: React.FC = () => {
   if (loading) {
     return (
       <NoSSR>
-        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
-          <Header />
-          
-          <AdminLayout>
-            <div className="max-w-4xl mx-auto p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Administration - À propos
-                </h1>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Déconnexion
-                </button>
-              </div>
-              {/* Zone blanche pendant le chargement */}
-              <div className="bg-white rounded-lg shadow-md p-6 min-h-96">
-              </div>
-            </div>
-          </AdminLayout>
-          <PortfolioFooter />
+        <div suppressHydrationWarning={true}>
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-4">Chargement...</span>
+          </div>
         </div>
       </NoSSR>
     );
@@ -242,29 +222,10 @@ const AboutAdmin: React.FC = () => {
   if (!textData) {
     return (
       <NoSSR>
-        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
-          <Header />
-          
-          <AdminLayout>
-            <div className="max-w-4xl mx-auto p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Administration - À propos
-                </h1>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Déconnexion
-                </button>
-              </div>
-              {/* Message d'erreur */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="text-red-600">Erreur lors du chargement des données</div>
-              </div>
-            </div>
-          </AdminLayout>
-          <PortfolioFooter />
+        <div suppressHydrationWarning={true}>
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div>Erreur lors du chargement des données</div>
+          </div>
         </div>
       </NoSSR>
     );
@@ -279,7 +240,7 @@ const AboutAdmin: React.FC = () => {
           <div className="max-w-4xl mx-auto p-6">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold text-gray-900">
-                Administration - À Propos
+                Administration - Contact
               </h1>
               <button
                 onClick={logout}
@@ -293,7 +254,7 @@ const AboutAdmin: React.FC = () => {
               {/* Image */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Image de portrait
+                  Image de contact
                 </label>
                 <div className="flex gap-4 items-start">
                   <div className="flex-1">
@@ -303,14 +264,14 @@ const AboutAdmin: React.FC = () => {
                       onChange={handleImageSelect}
                       className="w-full p-2 border border-gray-300 rounded-md file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer text-gray-700 placeholder:text-gray-400"
                     />
-                    {!selectedImageFile && !textData.about.image_url && (
+                    {!selectedImageFile && !textData.contact.image_url && (
                       <p className="mt-2 text-sm text-gray-800 font-medium">Aucun fichier choisi</p>
                     )}
-                    {(imagePreview || textData.about.image_url) && (
+                    {(imagePreview || textData.contact.image_url) && (
                       <div className="mt-4">
                         <p className="text-sm text-gray-800 font-medium mb-2">Aperçu :</p>
                         <img
-                          src={imagePreview || textData.about.image_url}
+                          src={imagePreview || textData.contact.image_url}
                           alt="Aperçu"
                           className="max-w-xs h-auto border rounded"
                         />
@@ -327,145 +288,95 @@ const AboutAdmin: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={textData.about.image_alt}
-                  onChange={(e) => setTextData(prev => ({ ...prev, about: { ...prev.about, image_alt: e.target.value } }))}
+                  value={textData.contact.image_alt}
+                  onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, image_alt: e.target.value } }))}
                   className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  placeholder="Description de l'image pour l'accessibilité"
                 />
               </div>
 
-              {/* Texte principal */}
+              {/* Nom */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Texte principal
-                </label>
-                <textarea
-                  value={textData.about.main_text}
-                  onChange={(e) => setTextData(prev => ({ ...prev, about: { ...prev.about, main_text: e.target.value } }))}
-                  rows={8}
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
-                />
-              </div>
-
-              {/* Citation */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Citation
-                </label>
-                <textarea
-                  value={textData.about.quote}
-                  onChange={(e) => setTextData(prev => ({ ...prev, about: { ...prev.about, quote: e.target.value } }))}
-                  rows={3}
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
-                />
-              </div>
-
-              {/* Auteur de la citation */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Auteur de la citation
+                  Nom complet
                 </label>
                 <input
                   type="text"
-                  value={textData.about.quote_author}
-                  onChange={(e) => setTextData(prev => ({ ...prev, about: { ...prev.about, quote_author: e.target.value } }))}
+                  value={textData.contact.name}
+                  onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, name: e.target.value } }))}
                   className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  placeholder="Nom et prénom"
                 />
               </div>
 
-              {/* Liens */}
+              {/* Email */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Liens</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Instagram
-                    </label>
-                    <input
-                      type="url"
-                      value={textData.about.links.instagram}
-                      onChange={(e) => setTextData(prev => ({
-                        ...prev,
-                        about: {
-                          ...prev.about,
-                          links: { ...prev.about.links, instagram: e.target.value }
-                        }
-                      }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
-                    />
-                  </div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                  Adresse email
+                </label>
+                <input
+                  type="email"
+                  value={textData.contact.email}
+                  onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, email: e.target.value } }))}
+                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  placeholder="exemple@email.com"
+                />
+              </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Facebook
-                    </label>
-                    <input
-                      type="url"
-                      value={textData.about.links.facebook}
-                      onChange={(e) => setTextData(prev => ({
-                        ...prev,
-                        about: {
-                          ...prev.about,
-                          links: { ...prev.about.links, facebook: e.target.value }
-                        }
-                      }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
-                    />
-                  </div>
+              {/* Téléphone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                  Numéro de téléphone
+                </label>
+                <input
+                  type="tel"
+                  value={textData.contact.phone}
+                  onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, phone: e.target.value } }))}
+                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  placeholder="+33 1 23 45 67 89"
+                />
+              </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      LinkedIn
-                    </label>
-                    <input
-                      type="url"
-                      value={textData.about.links.linkedin}
-                      onChange={(e) => setTextData(prev => ({
-                        ...prev,
-                        about: {
-                          ...prev.about,
-                          links: { ...prev.about.links, linkedin: e.target.value }
-                        }
-                      }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
-                    />
-                  </div>
+              {/* Adresse */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                  Adresse
+                </label>
+                <input
+                  type="text"
+                  value={textData.contact.address}
+                  onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, address: e.target.value } }))}
+                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  placeholder="123 Rue de la Paix"
+                />
+              </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Site web 1
-                    </label>
-                    <input
-                      type="url"
-                      value={textData.about.links.website1}
-                      onChange={(e) => setTextData(prev => ({
-                        ...prev,
-                        about: {
-                          ...prev.about,
-                          links: { ...prev.about.links, website1: e.target.value }
-                        }
-                      }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
-                    />
-                  </div>
+              {/* Ville et Pays */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Ville
+                  </label>
+                  <input
+                    type="text"
+                    value={textData.contact.city}
+                    onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, city: e.target.value } }))}
+                    className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                    placeholder="Paris"
+                  />
+                </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Site web 2
-                    </label>
-                    <input
-                      type="url"
-                      value={textData.about.links.website2}
-                      onChange={(e) => setTextData(prev => ({
-                        ...prev,
-                        about: {
-                          ...prev.about,
-                          links: { ...prev.about.links, website2: e.target.value }
-                        }
-                      }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Pays
+                  </label>
+                  <input
+                    type="text"
+                    value={textData.contact.country}
+                    onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, country: e.target.value } }))}
+                    className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                    placeholder="France"
+                  />
                 </div>
               </div>
 
@@ -482,10 +393,9 @@ const AboutAdmin: React.FC = () => {
             </div>
           </div>
         </AdminLayout>
-        <PortfolioFooter />
       </div>
     </NoSSR>
   );
 };
 
-export default AboutAdmin;
+export default ContactAdmin;

@@ -6,7 +6,6 @@ import { Header } from '../../components/Header';
 import { useAuth } from '../../components/AuthProvider';
 import AdminLayout from '../../components/AdminLayout';
 import NoSSR from '../../components/NoSSR';
-import PortfolioFooter from '../../components/PortfolioFooter';
 
 const AboutAdmin: React.FC = () => {
   const { logout } = useAuth();
@@ -212,28 +211,11 @@ const AboutAdmin: React.FC = () => {
   if (loading) {
     return (
       <NoSSR>
-        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
-          <Header />
-          
-          <AdminLayout>
-            <div className="max-w-4xl mx-auto p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Administration - À propos
-                </h1>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Déconnexion
-                </button>
-              </div>
-              {/* Zone blanche pendant le chargement */}
-              <div className="bg-white rounded-lg shadow-md p-6 min-h-96">
-              </div>
-            </div>
-          </AdminLayout>
-          <PortfolioFooter />
+        <div suppressHydrationWarning={true}>
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-4">Chargement...</span>
+          </div>
         </div>
       </NoSSR>
     );
@@ -242,29 +224,10 @@ const AboutAdmin: React.FC = () => {
   if (!textData) {
     return (
       <NoSSR>
-        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
-          <Header />
-          
-          <AdminLayout>
-            <div className="max-w-4xl mx-auto p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Administration - À propos
-                </h1>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Déconnexion
-                </button>
-              </div>
-              {/* Message d'erreur */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="text-red-600">Erreur lors du chargement des données</div>
-              </div>
-            </div>
-          </AdminLayout>
-          <PortfolioFooter />
+        <div suppressHydrationWarning={true}>
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div>Erreur lors du chargement des données</div>
+          </div>
         </div>
       </NoSSR>
     );
@@ -482,7 +445,6 @@ const AboutAdmin: React.FC = () => {
             </div>
           </div>
         </AdminLayout>
-        <PortfolioFooter />
       </div>
     </NoSSR>
   );

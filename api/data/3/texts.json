@@ -7,7 +7,9 @@
     "address": "1 rue Dumont d'Urville",
     "name": "Romain de Lagarde",
     "city": "69004 - Lyon",
-    "country": "France"
+    "country": "France",
+    "image_url": "/placeholder-contact.jpg",
+    "image_alt": "Romain de Lagarde dans son studio de création lumière"
   },
   "about": {
     "image_url": "/placeholder-portrait.jpg",

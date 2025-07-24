@@ -7,6 +7,8 @@ export interface TextData {
     name: string;
     city: string;
     country: string;
+    image_url: string;
+    image_alt: string;
   };
   
   // Données de la page à propos

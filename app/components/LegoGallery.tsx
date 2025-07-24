@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ImageComponent from './ImageComponent';
 import PortfolioHeader from './PortfolioHeader';
-import PortfolioFooter from './PortfolioFooter';
+// import PortfolioFooter from './PortfolioFooter';
 import { ImageMeta } from '../types/imageMeta';
 import { CATEGORIES, CategoryType, getCategoryLabel } from '../types/categories';
 
@@ -299,7 +299,7 @@ const LegoGallery: React.FC = () => {
         </div>
       )}
 
-      <PortfolioFooter />
+      {/* <PortfolioFooter /> */}
     </div>
   );
 };
