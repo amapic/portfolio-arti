@@ -535,6 +535,7 @@ app.post('/api/images', async (req, res) => {
       titre: titre || `Titre ${category}`,
       sousTitre: sousTitre || '',
       dimension: dimension || [1, 1],
+      crop: { x: 0, y: 0, size: 100 },
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };

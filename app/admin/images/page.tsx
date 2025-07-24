@@ -134,10 +134,9 @@ const ImagesAdmin: React.FC = () => {
         sousTitre: newImageMeta.sousTitre,
         dimension: newImageMeta.dimension,
         crop: {
-          x: 25,
-          y: 25,
-          width: 50,
-          height: 50
+          x: 0,
+          y: 0,
+          size: 100 // Image entière par défaut
         },
         selected: false,
         position: 0
@@ -257,7 +256,7 @@ const ImagesAdmin: React.FC = () => {
     router.push(newUrl);
   };
 
-  const handleCropChange = (crop: { x: number; y: number; width: number; height: number }) => {
+  const handleCropChange = (crop: { x: number; y: number; size: number }) => {
     if (croppingImage) {
       setCroppingImage(prev => prev ? { ...prev, crop } : null);
     }
@@ -269,7 +268,7 @@ const ImagesAdmin: React.FC = () => {
         ...prev, 
         dimension: newDimension,
         // Réinitialiser le crop quand on change de dimension
-        crop: { x: 25, y: 25, width: 50, height: 50 }
+        crop: { x: 0, y: 0, size: 100 }
       } : null);
     }
   };
@@ -498,7 +497,8 @@ const ImagesAdmin: React.FC = () => {
                   Toutes ({images.length})
                 </button>
                 {CATEGORY_VALUES.map(category => {
-                  const count = images.filter(img => img.category === category).length;
+                  console.log(category);
+                  const count = images.filter(img => imageMatchesCategory(img.category, category)).length;
                   const colorClass = getCategoryColor(category);
                   return (
                     <button
@@ -554,13 +554,6 @@ const ImagesAdmin: React.FC = () => {
                         <HiOutlineTrash className="w-4 h-4" />
                       </button>
                     </div>
-                    <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                      {normalizeCategoriesArray(image.category).map((cat, index) => (
-                        <span key={index} className={`px-2 py-1 text-xs rounded-full text-black ${getCategoryColor(cat)}`}>
-                          {getCategoryLabel(cat)}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                   
                   <div className="p-3">
@@ -606,7 +599,7 @@ const ImagesAdmin: React.FC = () => {
                                   }}
                                   className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                 />
-                                <span>{getCategoryLabel(cat)}</span>
+                                <span className="text-gray-900">{getCategoryLabel(cat)}</span>
                               </label>
                             ))}
                           </div>

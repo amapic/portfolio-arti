@@ -14,8 +14,7 @@ export interface ImageMeta {
   crop?: {
     x: number;      // position X du cadre (en %)
     y: number;      // position Y du cadre (en %)
-    width: number;  // largeur du cadre (en %)
-    height: number; // hauteur du cadre (en %)
+    size: number;   // taille du cadre (en %, 100% = plus petite dimension de l'image)
   };
   created_at?: string;
   updated_at?: string;
