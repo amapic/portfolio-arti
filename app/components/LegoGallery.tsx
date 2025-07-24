@@ -5,16 +5,22 @@ import ImageComponent from './ImageComponent';
 import PortfolioHeader from './PortfolioHeader';
 // import PortfolioFooter from './PortfolioFooter';
 import { ImageMeta } from '../types/imageMeta';
-import { CATEGORIES, CategoryType, getCategoryLabel } from '../types/categories';
+import { CATEGORIES, CategoryType, getCategoryLabel, imageMatchesCategory, normalizeCategoriesArray } from '../types/categories';
 
 interface GalleryItem {
   id: number;
-  category: string;
+  category: CategoryType | CategoryType[];
   imageUrl: string;
   alt: string;
   titre: string;
   sousTitre: string;
   dimension?: [number, number]; // Dimension optionnelle depuis l'API
+  crop?: {
+    x: number;      // position X du cadre (en %)
+    y: number;      // position Y du cadre (en %)
+    width: number;  // largeur du cadre (en %)
+    height: number; // hauteur du cadre (en %)
+  };
 }
 
 interface PlacedImage {
@@ -77,8 +83,9 @@ const LegoGallery: React.FC = () => {
     imageUrl: meta.image_url,
     alt: meta.alt,
     titre: meta.titre || '',
-    sousTitre: meta.sousTitre || ''
-    // Note: dimension ignorée pour l'instant - l'algorithme choisit aléatoirement
+    sousTitre: meta.sousTitre || '',
+    dimension: meta.dimension, // Utiliser la dimension de l'API
+    crop: meta.crop // Passer les métadonnées de crop
   }));
 
   // Algorithme de placement séquentiel sans trous
@@ -99,14 +106,25 @@ const LegoGallery: React.FC = () => {
     items.forEach((item, index) => {
       console.log(`\nPlacement image ${index + 1}: ${item.category}`);
       
+      // Utiliser la dimension de l'API ou par défaut [1, 1]
+      const targetDimension: [number, number] = item.dimension || [1, 1];
+      console.log(`Dimension de l'API: ${targetDimension[0]}x${targetDimension[1]}`);
+      
       // Trouver la prochaine position libre (de gauche à droite, haut en bas)
       const nextPosition = findNextFreePosition(grid, GRID_WIDTH);
       console.log(`Position de départ trouvée: [${nextPosition[0]}, ${nextPosition[1]}]`);
       
-      // Essayer les dimensions par ordre de priorité
+      // Essayer d'abord la dimension de l'API, puis les autres en fallback
+      const dimensionsToTry = [
+        targetDimension, // Priorité à la dimension de l'API
+        ...dimensionPriority.filter(dim => 
+          dim[0] !== targetDimension[0] || dim[1] !== targetDimension[1]
+        ) // Autres dimensions en fallback
+      ];
+      
       let placedSuccessfully = false;
       
-      for (const dimension of dimensionPriority) {
+      for (const dimension of dimensionsToTry) {
         const [width, height] = dimension;
         
         // Vérifier si cette dimension peut être placée à la position
@@ -221,7 +239,7 @@ const LegoGallery: React.FC = () => {
 
     const filteredItems = activeCategory === 'All' 
       ? galleryItems 
-      : galleryItems.filter(item => item.category === activeCategory);
+      : galleryItems.filter(item => imageMatchesCategory(item.category, activeCategory));
     
     console.log(`Filtrage pour catégorie "${activeCategory}":`, filteredItems.length, 'images sur', galleryItems.length, 'total'); // Debug
     
@@ -294,6 +312,7 @@ const LegoGallery: React.FC = () => {
               index={index}
               onImageRef={(idx, el) => { itemRefs.current[idx] = el; }}
               isVisible={visibleItems.includes(index)}
+              crop={placedImage.item.crop}
             />
           ))}
         </div>

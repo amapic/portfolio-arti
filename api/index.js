@@ -471,7 +471,7 @@ app.post('/api/images', async (req, res) => {
       return res.status(400).json({ error: 'ProjectId manquant' });
     }
 
-    const { image_url, position, selected, category, alt, titre, sousTitre, dimension } = req.body;
+    const { image_url, position, selected, category, alt, titre, sousTitre, dimension, crop } = req.body;
     
     if (!image_url || !category) {
       return res.status(400).json({ error: 'image_url et category sont requis' });
@@ -493,6 +493,7 @@ app.post('/api/images', async (req, res) => {
       titre: titre || `Titre ${category}`,
       sousTitre: sousTitre || '',
       dimension: dimension || [1, 1],
+      crop: crop || { x: 25, y: 25, width: 50, height: 50 }, // Valeur par défaut
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -529,7 +530,7 @@ app.put('/api/images/:id', async (req, res) => {
     }
 
     // Mettre à jour les champs autorisés
-    const allowedFields = ['position', 'selected', 'category', 'alt', 'titre', 'sousTitre', 'dimension'];
+    const allowedFields = ['position', 'selected', 'category', 'alt', 'titre', 'sousTitre', 'dimension', 'crop'];
     const updatedImage = { ...data.images[imageIndex] };
     
     allowedFields.forEach(field => {

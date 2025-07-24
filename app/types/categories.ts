@@ -25,3 +25,19 @@ export const getCategoryLabel = (value: CategoryType): string => {
 export const getCategoryColor = (value: CategoryType): string => {
   return CATEGORIES.find(cat => cat.value === value)?.color || 'bg-gray-100 text-gray-800';
 };
+
+// Fonctions utilitaires pour les catégories multiples
+export const normalizeCategoriesArray = (categories: CategoryType | CategoryType[]): CategoryType[] => {
+  return Array.isArray(categories) ? categories : [categories];
+};
+
+export const getCategoriesLabels = (categories: CategoryType | CategoryType[]): string => {
+  const categoriesArray = normalizeCategoriesArray(categories);
+  return categoriesArray.map(cat => getCategoryLabel(cat)).join(', ');
+};
+
+export const imageMatchesCategory = (imageCategory: CategoryType | CategoryType[], filterCategory: CategoryType | 'All'): boolean => {
+  if (filterCategory === 'All') return true;
+  const imageCategoriesArray = normalizeCategoriesArray(imageCategory);
+  return imageCategoriesArray.includes(filterCategory);
+};

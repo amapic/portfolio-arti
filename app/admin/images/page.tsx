@@ -9,8 +9,9 @@ import NoSSR from '../../components/NoSSR';
 import { Header } from '../../components/Header';
 import { useAuth } from '../../components/AuthProvider';
 import AdminLayout from '../../components/AdminLayout';
-import { CATEGORIES, CATEGORY_VALUES, CategoryType, getCategoryLabel, getCategoryColor } from '../../types/categories';
+import { CATEGORIES, CATEGORY_VALUES, CategoryType, getCategoryLabel, getCategoryColor, imageMatchesCategory, normalizeCategoriesArray, getCategoriesLabels } from '../../types/categories';
 import PortfolioFooter from '../../components/PortfolioFooter';
+import ImageCropper from '../../components/ImageCropper';
 
 const ImagesAdmin: React.FC = () => {
   const searchParams = useSearchParams();
@@ -25,8 +26,9 @@ const ImagesAdmin: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [editingImage, setEditingImage] = useState<ImageMeta | null>(null);
+  const [croppingImage, setCroppingImage] = useState<ImageMeta | null>(null);
   const [newImageMeta, setNewImageMeta] = useState({
-    category: 'Theater' as CategoryType,
+    category: ['Theater'] as CategoryType[],
     alt: '',
     titre: '',
     sousTitre: '',
@@ -57,7 +59,7 @@ const ImagesAdmin: React.FC = () => {
     if (selectedCategory === 'All') {
       setFilteredImages(images);
     } else {
-      setFilteredImages(images.filter(img => img.category === selectedCategory));
+      setFilteredImages(images.filter(img => imageMatchesCategory(img.category, selectedCategory)));
     }
   }, [images, selectedCategory]);
 
@@ -131,6 +133,12 @@ const ImagesAdmin: React.FC = () => {
         titre: newImageMeta.titre,
         sousTitre: newImageMeta.sousTitre,
         dimension: newImageMeta.dimension,
+        crop: {
+          x: 25,
+          y: 25,
+          width: 50,
+          height: 50
+        },
         selected: false,
         position: 0
       };
@@ -149,7 +157,7 @@ const ImagesAdmin: React.FC = () => {
       setSelectedFile(null);
       setPreviewUrl('');
       setNewImageMeta({
-        category: 'Theater',
+        category: ['Theater'],
         alt: '',
         titre: '',
         sousTitre: '',
@@ -249,6 +257,51 @@ const ImagesAdmin: React.FC = () => {
     router.push(newUrl);
   };
 
+  const handleCropChange = (crop: { x: number; y: number; width: number; height: number }) => {
+    if (croppingImage) {
+      setCroppingImage(prev => prev ? { ...prev, crop } : null);
+    }
+  };
+
+  const handleDimensionChange = (newDimension: [number, number]) => {
+    if (croppingImage) {
+      setCroppingImage(prev => prev ? { 
+        ...prev, 
+        dimension: newDimension,
+        // Réinitialiser le crop quand on change de dimension
+        crop: { x: 25, y: 25, width: 50, height: 50 }
+      } : null);
+    }
+  };
+
+  const handleSaveCrop = async () => {
+    if (!croppingImage) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/images/${croppingImage.id}?projectId=${PROJECT_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(croppingImage)
+      });
+
+      if (response.ok) {
+        // Mettre à jour l'état local
+        setImages(prevImages => 
+          prevImages.map(img => 
+            img.id === croppingImage.id ? croppingImage : img
+          )
+        );
+        setCroppingImage(null);
+        alert('Recadrage sauvegardé avec succès');
+      } else {
+        alert('Erreur lors de la sauvegarde du recadrage');
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de la sauvegarde du recadrage');
+    }
+  };
+
   if (loading) {
     return (
       <NoSSR>
@@ -334,18 +387,34 @@ const ImagesAdmin: React.FC = () => {
                 {/* Métadonnées */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Catégorie
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      Catégories
                     </label>
-                    <select
-                      value={newImageMeta.category}
-                      onChange={(e) => setNewImageMeta(prev => ({ ...prev, category: e.target.value as CategoryType }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                    >
+                    <div className="grid grid-cols-2 gap-2">
                       {CATEGORY_VALUES.map(cat => (
-                        <option key={cat} value={cat}>{getCategoryLabel(cat)}</option>
+                        <label key={cat} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={newImageMeta.category.includes(cat)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setNewImageMeta(prev => ({ 
+                                  ...prev, 
+                                  category: [...prev.category, cat] 
+                                }));
+                              } else {
+                                setNewImageMeta(prev => ({ 
+                                  ...prev, 
+                                  category: prev.category.filter(c => c !== cat) 
+                                }));
+                              }
+                            }}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <span className="text-sm text-gray-900">{getCategoryLabel(cat)}</span>
+                        </label>
                       ))}
-                    </select>
+                    </div>
                   </div>
 
                   <div>
@@ -460,6 +529,13 @@ const ImagesAdmin: React.FC = () => {
                     />
                     <div className="absolute top-2 right-2 flex gap-1">
                       <button
+                        onClick={() => setCroppingImage(image)}
+                        className="p-1 bg-purple-600 text-white rounded-full hover:bg-purple-700"
+                        title="Recadrer"
+                      >
+                        <HiOutlineFunnel className="w-4 h-4" />
+                      </button>
+                      <button
                         onClick={() => handleToggleVisibility(image)}
                         className={`p-1 rounded-full ${
                           image.selected
@@ -478,10 +554,12 @@ const ImagesAdmin: React.FC = () => {
                         <HiOutlineTrash className="w-4 h-4" />
                       </button>
                     </div>
-                    <div className="absolute top-2 left-2">
-                      <span className={`px-2 py-1 text-xs rounded-full text-black ${getCategoryColor(image.category)}`}>
-                        {getCategoryLabel(image.category)}
-                      </span>
+                    <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                      {normalizeCategoriesArray(image.category).map((cat, index) => (
+                        <span key={index} className={`px-2 py-1 text-xs rounded-full text-black ${getCategoryColor(cat)}`}>
+                          {getCategoryLabel(cat)}
+                        </span>
+                      ))}
                     </div>
                   </div>
                   
@@ -502,6 +580,37 @@ const ImagesAdmin: React.FC = () => {
                           className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Sous-titre"
                         />
+                        
+                        {/* Catégories multiples */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Catégories</label>
+                          <div className="grid grid-cols-2 gap-1">
+                            {CATEGORY_VALUES.map(cat => (
+                              <label key={cat} className="flex items-center space-x-1 text-xs">
+                                <input
+                                  type="checkbox"
+                                  checked={normalizeCategoriesArray(editingImage.category).includes(cat)}
+                                  onChange={(e) => {
+                                    const currentCategories = normalizeCategoriesArray(editingImage.category);
+                                    if (e.target.checked) {
+                                      setEditingImage(prev => prev ? { 
+                                        ...prev, 
+                                        category: [...currentCategories, cat] 
+                                      } : null);
+                                    } else {
+                                      setEditingImage(prev => prev ? { 
+                                        ...prev, 
+                                        category: currentCategories.filter(c => c !== cat) 
+                                      } : null);
+                                    }
+                                  }}
+                                  className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <span>{getCategoryLabel(cat)}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
                         <div className="flex gap-1">
                           <button
                             onClick={() => handleSaveEdit(editingImage)}
@@ -539,6 +648,48 @@ const ImagesAdmin: React.FC = () => {
                 </div>
               ))}
             </div>
+
+            {/* Modal de recadrage */}
+            {croppingImage && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Recadrer l'image - {croppingImage.titre || 'Sans titre'}
+                    </h3>
+                    <button
+                      onClick={() => setCroppingImage(null)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <HiOutlineX className="w-6 h-6" />
+                    </button>
+                  </div>
+                  
+                  <ImageCropper
+                    imageUrl={croppingImage.image_url}
+                    dimension={croppingImage.dimension}
+                    initialCrop={croppingImage.crop}
+                    onCropChange={handleCropChange}
+                    onDimensionChange={handleDimensionChange}
+                  />
+                  
+                  <div className="flex gap-2 mt-6 pt-4 border-t">
+                    <button
+                      onClick={handleSaveCrop}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Sauvegarder le recadrage
+                    </button>
+                    <button
+                      onClick={() => setCroppingImage(null)}
+                      className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </AdminLayout>
         <PortfolioFooter />

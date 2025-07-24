@@ -1,13 +1,12 @@
 {
   "images": [
-    
     {
       "id": "1753209266946uep5bx6ek",
       "projet": "3",
       "image_url": "https://dev2site.net:4001/uploads/3/1753209266703-196198538.PNG",
       "position": 5,
       "selected": false,
-      "category": "Opera",
+      "category": ["Opera"],
       "alt": "Image Dance",
       "titre": "Danse Artistique",
       "sousTitre": "Mouvement et grâce en harmonie",
@@ -15,6 +14,12 @@
         1,
         1
       ],
+      "crop": {
+        "x": 25,
+        "y": 25,
+        "width": 50,
+        "height": 50
+      },
       "created_at": "2025-07-22T18:34:26.946Z",
       "updated_at": "2025-07-22T18:47:50.339Z"
     },
@@ -24,16 +29,22 @@
       "image_url": "https://dev2site.net:4001/uploads/3/1753210920911-953557526.jpg",
       "position": 6,
       "selected": true,
-      "category": "Theater",
+      "category": ["Theater", "Dance"],
       "alt": "tulipe",
       "titre": "Tulipe Éclatante",
       "sousTitre": "Beauté printanière en fleur",
       "dimension": [
-        1,
+        2,
         1
       ],
+      "crop": {
+        "x": 25,
+        "y": 25,
+        "width": 50,
+        "height": 50
+      },
       "created_at": "2025-07-22T19:02:01.044Z",
-      "updated_at": "2025-07-22T21:34:02.701Z"
+      "updated_at": "2025-07-24T02:45:27.495Z"
     },
     {
       "id": "17532109580314l1yv1s5b",
@@ -41,16 +52,22 @@
       "image_url": "https://dev2site.net:4001/uploads/3/1753210957902-850515857.jpg",
       "position": 7,
       "selected": true,
-      "category": "Theater",
+      "category": ["Theater"],
       "alt": "arbre",
-      "titre": "Arbre Majestueux",
+      "titre": "Arbre Majestueux2",
       "sousTitre": "Symbole de force et d'ancrage",
       "dimension": [
         1,
         1
       ],
+      "crop": {
+        "x": 25,
+        "y": 25,
+        "width": 50,
+        "height": 50
+      },
       "created_at": "2025-07-22T19:02:38.031Z",
-      "updated_at": "2025-07-22T19:04:36.015Z"
+      "updated_at": "2025-07-23T16:10:37.447Z"
     },
     {
       "id": "1753210985228f5vqsjjk2",
@@ -58,7 +75,7 @@
       "image_url": "https://dev2site.net:4001/uploads/3/1753210985090-545045453.jpg",
       "position": 8,
       "selected": true,
-      "category": "Theater",
+      "category": ["Theater", "Opera"],
       "alt": "ciel",
       "titre": "Ciel Infini",
       "sousTitre": "Immensité et liberté céleste",
@@ -66,6 +83,12 @@
         1,
         1
       ],
+      "crop": {
+        "x": 25,
+        "y": 25,
+        "width": 50,
+        "height": 50
+      },
       "created_at": "2025-07-22T19:03:05.228Z",
       "updated_at": "2025-07-22T21:34:25.008Z"
     },
@@ -75,7 +98,7 @@
       "image_url": "https://dev2site.net:4001/uploads/3/1753210998991-233580877.jpg",
       "position": 9,
       "selected": true,
-      "category": "Dance",
+      "category": ["Dance"],
       "alt": "ciel 2",
       "titre": "Ciel Dramatique",
       "sousTitre": "Nuances et contrastes atmosphériques",
@@ -83,6 +106,12 @@
         1,
         1
       ],
+      "crop": {
+        "x": 25,
+        "y": 25,
+        "width": 50,
+        "height": 50
+      },
       "created_at": "2025-07-22T19:03:19.111Z",
       "updated_at": "2025-07-22T19:04:31.269Z"
     },
@@ -92,7 +121,7 @@
       "image_url": "https://dev2site.net:4001/uploads/3/1753211019856-976378714.jpg",
       "position": 10,
       "selected": true,
-      "category": "Theater",
+      "category": ["Theater", "Event"],
       "alt": "aurore boréale",
       "titre": "Aurore Boréale",
       "sousTitre": "Magie lumineuse du grand nord",
@@ -100,8 +129,14 @@
         1,
         1
       ],
+      "crop": {
+        "x": 25,
+        "y": 25,
+        "width": 50,
+        "height": 50
+      },
       "created_at": "2025-07-22T19:03:39.969Z",
-      "updated_at": "2025-07-22T19:04:32.275Z"
+      "updated_at": "2025-07-24T02:18:27.359Z"
     },
     {
       "id": "1753211043390rdf0nzbeq",
@@ -109,7 +144,7 @@
       "image_url": "https://dev2site.net:4001/uploads/3/1753211043276-741400421.jpg",
       "position": 11,
       "selected": true,
-      "category": "Theater",
+      "category": ["Theater"],
       "alt": "mer1",
       "titre": "Mer Apaisante",
       "sousTitre": "Vagues et sérénité marine",
@@ -117,6 +152,12 @@
         1,
         1
       ],
+      "crop": {
+        "x": 25,
+        "y": 25,
+        "width": 50,
+        "height": 50
+      },
       "created_at": "2025-07-22T19:04:03.390Z",
       "updated_at": "2025-07-22T19:04:34.026Z"
     },
@@ -126,7 +167,7 @@
       "image_url": "https://dev2site.net:4001/uploads/3/1753211063806-117415232.jpg",
       "position": 12,
       "selected": true,
-      "category": "Circus",
+      "category": ["Circus", "Event"],
       "alt": "brouillard",
       "titre": "Brouillard Mystérieux",
       "sousTitre": "Voile de mystère et d'émotion",
@@ -134,6 +175,12 @@
         1,
         1
       ],
+      "crop": {
+        "x": 25,
+        "y": 25,
+        "width": 50,
+        "height": 50
+      },
       "created_at": "2025-07-22T19:04:23.930Z",
       "updated_at": "2025-07-22T19:04:37.536Z"
     }

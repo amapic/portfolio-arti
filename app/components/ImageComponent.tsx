@@ -1,9 +1,10 @@
 import React from 'react';
+import { CategoryType } from '../types/categories';
 
 interface ImageComponentProps {
   item: {
     id: number;
-    category: string;
+    category: CategoryType | CategoryType[];
     imageUrl: string;
     alt: string;
     titre: string;
@@ -14,6 +15,12 @@ interface ImageComponentProps {
   index: number;
   onImageRef: (index: number, el: HTMLDivElement | null) => void;
   isVisible: boolean;
+  crop?: {
+    x: number;      // position X du cadre (en %)
+    y: number;      // position Y du cadre (en %)
+    width: number;  // largeur du cadre (en %)
+    height: number; // hauteur du cadre (en %)
+  };
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = ({
@@ -22,7 +29,8 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
   position,
   index,
   onImageRef,
-  isVisible
+  isVisible,
+  crop
 }) => {
   const [width, height] = dimension;
   const [col, row] = position;
@@ -40,6 +48,23 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
     gridRow: `${row + 1} / span ${height}`
   };
 
+  // Style pour le crop de l'image
+  const getImageStyle = () => {
+    if (!crop) {
+      return {};
+    }
+    
+    // Utiliser background-image pour un contrôle précis du crop
+    return {
+      backgroundImage: `url(${item.imageUrl})`,
+      backgroundSize: `${100 / (crop.width / 100)}% ${100 / (crop.height / 100)}%`,
+      backgroundPosition: `${-crop.x / (crop.width / 100)}% ${-crop.y / (crop.height / 100)}%`,
+      backgroundRepeat: 'no-repeat'
+    };
+  };
+
+  const shouldUseBackground = Boolean(crop);
+
   return (
     <div 
       ref={(el) => onImageRef(index, el)}
@@ -52,12 +77,21 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
       `}
       style={gridStyle}
     >
-      <img
-        src={item.imageUrl}
-        alt={item.alt}
-        className="w-full h-full object-cover"
-        loading="eager"
-      />
+      {shouldUseBackground ? (
+        // Utiliser un div avec background-image pour le crop
+        <div
+          className="w-full h-full"
+          style={getImageStyle()}
+        />
+      ) : (
+        // Image normale sans crop
+        <img
+          src={item.imageUrl}
+          alt={item.alt}
+          className="w-full h-full object-cover"
+          loading="eager"
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-br from-red-500/70 via-orange-500/60 to-yellow-500/40 opacity-0 hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
         <div className="text-center px-4">
           <h3 className="text-white text-lg font-semibold tracking-wider drop-shadow-lg">
