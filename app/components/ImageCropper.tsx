@@ -207,18 +207,32 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
     return { cropWidthPercent, cropHeightPercent };
   };
 
-  // Fonction pour calculer le backgroundSize de l'aperçu de manière sécurisée
-  const getPreviewBackgroundSize = () => {
+  // Fonction pour calculer le backgroundSize et backgroundPosition corrects pour l'aperçu
+  const getPreviewBackground = () => {
     // Utiliser l'état displayDimensions qui est mis à jour de manière sécurisée
     const { cropWidthPercent, cropHeightPercent } = displayDimensions;
-    
     // Éviter la division par zéro et les valeurs trop petites
     const safeWidthPercent = Math.max(cropWidthPercent, 1);
     const safeHeightPercent = Math.max(cropHeightPercent, 1);
-    
+    // Facteur de zoom appliqué dans l'aperçu
     const bgSizeX = 100 / (safeWidthPercent / 100);
     const bgSizeY = 100 / (safeHeightPercent / 100);
-    
+    // Pour la position, il faut appliquer le même facteur
+    const bgPosX = cropArea.x * (bgSizeX / 100);
+    const bgPosY = cropArea.y * (bgSizeY / 100);
+    return {
+      backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
+      backgroundPosition: `${bgPosX}% ${bgPosY}%`
+    };
+  };
+
+  // Fonction pour calculer la taille de fond pour l'aperçu du résultat
+  const getPreviewBackgroundSize = () => {
+    const { cropWidthPercent, cropHeightPercent } = displayDimensions;
+    const safeWidthPercent = Math.max(cropWidthPercent, 1);
+    const safeHeightPercent = Math.max(cropHeightPercent, 1);
+    const bgSizeX = 100 / (safeWidthPercent / 100);
+    const bgSizeY = 100 / (safeHeightPercent / 100);
     return `${bgSizeX}% ${bgSizeY}%`;
   };
 
@@ -269,33 +283,46 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
               </button>
             ))}
           </div>
+          
+          {/* Contrôle de taille */}
+          <div className="flex items-center space-x-3">
+            <span className="text-xs text-gray-500">10%</span>
+            <input
+              type="range"
+              min="10"
+              max="100"
+              value={cropSize}
+              onChange={(e) => handleSizeChange(Number(e.target.value))}
+              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+              style={{
+                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${cropSize}%, #e5e7eb ${cropSize}%, #e5e7eb 100%)`
+              }}
+            />
+            <span className="text-xs text-gray-500">100%</span>
+          </div>
+          
+          <p className="text-xs text-gray-500">
+            Ajustez la taille du cadre de recadrage par rapport à l'image originale
+          </p>
+          
+          {/* Aperçu miniature */}
+          <div 
+            className="border border-gray-300 rounded overflow-hidden mt-4"
+            style={{ 
+              width: `${Math.min(200, 200 * getAspectRatio())}px`,
+              height: `${Math.min(200, 200 / getAspectRatio())}px`
+            }}
+          >
+            <div
+              className="w-full h-full bg-cover bg-no-repeat"
+              style={{
+                backgroundImage: `url(${imageUrl})`,
+                ...getPreviewBackground()
+              }}
+            />
+          </div>
         </div>
       )}
-      
-      {/* Curseur de taille du cadre */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Taille du cadre de sélection: {cropSize}%
-        </label>
-        <div className="flex items-center space-x-3">
-          <span className="text-xs text-gray-500">0%</span>
-          <input
-            type="range"
-            min="10"
-            max="100"
-            value={cropSize}
-            onChange={(e) => handleSizeChange(Number(e.target.value))}
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-            style={{
-              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${cropSize}%, #e5e7eb ${cropSize}%, #e5e7eb 100%)`
-            }}
-          />
-          <span className="text-xs text-gray-500">100%</span>
-        </div>
-        <p className="text-xs text-gray-500">
-          Ajustez la taille du cadre de recadrage par rapport à l'image originale
-        </p>
-      </div>
       
       <div className="text-sm text-gray-600">
         Format sélectionné: {dimension[0]}×{dimension[1]} - Glissez le cadre pour recadrer
@@ -355,8 +382,29 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
             className="w-full h-full bg-cover bg-no-repeat"
             style={{
               backgroundImage: `url(${imageUrl})`,
-              backgroundPosition: `${cropArea.x}% ${cropArea.y}%`,
-              backgroundSize: getPreviewBackgroundSize()
+              // Calcul du ratio entre la taille affichée de la 2e image (container) et celle de l'aperçu
+              ...(() => {
+                if (!containerRef.current) return { backgroundPosition: `${cropArea.x}% ${cropArea.y}%` };
+                const containerW = containerRef.current.offsetWidth;
+                const containerH = containerRef.current.offsetHeight;
+                // Taille de l'aperçu (3e image)
+                const previewW = Math.min(200, 200 * getAspectRatio());
+                const previewH = Math.min(200, 200 / getAspectRatio());
+                // Ratio d'échelle entre container et aperçu
+                const ratioX = containerW / previewW;
+                const ratioY = containerH / previewH;
+                // Adapter la position du crop
+                const posX = cropArea.x / ratioX;
+                const posY = cropArea.y / ratioY;
+                // console.log(`imageDimensions: ${imageDimensions.width} ${imageDimensions.height}`);
+                // console.log(`AA: ${ratioX}% ${ratioY}%`);
+                // console.log(previewW, previewH,containerH,containerW);
+                // console.log(`Crop position: ${posX}% ${posY}%`);
+                console.log(`cropArea.x: ${cropArea.x}, cropArea.y: ${cropArea.y}`);
+                console.log(`displayDimensions: ${displayDimensions.cropWidthPercent}% ${displayDimensions.cropHeightPercent}%`);
+                return { backgroundPosition: `${cropArea.x*(1+displayDimensions.cropWidthPercent/100)}% ${cropArea.y*(1+displayDimensions.cropHeightPercent/100)}%` };
+              })(),
+              // backgroundSize: getPreviewBackgroundSize()
             }}
           />
         </div>
