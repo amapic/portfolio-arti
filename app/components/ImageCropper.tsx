@@ -31,6 +31,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   );
   const [cropSize, setCropSize] = useState<number>(initialCrop?.size || 100);
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [displayDimensions, setDisplayDimensions] = useState({ cropWidthPercent: 50, cropHeightPercent: 50 });
 
   // Charger les dimensions réelles de l'image
   useEffect(() => {
@@ -53,46 +54,25 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
     
     const containerWidth = containerRef.current.offsetWidth;
     const containerHeight = containerRef.current.offsetHeight;
-    const aspectRatio = getAspectRatio();
+    const cropAspectRatio = getAspectRatio(); // Ratio du format choisi (2x1, 1x2, 1x1)
+    const containerAspectRatio = containerWidth / containerHeight; // Ratio de l'image affichée
     
-    // Calculer l'échelle d'affichage de l'image dans le container
-    const imageAspectRatio = imageDimensions.width / imageDimensions.height;
-    let displayWidth, displayHeight;
+    let maxCropWidth, maxCropHeight;
     
-    if (imageAspectRatio > containerWidth / containerHeight) {
-      // L'image est limitée par la largeur du container
-      displayWidth = containerWidth;
-      displayHeight = containerWidth / imageAspectRatio;
+    // Calculer la taille maximale possible du cadre en respectant le ratio choisi
+    if (cropAspectRatio > containerAspectRatio) {
+      // Le cadre est plus large que l'image : la largeur du container limite
+      maxCropWidth = containerWidth;
+      maxCropHeight = maxCropWidth / cropAspectRatio;
     } else {
-      // L'image est limitée par la hauteur du container
-      displayHeight = containerHeight;
-      displayWidth = containerHeight * imageAspectRatio;
+      // Le cadre est plus haut que l'image : la hauteur du container limite
+      maxCropHeight = containerHeight;
+      maxCropWidth = maxCropHeight * cropAspectRatio;
     }
     
-    // La plus petite dimension de l'image réelle
-    const smallestImageDimension = Math.min(imageDimensions.width, imageDimensions.height);
-    
-    // Calculer la taille de base du cadre : le plus grand côté du cadre = plus petite dimension de l'image
-    const scaleToContainer = Math.min(displayWidth / imageDimensions.width, displayHeight / imageDimensions.height);
-    const baseCropSizeInContainer = smallestImageDimension * scaleToContainer;
-    
-    // Appliquer le pourcentage de taille
-    const actualCropSizeInContainer = (baseCropSizeInContainer * sizePercent) / 100;
-    
-    let cropWidth, cropHeight;
-    
-    if (aspectRatio > 1) {
-      // Format horizontal (2x1) : la largeur est le côté le plus grand
-      cropWidth = actualCropSizeInContainer;
-      cropHeight = cropWidth / aspectRatio;
-    } else if (aspectRatio < 1) {
-      // Format vertical (1x2) : la hauteur est le côté le plus grand
-      cropHeight = actualCropSizeInContainer;
-      cropWidth = cropHeight * aspectRatio;
-    } else {
-      // Format carré (1x1) : les deux côtés sont égaux
-      cropWidth = cropHeight = actualCropSizeInContainer;
-    }
+    // Appliquer le pourcentage à la taille maximale
+    const cropWidth = (maxCropWidth * sizePercent) / 100;
+    const cropHeight = (maxCropHeight * sizePercent) / 100;
     
     return { width: cropWidth, height: cropHeight };
   };
@@ -179,6 +159,14 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
     setCropSize(cropArea.size);
   }, [cropArea.size, dimension, imageDimensions]);
 
+  // Mettre à jour les dimensions d'affichage quand les paramètres changent
+  useEffect(() => {
+    if (containerRef.current && imageDimensions) {
+      const { cropWidthPercent, cropHeightPercent } = getCropDisplayDimensions();
+      setDisplayDimensions({ cropWidthPercent, cropHeightPercent });
+    }
+  }, [cropArea, dimension, imageDimensions]);
+
   const dimensions = [
     { label: '1x1 (Carré)', value: [1, 1] as [number, number] },
     { label: '2x1 (Rectangle horizontal)', value: [2, 1] as [number, number] },
@@ -207,10 +195,31 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
 
   // Fonction pour calculer les dimensions d'affichage du cadre en pourcentage du container
   const getCropDisplayDimensions = () => {
+    if (!containerRef.current || !imageDimensions) {
+      // Valeurs par défaut sécurisées quand le container n'est pas encore disponible
+      return { cropWidthPercent: 50, cropHeightPercent: 50 };
+    }
+    
     const { width: cropWidth, height: cropHeight } = getCropDimensions();
-    const cropWidthPercent = containerRef.current ? (cropWidth / containerRef.current.offsetWidth) * 100 : 50;
-    const cropHeightPercent = containerRef.current ? (cropHeight / containerRef.current.offsetHeight) * 100 : 50;
+    // Maintenant l'image remplit exactement le container, donc on peut diviser directement
+    const cropWidthPercent = (cropWidth / containerRef.current.offsetWidth) * 100;
+    const cropHeightPercent = (cropHeight / containerRef.current.offsetHeight) * 100;
     return { cropWidthPercent, cropHeightPercent };
+  };
+
+  // Fonction pour calculer le backgroundSize de l'aperçu de manière sécurisée
+  const getPreviewBackgroundSize = () => {
+    // Utiliser l'état displayDimensions qui est mis à jour de manière sécurisée
+    const { cropWidthPercent, cropHeightPercent } = displayDimensions;
+    
+    // Éviter la division par zéro et les valeurs trop petites
+    const safeWidthPercent = Math.max(cropWidthPercent, 1);
+    const safeHeightPercent = Math.max(cropHeightPercent, 1);
+    
+    const bgSizeX = 100 / (safeWidthPercent / 100);
+    const bgSizeY = 100 / (safeHeightPercent / 100);
+    
+    return `${bgSizeX}% ${bgSizeY}%`;
   };
 
   return (
@@ -294,8 +303,12 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
       
       <div 
         ref={containerRef}
-        className="relative bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden"
-        style={{ width: '400px', height: '300px' }}
+        className="relative bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden mx-auto"
+        style={{ 
+          maxWidth: '500px', 
+          maxHeight: '400px',
+          aspectRatio: imageDimensions ? `${imageDimensions.width} / ${imageDimensions.height}` : '1'
+        }}
         onMouseMove={handleMouseMove}
       >
         {/* Image de fond */}
@@ -315,8 +328,8 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
           style={{
             left: `${cropArea.x}%`,
             top: `${cropArea.y}%`,
-            width: `${getCropDisplayDimensions().cropWidthPercent}%`,
-            height: `${getCropDisplayDimensions().cropHeightPercent}%`,
+            width: `${displayDimensions.cropWidthPercent}%`,
+            height: `${displayDimensions.cropHeightPercent}%`,
             boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
           }}
           onMouseDown={handleMouseDown}
@@ -343,7 +356,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
             style={{
               backgroundImage: `url(${imageUrl})`,
               backgroundPosition: `${cropArea.x}% ${cropArea.y}%`,
-              backgroundSize: `${100 / (getCropDisplayDimensions().cropWidthPercent / 100)}% ${100 / (getCropDisplayDimensions().cropHeightPercent / 100)}%`
+              backgroundSize: getPreviewBackgroundSize()
             }}
           />
         </div>

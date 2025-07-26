@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force la barre de défilement pour éviter le hochement lors des transitions */
+html {
+  overflow-y: scroll;
+}
+
 /* Ajoutez une transition douce pour les changements de thème */
 /* * {
   transition-property: color, background-color, border-color;

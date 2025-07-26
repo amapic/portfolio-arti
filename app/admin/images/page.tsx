@@ -1,4 +1,28 @@
+
 "use client";
+
+// Calcule le crop maximal centré pour un ratio donné et des dimensions d'image
+function getCenteredMaxCrop(imageWidth: number, imageHeight: number, ratio: [number, number]) {
+  const [rw, rh] = ratio;
+  const cropAspect = rw / rh;
+  let cropW = imageWidth;
+  let cropH = imageHeight;
+  if (imageWidth / imageHeight > cropAspect) {
+    // Image plus large que le ratio : hauteur limite
+    cropH = imageHeight;
+    cropW = cropH * cropAspect;
+  } else {
+    // Image plus haute (ou égale) que le ratio : largeur limite
+    cropW = imageWidth;
+    cropH = cropW / cropAspect;
+  }
+  // Position centrée
+  const x = ((imageWidth - cropW) / 2) / imageWidth * 100;
+  const y = ((imageHeight - cropH) / 2) / imageHeight * 100;
+  // Taille en pourcentage du max possible
+  const size = 100;
+  return { x, y, size };
+}
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -32,7 +56,8 @@ const ImagesAdmin: React.FC = () => {
     alt: '',
     titre: '',
     sousTitre: '',
-    dimension: [1, 1] as [number, number]
+    dimension: [1, 1] as [number, number],
+    position: 0
   });
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -125,6 +150,21 @@ const ImagesAdmin: React.FC = () => {
         imageUrl = imageUrl.replace("http://", "https://");
       }
 
+
+      // Charger l'image pour obtenir ses dimensions réelles
+      let crop = { x: 0, y: 0, size: 100 };
+      try {
+        const img = new window.Image();
+        await new Promise((resolve, reject) => {
+          img.onload = () => resolve(true);
+          img.onerror = reject;
+          img.src = imageUrl;
+        });
+        crop = getCenteredMaxCrop(img.naturalWidth, img.naturalHeight, newImageMeta.dimension);
+      } catch (e) {
+        // fallback crop par défaut
+      }
+
       // Création des métadonnées
       const metadata = {
         image_url: imageUrl,
@@ -133,13 +173,9 @@ const ImagesAdmin: React.FC = () => {
         titre: newImageMeta.titre,
         sousTitre: newImageMeta.sousTitre,
         dimension: newImageMeta.dimension,
-        crop: {
-          x: 0,
-          y: 0,
-          size: 100 // Image entière par défaut
-        },
+        crop,
         selected: false,
-        position: 0
+        position: newImageMeta.position
       };
 
       const metaResponse = await fetch(`${API_URL}/api/images?projectId=${PROJECT_ID}`, {
@@ -160,7 +196,8 @@ const ImagesAdmin: React.FC = () => {
         alt: '',
         titre: '',
         sousTitre: '',
-        dimension: [1, 1]
+        dimension: [1, 1],
+        position: 0
       });
 
       // Recharger la liste
@@ -264,12 +301,17 @@ const ImagesAdmin: React.FC = () => {
 
   const handleDimensionChange = (newDimension: [number, number]) => {
     if (croppingImage) {
-      setCroppingImage(prev => prev ? { 
-        ...prev, 
-        dimension: newDimension,
-        // Réinitialiser le crop quand on change de dimension
-        crop: { x: 0, y: 0, size: 100 }
-      } : null);
+      // Charger l'image pour obtenir ses dimensions réelles
+      const img = new window.Image();
+      img.onload = () => {
+        const crop = getCenteredMaxCrop(img.naturalWidth, img.naturalHeight, newDimension);
+        setCroppingImage(prev => prev ? {
+          ...prev,
+          dimension: newDimension,
+          crop
+        } : null);
+      };
+      img.src = croppingImage.image_url;
     }
   };
 
@@ -472,6 +514,20 @@ const ImagesAdmin: React.FC = () => {
                     </select>
                   </div>
 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
+                      Position
+                    </label>
+                    <input
+                      type="number"
+                      value={newImageMeta.position}
+                      onChange={(e) => setNewImageMeta(prev => ({ ...prev, position: parseInt(e.target.value) || 0 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                      placeholder="Position dans l'ordre d'affichage"
+                      min="0"
+                    />
+                  </div>
+
                   <button
                     onClick={handleUpload}
                     disabled={!selectedFile || uploading}
@@ -604,6 +660,19 @@ const ImagesAdmin: React.FC = () => {
                             ))}
                           </div>
                         </div>
+                        
+                        {/* Position */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Position</label>
+                          <input
+                            type="number"
+                            value={editingImage.position}
+                            onChange={(e) => setEditingImage(prev => prev ? { ...prev, position: parseInt(e.target.value) || 0 } : null)}
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Position"
+                            min="0"
+                          />
+                        </div>
                         <div className="flex gap-1">
                           <button
                             onClick={() => handleSaveEdit(editingImage)}
@@ -629,10 +698,10 @@ const ImagesAdmin: React.FC = () => {
                           <HiOutlinePencil className="w-3 h-3" />
                         </button>
                         <div className="ml-6">
-                          <h3 className="font-medium text-sm truncate">{image.titre || 'Sans titre'}</h3>
+                          <h3 className="font-medium text-sm truncate text-black">{image.titre || 'Sans titre'}</h3>
                           <p className="text-xs text-gray-600 truncate">{image.sousTitre || 'Sans sous-titre'}</p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {image.dimension.join('×')} • {image.selected ? 'Sélectionné' : 'Non sélectionné'}
+                            {image.dimension.join('×')} • Position: {image.position} • {image.selected ? 'Sélectionné' : 'Non sélectionné'}
                           </p>
                         </div>
                       </div>

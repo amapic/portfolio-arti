@@ -4,26 +4,26 @@
       "id": "17533282325305egqi0gyp",
       "projet": "3",
       "image_url": "https://dev2site.net:4001/uploads/3/1753328232385-732829621.jpg",
-      "position": 0,
+      "position": 3,
       "selected": true,
       "category": [
         "Theater",
         "Opera"
       ],
       "alt": "b",
-      "titre": "A",
-      "sousTitre": "A",
+      "titre": "Agg",
+      "sousTitre": "Agg",
       "dimension": [
-        2,
-        1
+        1,
+        2
       ],
       "crop": {
-        "x": 0,
-        "y": 0,
+        "x": 25,
+        "y": 19.375,
         "size": 100
       },
       "created_at": "2025-07-24T03:37:12.530Z",
-      "updated_at": "2025-07-24T15:21:25.732Z"
+      "updated_at": "2025-07-24T23:38:04.920Z"
     },
     {
       "id": "1753328252493dmzb1a9qu",
@@ -86,19 +86,19 @@
         "Circus"
       ],
       "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
+      "titre": "AAA",
+      "sousTitre": "k",
       "dimension": [
-        1,
+        2,
         1
       ],
       "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
+        "x": 7.899999999999999,
+        "y": 5.599999999999994,
+        "size": 84
       },
       "created_at": "2025-07-24T12:47:02.135Z",
-      "updated_at": "2025-07-24T15:21:26.964Z"
+      "updated_at": "2025-07-25T01:14:07.964Z"
     },
     {
       "id": "1753369928674zlxc9i96d",
@@ -182,19 +182,19 @@
         "Theater"
       ],
       "alt": "Image Theater",
-      "titre": "Titre Theater",
+      "titre": "coupe au bol",
       "sousTitre": "",
       "dimension": [
-        1,
+        2,
         1
       ],
       "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
+        "x": 3.749999999999993,
+        "y": 13.625,
+        "size": 95
       },
       "created_at": "2025-07-24T15:12:49.747Z",
-      "updated_at": "2025-07-24T15:21:28.097Z"
+      "updated_at": "2025-07-25T00:20:06.768Z"
     },
     {
       "id": "1753369998854qthhyxrk8",
@@ -299,22 +299,22 @@
       "position": 0,
       "selected": true,
       "category": [
-        "Theater"
+        "Event"
       ],
       "alt": "Image Theater",
-      "titre": "Titre Theater",
+      "titre": "noir",
       "sousTitre": "",
       "dimension": [
         1,
-        1
+        2
       ],
       "crop": {
-        "x": 0,
+        "x": 36.199999999999996,
         "y": 0,
         "size": 100
       },
       "created_at": "2025-07-24T15:14:12.111Z",
-      "updated_at": "2025-07-24T15:21:36.255Z"
+      "updated_at": "2025-07-24T23:57:32.761Z"
     },
     {
       "id": "1753370553793jnet5knyf",

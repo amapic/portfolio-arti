@@ -3,7 +3,7 @@ import { CategoryType } from '../types/categories';
 
 interface ImageComponentProps {
   item: {
-    id: number;
+    id: string; // Changer en string pour éviter la troncature
     category: CategoryType | CategoryType[];
     imageUrl: string;
     alt: string;
@@ -18,9 +18,9 @@ interface ImageComponentProps {
   crop?: {
     x: number;      // position X du cadre (en %)
     y: number;      // position Y du cadre (en %)
-    width: number;  // largeur du cadre (en %)
-    height: number; // hauteur du cadre (en %)
+    size: number;   // taille du cadre (en %)
   };
+  transitionState?: 'stable' | 'entering' | 'exiting';
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = ({
@@ -30,7 +30,8 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
   index,
   onImageRef,
   isVisible,
-  crop
+  crop,
+  transitionState = 'stable'
 }) => {
   const [width, height] = dimension;
   const [col, row] = position;
@@ -54,29 +55,111 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
       return {};
     }
     
-    // Utiliser background-image pour un contrôle précis du crop
+    // Logique cohérente avec ImageCropper - calcul basé sur la dimension limitante
+    const [cropRatioW, cropRatioH] = dimension;
+    const cropAspectRatio = cropRatioW / cropRatioH;
+    
+    // Pour calculer les dimensions du crop, on doit déterminer quelle dimension limite
+    // On suppose que l'image affichée a un ratio de 1:1 dans le container (object-cover)
+    // et on calcule comme dans ImageCropper
+    
+    let maxCropWidthPercent, maxCropHeightPercent;
+    
+    // Calculer la taille maximale possible du cadre en respectant le ratio choisi
+    // On assume que l'image remplit son container de manière proportionnelle
+    if (cropAspectRatio >= 1) {
+      // Format horizontal (2x1) ou carré (1x1)
+      // La largeur est limitante ou égale
+      maxCropWidthPercent = 100;
+      maxCropHeightPercent = 100 / cropAspectRatio;
+    } else {
+      // Format vertical (1x2)
+      // La hauteur est limitante
+      maxCropHeightPercent = 100;
+      maxCropWidthPercent = 100 * cropAspectRatio;
+    }
+    
+    // Appliquer le pourcentage de size à la taille maximale
+    const cropWidthPercent = (maxCropWidthPercent * crop.size) / 100;
+    const cropHeightPercent = (maxCropHeightPercent * crop.size) / 100;
+    
+    // Calculer le background-size pour afficher la bonne portion
+    const bgSizeX = 100 / (cropWidthPercent / 100);
+    const bgSizeY = 100 / (cropHeightPercent / 100);
+    
+    // Calculer le background-position pour centrer le crop
+    const bgPosX = -(crop.x * bgSizeX) / 100;
+    const bgPosY = -(crop.y * bgSizeY) / 100;
+    
     return {
       backgroundImage: `url(${item.imageUrl})`,
-      backgroundSize: `${100 / (crop.width / 100)}% ${100 / (crop.height / 100)}%`,
-      backgroundPosition: `${-crop.x / (crop.width / 100)}% ${-crop.y / (crop.height / 100)}%`,
+      backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
+      backgroundPosition: `${bgPosX}% ${bgPosY}%`,
       backgroundRepeat: 'no-repeat'
     };
   };
 
   const shouldUseBackground = Boolean(crop);
 
+  // Classes CSS pour les transitions
+  const getTransitionClasses = () => {
+    switch (transitionState) {
+      case 'entering':
+        return 'entering-animation';
+      case 'exiting':
+        return 'exiting-animation';
+      default:
+        return '';
+    }
+  };
+
   return (
-    <div 
-      ref={(el) => onImageRef(index, el)}
-      data-index={index}
-      className={`
-        relative overflow-hidden shadow-lg 
-        cursor-pointer
-        ${isVisible ? 'animate-pulse' : ''}
-        ${getGridClasses()}
-      `}
-      style={gridStyle}
-    >
+    <>
+      {/* Animation CSS pour les transitions */}
+      <style jsx>{`
+        @keyframes scaleIn {
+          from { 
+            transform: scale(0);
+            opacity: 0;
+          }
+          to { 
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes scaleOut {
+          from { 
+            transform: scale(1);
+            opacity: 1;
+          }
+          to { 
+            transform: scale(0);
+            opacity: 0;
+          }
+        }
+        
+        .entering-animation {
+          animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        .exiting-animation {
+          animation: scaleOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      `}</style>
+      
+      <div 
+        ref={(el) => onImageRef(index, el)}
+        data-index={index}
+        className={`
+          relative overflow-hidden shadow-sm 
+          cursor-pointer
+          ${isVisible ? 'animate-pulse' : ''}
+          ${getGridClasses()}
+          ${getTransitionClasses()}
+        `}
+        style={gridStyle}
+      >
       {shouldUseBackground ? (
         // Utiliser un div avec background-image pour le crop
         <div
@@ -92,20 +175,20 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
           loading="eager"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-br from-red-500/70 via-orange-500/60 to-yellow-500/40 opacity-0 hover:opacity-100 transition-opacity duration-400 flex items-center justify-center">
-        <div className="text-center px-4">
-          <h3 className="text-white text-lg font-semibold tracking-wider drop-shadow-lg">
-            {item.titre }
-          </h3>
-          {item.sousTitre && (
-            <p className="text-white text-sm mt-2 opacity-90 font-light">
-              {item.sousTitre}
-            </p>
-          )}
-         
-        </div>
+      
+      {/* Titre et sous-titre sans overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <h3 className="text-white text-lg font-semibold tracking-wider drop-shadow-lg">
+          {item.titre}
+        </h3>
+        {item.sousTitre && (
+          <p className="text-white text-sm mt-1 opacity-90 font-light drop-shadow-lg">
+            {item.sousTitre}
+          </p>
+        )}
       </div>
     </div>
+    </>
   );
 };
 

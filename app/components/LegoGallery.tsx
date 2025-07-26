@@ -8,7 +8,7 @@ import { ImageMeta } from '../types/imageMeta';
 import { CATEGORIES, CategoryType, getCategoryLabel, imageMatchesCategory, normalizeCategoriesArray } from '../types/categories';
 
 interface GalleryItem {
-  id: number;
+  id: string; // Changer en string pour éviter la troncature
   category: CategoryType | CategoryType[];
   imageUrl: string;
   alt: string;
@@ -18,8 +18,7 @@ interface GalleryItem {
   crop?: {
     x: number;      // position X du cadre (en %)
     y: number;      // position Y du cadre (en %)
-    width: number;  // largeur du cadre (en %)
-    height: number; // hauteur du cadre (en %)
+    size: number;   // taille du cadre (en %)
   };
 }
 
@@ -29,10 +28,16 @@ interface PlacedImage {
   position: [number, number]; // [col, row]
 }
 
+interface TransitioningImage extends PlacedImage {
+  transitionState?: 'stable' | 'entering' | 'exiting';
+}
+
 const LegoGallery: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<CategoryType | 'All'>('All');
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const [placedImages, setPlacedImages] = useState<PlacedImage[]>([]);
+  const [transitioningImages, setTransitioningImages] = useState<TransitioningImage[]>([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [gridHeight, setGridHeight] = useState(10);
   const [imagesMeta, setImagesMeta] = useState<ImageMeta[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +83,7 @@ const LegoGallery: React.FC = () => {
 
   // Convertir les métadonnées en items de galerie
   const galleryItems: GalleryItem[] = imagesMeta.map((meta, index) => ({
-    id: parseInt(meta.id.replace('img_', '') || '0'), // Convertir l'ID string en number
+    id: meta.id, // Garder l'ID comme string pour éviter la troncature
     category: meta.category,
     imageUrl: meta.image_url,
     alt: meta.alt,
@@ -157,11 +162,11 @@ const LegoGallery: React.FC = () => {
       }
     });
 
-    // Calculer la hauteur finale de la grille
-    setGridHeight(grid.length);
-    console.log(`Grille finale: ${GRID_WIDTH}x${grid.length}`);
+    // Calculer la hauteur finale de la grille et la retourner
+    const finalGridHeight = grid.length;
+    console.log(`Grille finale: ${GRID_WIDTH}x${finalGridHeight}`);
     
-    return placed;
+    return { placed, gridHeight: finalGridHeight };
   };
 
   // Trouver la prochaine position libre (balayage de gauche à droite, haut en bas)
@@ -229,11 +234,34 @@ const LegoGallery: React.FC = () => {
     }
   };
 
+  // Gérer les transitions lors du changement de filtre
+  const handleFilterTransition = (newLayout: PlacedImage[], newGridHeight: number) => {
+    setIsTransitioning(true);
+    
+    // Toutes les nouvelles images apparaissent avec l'animation d'entrée
+    const transitionImages: TransitioningImage[] = newLayout.map(placedImage => ({
+      ...placedImage,
+      transitionState: 'entering'
+    }));
+    
+    // Mettre à jour immédiatement avec les positions finales
+    setTransitioningImages(transitionImages);
+    setPlacedImages(newLayout);
+    setGridHeight(newGridHeight);
+    
+    // Finir la transition après l'animation
+    setTimeout(() => {
+      setIsTransitioning(false);
+      setTransitioningImages([]);
+    }, 600); // 500ms animation + 100ms buffer
+  };
+
   // Générer le layout quand les items changent
   useEffect(() => {
     // Ne générer le layout que si on a des images de l'API
     if (galleryItems.length === 0) {
       setPlacedImages([]);
+      setTransitioningImages([]);
       return;
     }
 
@@ -243,8 +271,8 @@ const LegoGallery: React.FC = () => {
     
     console.log(`Filtrage pour catégorie "${activeCategory}":`, filteredItems.length, 'images sur', galleryItems.length, 'total'); // Debug
     
-    const layout = generateLayout(filteredItems);
-    setPlacedImages(layout);
+    const { placed, gridHeight: newGridHeight } = generateLayout(filteredItems);
+    handleFilterTransition(placed, newGridHeight);
   }, [activeCategory, imagesMeta]); // Ajouter imagesMeta comme dépendance
 
   // Intersection Observer (commenté pour l'instant)
@@ -300,10 +328,14 @@ const LegoGallery: React.FC = () => {
       {/* Dynamic Lego Gallery Grid */}
       {!loading && galleryItems.length > 0 && (
         <div 
-          className="grid grid-cols-3 gap-2 p-8 pt-2 max-w-6xl mx-auto auto-rows-[400px]"
-          style={{ gridTemplateRows: `repeat(${gridHeight}, 400px)` }}
+          className="grid grid-cols-3 gap-2 p-8 pt-2 mx-auto auto-rows-[400px]"
+          style={{ 
+            gridTemplateRows: `repeat(${gridHeight}, 400px)`,
+            width: '1152px', // Largeur fixe pour éviter les variations
+            maxWidth: '100vw' // Ne pas dépasser la largeur de l'écran
+          }}
         >
-          {placedImages.map((placedImage, index) => (
+          {(isTransitioning ? transitioningImages : placedImages).map((placedImage, index) => (
             <ImageComponent
               key={placedImage.item.id}
               item={placedImage.item}
@@ -313,6 +345,7 @@ const LegoGallery: React.FC = () => {
               onImageRef={(idx, el) => { itemRefs.current[idx] = el; }}
               isVisible={visibleItems.includes(index)}
               crop={placedImage.item.crop}
+              transitionState={isTransitioning ? (placedImage as TransitioningImage).transitionState : 'stable'}
             />
           ))}
         </div>
