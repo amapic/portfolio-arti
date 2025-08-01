@@ -24,7 +24,21 @@ export interface AboutData {
     };
     contactImage?: string;
   };
+  footer?: {
+    copyrightText?: string;
+    designBy?: string;
+    designUrl?: string;
+    realisationBy?: string;
+    realisationUrl?: string;
+    mentionsLegalesUrl?: string;
+  };
 
   created_at?: string;
   updated_at?: string;
 }
+
+// export interface AboutData {
+//   // existing properties
+
+  
+// }

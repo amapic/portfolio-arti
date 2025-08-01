@@ -36,26 +36,11 @@ const AboutPage: React.FC = () => {
     loadTextData();
   }, [API_URL, PROJECT_ID]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Chargement...</p>
-        </div>
-      </div>
-    );
-  }
 
-  if (!textData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Erreur lors du chargement des données</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Don't render until textData is loaded
+  if (!textData) return null;
+  // Do not render until textData is loaded
+  if (!textData) return null;
   return (
     <div className="min-h-screen bg-white font-exposure">
       {/* Header */}
@@ -63,13 +48,13 @@ const AboutPage: React.FC = () => {
         title="Romain de Lagarde"
         currentPage="about"
       />
-      {/* Contenu principal */}}
+      {/* Contenu principal */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
             
-            {/* Image à gauche */}
-            <div className="w-full">
+            {/* Image à gauche (1/3) */}
+            <div className="w-full lg:col-span-1">
               <img
                 src={textData.about.image_url}
                 alt={textData.about.image_alt}
@@ -77,8 +62,8 @@ const AboutPage: React.FC = () => {
               />
             </div>
 
-            {/* Contenu à droite */}
-            <div className="space-y-8">
+            {/* Contenu à droite (2/3) */}
+            <div className="space-y-8 lg:col-span-2">
               {/* Texte principal */}
               <div>
                 <div className="prose prose-lg max-w-none">
@@ -88,87 +73,64 @@ const AboutPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Citation */}
-              <div className="border-l-4 border-gray-300 pl-6">
+              {/* Citation centered with dividers */}
+              <hr className="border-t border-gray-600 my-6" />
+              <div className="mx-auto max-w-2xl text-right">
                 <blockquote className="italic text-gray-600 text-lg">
                   "{textData.about.quote}"
                 </blockquote>
-                <cite className="text-gray-500 text-sm mt-2 block">
+                <div className="mt-2 text-gray-600 text-sm">
                   {textData.about.quote_author}
-                </cite>
-              </div>
-
-              {/* Réseaux sociaux */}
-              <div className="space-y-2 pt-4">
-                <h4 className="text-lg font-light text-gray-700 mb-3">Réseaux sociaux</h4>
-                <div className="flex gap-4">
-                  {textData.about.links.instagram && (
-                    <a 
-                      href={textData.about.links.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-black transition-colors underline decoration-1 underline-offset-4"
-                    >
-                      Instagram
-                    </a>
-                  )}
-                  
-                  {textData.about.links.facebook && (
-                    <a 
-                      href={textData.about.links.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-black transition-colors underline decoration-1 underline-offset-4"
-                    >
-                      Facebook
-                    </a>
-                  )}
-                  
-                  {textData.about.links.linkedin && (
-                    <a 
-                      href={textData.about.links.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-black transition-colors underline decoration-1 underline-offset-4"
-                    >
-                      LinkedIn
-                    </a>
-                  )}
                 </div>
               </div>
+              {/* <hr className="border-t border-gray-300 my-6" /> */}
 
-              {/* Sites web */}
-              <div className="space-y-2 pt-4">
-                <h4 className="text-lg font-light text-gray-700 mb-3">Sites web</h4>
-                <div className="space-y-1">
-                  {textData.about.links.website1 && (
-                    <div>
-                      <a 
-                        href={textData.about.links.website1}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-600 hover:text-black transition-colors underline decoration-1 underline-offset-4"
-                      >
-                        {textData.about.links.website1.replace('https://', '')}
-                      </a>
-                    </div>
-                  )}
-                  
-                  {textData.about.links.website2 && (
-                    <div>
-                      <a 
-                        href={textData.about.links.website2}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-600 hover:text-black transition-colors underline decoration-1 underline-offset-4"
-                      >
-                        {textData.about.links.website2.replace('https://', '')}
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social and Website links below grid */}
+      <section className="px-4 sm:px-6 lg:px-8 pb-32">
+        <div className="max-w-6xl mx-auto">
+          <div className="pt-8">
+            <ul className="list-none space-y-1 text-gray-600">
+              {textData.about.links.instagram && (
+                <li>
+                  <a href={textData.about.links.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors underline decoration-1 underline-offset-4">
+                    Instagram
+                  </a>
+                </li>
+              )}
+              {textData.about.links.facebook && (
+                <li>
+                  <a href={textData.about.links.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors underline decoration-1 underline-offset-4">
+                    Facebook
+                  </a>
+                </li>
+              )}
+              {textData.about.links.linkedin && (
+                <li>
+                  <a href={textData.about.links.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors underline decoration-1 underline-offset-4">
+                    LinkedIn
+                  </a>
+                </li>
+              )}
+              {textData.about.links.website1 && (
+                <li>
+                  <a href={textData.about.links.website1} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors underline decoration-1 underline-offset-4">
+                    {textData.about.links.website1.replace('https://', '')}
+                  </a>
+                </li>
+              )}
+              {textData.about.links.website2 && (
+                <li>
+                  <a href={textData.about.links.website2} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors underline decoration-1 underline-offset-4">
+                    {textData.about.links.website2.replace('https://', '')}
+                  </a>
+                </li>
+              )}
+            </ul>
           </div>
         </div>
       </section>

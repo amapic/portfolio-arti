@@ -14,6 +14,8 @@ interface ImageCropperProps {
   initialCrop?: CropArea;
   onCropChange: (crop: CropArea) => void;
   onDimensionChange?: (dimension: [number, number]) => void;
+  // notify parent of the current display dimensions of the crop box
+  onDisplayChange?: (displayDimensions: { cropWidthPercent: number; cropHeightPercent: number }) => void;
 }
 
 const ImageCropper: React.FC<ImageCropperProps> = ({
@@ -21,7 +23,8 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   dimension,
   initialCrop,
   onCropChange,
-  onDimensionChange
+  onDimensionChange,
+  onDisplayChange
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -162,8 +165,11 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   // Mettre à jour les dimensions d'affichage quand les paramètres changent
   useEffect(() => {
     if (containerRef.current && imageDimensions) {
-      const { cropWidthPercent, cropHeightPercent } = getCropDisplayDimensions();
-      setDisplayDimensions({ cropWidthPercent, cropHeightPercent });
+      const dims = getCropDisplayDimensions();
+      setDisplayDimensions(dims);
+      if (onDisplayChange) {
+        onDisplayChange(dims);
+      }
     }
   }, [cropArea, dimension, imageDimensions]);
 

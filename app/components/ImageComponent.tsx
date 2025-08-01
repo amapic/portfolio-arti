@@ -63,47 +63,20 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
     if (!crop) {
       return {};
     }
-    // Utiliser displayDimensions si disponibles (venant de l'API)
-    let cropWidthPercent = 100;
-    let cropHeightPercent = 100;
-    if (displayDimensions && displayDimensions.cropWidthPercent && displayDimensions.cropHeightPercent) {
-      cropWidthPercent = displayDimensions.cropWidthPercent;
-      cropHeightPercent = displayDimensions.cropHeightPercent;
-    } else if (item.displayDimensions && item.displayDimensions.cropWidthPercent && item.displayDimensions.cropHeightPercent) {
-      cropWidthPercent = item.displayDimensions.cropWidthPercent;
-      cropHeightPercent = item.displayDimensions.cropHeightPercent;
-    } else {
-      // Fallback: ancienne logique basée sur le ratio de la grille
-      const [cropRatioW, cropRatioH] = dimension;
-      const cropAspectRatio = cropRatioW / cropRatioH;
-      if (cropAspectRatio >= 1) {
-        cropWidthPercent = 100;
-        cropHeightPercent = 100 / cropAspectRatio;
-      } else {
-        cropHeightPercent = 100;
-        cropWidthPercent = 100 * cropAspectRatio;
-      }
-    }
-    // Appliquer le pourcentage de size à la taille maximale
-    cropWidthPercent = (cropWidthPercent * crop.size) / 100;
-    cropHeightPercent = (cropHeightPercent * crop.size) / 100;
-    // Calculer le background-size pour afficher la bonne portion
-    const bgSizeX = 100 / (cropWidthPercent / 100);
-    const bgSizeY = 100 / (cropHeightPercent / 100);
-    // Calculer le background-position pour centrer le crop
-    // const bgPosX = -(crop.x * bgSizeX) / 100;
-    // const bgPosY = -(crop.y * bgSizeY) / 100;
-    // const bgPosY = -(crop.y * bgSizeY) / 100;
-    const bgPosX = crop.x * ((100 / 100) + item.displayDimensions.cropWidthPercent / 100);
-    const bgPosY = crop.y * ((100 / 100) + item.displayDimensions.cropHeightPercent / 100);
-    console.log(`cropArea.x: ${crop.x}, cropArea.y: ${crop.y}`);
-    console.log(`displayDimensions: ${item.displayDimensions.cropWidthPercent}% ${item.displayDimensions.cropHeightPercent}%`);
-    console.log(`bgPosition: ${bgPosX}% ${bgPosY}%`);
+    // Use displayDimensions from prop or API, fallback to full image
+    const dims = displayDimensions || item.displayDimensions || { cropWidthPercent: 100, cropHeightPercent: 100 };
+    const safeW = Math.max(dims.cropWidthPercent, 1);
+    const safeH = Math.max(dims.cropHeightPercent, 1);
+    // Compute background size based on display dimensions
+    const bgSizeX = 100 / (safeW / 100);
+    const bgSizeY = 100 / (safeH / 100);
+    // Compute background position based on crop offsets
+    const bgPosX = (crop.x * bgSizeX) / 100;
+    const bgPosY = (crop.y * bgSizeY) / 100;
     return {
       backgroundImage: `url(${item.imageUrl})`,
       backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
       backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-      // bac
       backgroundRepeat: 'no-repeat'
     };
   };
@@ -187,7 +160,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
       
       {/* Titre et sous-titre centrés au hover, sans animation */}
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100"
+        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
         style={{ zIndex: 2 }}
       >
         <h3 className="text-white text-lg font-semibold tracking-wider drop-shadow-lg text-center">

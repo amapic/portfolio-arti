@@ -733,6 +733,9 @@ const ImagesAdmin: React.FC = () => {
                     initialCrop={croppingImage.crop}
                     onCropChange={handleCropChange}
                     onDimensionChange={handleDimensionChange}
+                    onDisplayChange={(dims) => {
+                      setCroppingImage(prev => prev ? { ...prev, displayDimensions: dims } : null);
+                    }}
                   />
                   
                   <div className="flex gap-2 mt-6 pt-4 border-t">

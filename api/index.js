@@ -471,7 +471,7 @@ app.post('/api/images', async (req, res) => {
       return res.status(400).json({ error: 'ProjectId manquant' });
     }
 
-    const { image_url, position, selected, category, alt, titre, sousTitre, dimension, crop } = req.body;
+    const { image_url, position, selected, category, alt, titre, sousTitre, dimension, crop, displayDimensions } = req.body;
     
     if (!image_url || !category) {
       return res.status(400).json({ error: 'image_url et category sont requis' });
@@ -494,6 +494,8 @@ app.post('/api/images', async (req, res) => {
       sousTitre: sousTitre || '',
       dimension: dimension || [1, 1],
       crop: crop || { x: 0, y: 0, size: 100 }, // Image entière par défaut
+      // optional precomputed display dims for preview rendering
+      displayDimensions: displayDimensions || undefined,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };

@@ -15,6 +15,7 @@ const ContactAdmin: React.FC = () => {
     id: '',
     projet: '3',
     contact: {
+      title: 'Get In Touch',
       email: '',
       phone: '',
       address: '',

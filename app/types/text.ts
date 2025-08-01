@@ -1,6 +1,8 @@
 export interface TextData {
   // Données de contact
   contact: {
+    /** Titre de la section contact, p.ex. 'Get In Touch' */
+    title?: string;
     email: string;
     phone: string;
     address: string;

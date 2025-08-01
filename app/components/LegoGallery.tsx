@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ImageComponent from './ImageComponent';
 import PortfolioHeader from './PortfolioHeader';
-// import PortfolioFooter from './PortfolioFooter';
 import { ImageMeta } from '../types/imageMeta';
 import { CATEGORIES, CategoryType, getCategoryLabel, imageMatchesCategory, normalizeCategoriesArray } from '../types/categories';
 
@@ -297,15 +296,20 @@ const LegoGallery: React.FC = () => {
       <PortfolioHeader />
 
       {/* Category Navigation */}
-      <nav className="flex justify-center gap-12 pt-12 bg-transparent">
+      <nav className="font-exposure flex justify-between px-8 pt-12 bg-transparent w-full max-w-[1152px] mx-auto"
+      style={{
+            gridTemplateRows: `repeat(${gridHeight}, 400px)`,
+            fontFamily: 'ExposureTrial',
+      }}
+      >
         {categories.map((category) => (
           <button
             key={category}
             className={`
-              bg-none border-none text-xl font-light text-black cursor-pointer 
-               py-2 tracking-wide font-serif relative text-center w-[50px] md:w-[90px]
+              bg-none border-none text-xl text-black cursor-pointer 
+               py-2 font-[400] tracking-wide relative text-center w-[50px] md:w-[90px]
               hover:font-[600] transition-opacity duration-200
-              ${activeCategory === category ? 'font-semibold opacity-100' : ''}
+              ${activeCategory === category ? 'font-[600]' : ''}
             `}
             onClick={() => setActiveCategory(category)}
           >
@@ -317,7 +321,7 @@ const LegoGallery: React.FC = () => {
       {/* Loading Indicator */}
       {loading && (
         <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+          {/* <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div> */}
           {/* <span className="ml-4 text-black opacity-70">Chargement des images...</span> */}
         </div>
       )}
@@ -357,7 +361,18 @@ const LegoGallery: React.FC = () => {
         </div>
       )}
 
-      {/* <PortfolioFooter /> */}
+      {/* Global font-face and utility class for ExposureTrial */}
+      <style jsx global>{`
+        @font-face {
+          font-family: 'ExposureTrial';
+          src: url('/ExposureTrial-0.woff2') format('woff2');
+          font-weight: normal;
+          font-style: normal;
+        }
+        .font-exposure {
+          font-family: 'ExposureTrial', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+        }
+      `}</style>
     </div>
   );
 };
