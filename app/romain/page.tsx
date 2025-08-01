@@ -4,11 +4,8 @@ import LegoGallery from "../components/LegoGallery";
 
 function Dev() {
   return (
-    <div>
-      {/* <Lego></Lego> */}
-        <LegoGallery />
-        {/* Uncomment the line below to include the Artistic Gallery */}
-      {/* <ArtisticGallery /> */}
+    <div className="font-exposure">
+      <LegoGallery />
     </div>
   );
 }

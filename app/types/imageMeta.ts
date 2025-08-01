@@ -16,6 +16,10 @@ export interface ImageMeta {
     y: number;      // position Y du cadre (en %)
     size: number;   // taille du cadre (en %, 100% = plus petite dimension de l'image)
   };
+  displayDimensions?: {
+    cropWidthPercent: number;
+    cropHeightPercent: number;
+  };
   created_at?: string;
   updated_at?: string;
 }

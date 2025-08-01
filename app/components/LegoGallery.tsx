@@ -8,17 +8,21 @@ import { ImageMeta } from '../types/imageMeta';
 import { CATEGORIES, CategoryType, getCategoryLabel, imageMatchesCategory, normalizeCategoriesArray } from '../types/categories';
 
 interface GalleryItem {
-  id: string; // Changer en string pour éviter la troncature
+  id: string;
   category: CategoryType | CategoryType[];
   imageUrl: string;
   alt: string;
   titre: string;
   sousTitre: string;
-  dimension?: [number, number]; // Dimension optionnelle depuis l'API
+  dimension?: [number, number];
   crop?: {
-    x: number;      // position X du cadre (en %)
-    y: number;      // position Y du cadre (en %)
-    size: number;   // taille du cadre (en %)
+    x: number;
+    y: number;
+    size: number;
+  };
+  displayDimensions?: {
+    cropWidthPercent: number;
+    cropHeightPercent: number;
   };
 }
 
@@ -83,14 +87,15 @@ const LegoGallery: React.FC = () => {
 
   // Convertir les métadonnées en items de galerie
   const galleryItems: GalleryItem[] = imagesMeta.map((meta, index) => ({
-    id: meta.id, // Garder l'ID comme string pour éviter la troncature
+    id: meta.id,
     category: meta.category,
     imageUrl: meta.image_url,
     alt: meta.alt,
     titre: meta.titre || '',
     sousTitre: meta.sousTitre || '',
-    dimension: meta.dimension, // Utiliser la dimension de l'API
-    crop: meta.crop // Passer les métadonnées de crop
+    dimension: meta.dimension,
+    crop: meta.crop,
+    displayDimensions: meta.displayDimensions
   }));
 
   // Algorithme de placement séquentiel sans trous
@@ -297,9 +302,9 @@ const LegoGallery: React.FC = () => {
           <button
             key={category}
             className={`
-              bg-none border-none text-xl font-light text-black opacity-70 cursor-pointer 
-              px-4 py-2 tracking-wide font-serif relative text-center w-[50px] md:w-[90px]
-              hover:opacity-100 transition-opacity duration-200
+              bg-none border-none text-xl font-light text-black cursor-pointer 
+               py-2 tracking-wide font-serif relative text-center w-[50px] md:w-[90px]
+              hover:font-[600] transition-opacity duration-200
               ${activeCategory === category ? 'font-semibold opacity-100' : ''}
             `}
             onClick={() => setActiveCategory(category)}
@@ -313,7 +318,7 @@ const LegoGallery: React.FC = () => {
       {loading && (
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-          <span className="ml-4 text-black opacity-70">Chargement des images...</span>
+          {/* <span className="ml-4 text-black opacity-70">Chargement des images...</span> */}
         </div>
       )}
 
@@ -345,6 +350,7 @@ const LegoGallery: React.FC = () => {
               onImageRef={(idx, el) => { itemRefs.current[idx] = el; }}
               isVisible={visibleItems.includes(index)}
               crop={placedImage.item.crop}
+              displayDimensions={placedImage.item.displayDimensions}
               transitionState={isTransitioning ? (placedImage as TransitioningImage).transitionState : 'stable'}
             />
           ))}

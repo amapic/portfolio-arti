@@ -305,22 +305,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
             Ajustez la taille du cadre de recadrage par rapport à l'image originale
           </p>
           
-          {/* Aperçu miniature */}
-          <div 
-            className="border border-gray-300 rounded overflow-hidden mt-4"
-            style={{ 
-              width: `${Math.min(200, 200 * getAspectRatio())}px`,
-              height: `${Math.min(200, 200 / getAspectRatio())}px`
-            }}
-          >
-            <div
-              className="w-full h-full bg-cover bg-no-repeat"
-              style={{
-                backgroundImage: `url(${imageUrl})`,
-                ...getPreviewBackground()
-              }}
-            />
-          </div>
+          {/* Aperçu miniature supprimé, on ne garde que l'aperçu du résultat plus bas */}
         </div>
       )}
       
@@ -402,9 +387,9 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
                 // console.log(`Crop position: ${posX}% ${posY}%`);
                 console.log(`cropArea.x: ${cropArea.x}, cropArea.y: ${cropArea.y}`);
                 console.log(`displayDimensions: ${displayDimensions.cropWidthPercent}% ${displayDimensions.cropHeightPercent}%`);
-                return { backgroundPosition: `${cropArea.x*(1+displayDimensions.cropWidthPercent/100)}% ${cropArea.y*(1+displayDimensions.cropHeightPercent/100)}%` };
+                return { backgroundPosition: `${cropArea.x*((100/100)+displayDimensions.cropWidthPercent/100)}% ${cropArea.y*((100/100)+displayDimensions.cropHeightPercent/100)}%` };
               })(),
-              // backgroundSize: getPreviewBackgroundSize()
+              backgroundSize: getPreviewBackgroundSize()
             }}
           />
         </div>

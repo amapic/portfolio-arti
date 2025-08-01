@@ -49,7 +49,7 @@ const ContactPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col font-exposure">
       {/* Header */}
       <PortfolioHeader 
         title="Romain de Lagarde"

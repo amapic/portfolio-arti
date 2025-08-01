@@ -17,7 +17,7 @@ export const Header = () => {
             href="/" 
             className="text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
-            Portfolio Artistique
+            Site web
           </Link>
           
           {/* Menu Admin - Navigation entre pages admin */}

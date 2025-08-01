@@ -58,7 +58,7 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 border rounded-lg 
-                  dark:bg-gray-700 dark:border-gray-600 dark:text-white
+                  bg-black text-white border-gray-300
                   focus:ring-2 focus:ring-blue-500 focus:border-transparent
                   ${error ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="Mot de passe"

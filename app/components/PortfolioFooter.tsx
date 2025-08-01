@@ -23,7 +23,7 @@ const PortfolioFooter: React.FC<PortfolioFooterProps> = ({ aboutData }) => {
   const currentFooterData = footerData || defaultFooterData;
 
   return (
-    <footer className="w-full h-full py-6 px-8 bg-white border-t border-gray-200 flex flex-col items-end">
+    <footer className="w-full h-full py-6 px-8  flex flex-col items-end">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           {/* Copyright à gauche */}

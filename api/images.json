@@ -15,15 +15,19 @@
       "sousTitre": "Agg",
       "dimension": [
         1,
-        2
+        1
       ],
       "crop": {
-        "x": 25,
-        "y": 19.375,
+        "x": 0,
+        "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T03:37:12.530Z",
-      "updated_at": "2025-07-24T23:38:04.920Z"
+      "updated_at": "2025-07-29T06:22:17.766Z"
     },
     {
       "id": "1753328252493dmzb1a9qu",
@@ -46,6 +50,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T03:37:32.493Z",
       "updated_at": "2025-07-24T03:38:21.950Z"
@@ -72,8 +80,12 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T03:37:55.250Z",
-      "updated_at": "2025-07-24T14:05:59.972Z"
+      "updated_at": "2025-07-25T01:24:42.371Z"
     },
     {
       "id": "1753361222135xeaqknrx7",
@@ -82,23 +94,26 @@
       "position": 0,
       "selected": true,
       "category": [
-        "Theater",
-        "Circus"
+        "Dance"
       ],
       "alt": "Image Theater",
       "titre": "AAA",
       "sousTitre": "k",
       "dimension": [
-        2,
-        1
+        1,
+        2
       ],
       "crop": {
-        "x": 7.899999999999999,
-        "y": 5.599999999999994,
+        "x": 16,
+        "y": 16,
         "size": 84
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T12:47:02.135Z",
-      "updated_at": "2025-07-25T01:14:07.964Z"
+      "updated_at": "2025-07-29T06:49:17.394Z"
     },
     {
       "id": "1753369928674zlxc9i96d",
@@ -120,6 +135,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:12:08.674Z",
       "updated_at": "2025-07-24T15:21:30.393Z"
@@ -145,6 +164,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:12:17.747Z",
       "updated_at": "2025-07-24T15:21:29.433Z"
     },
@@ -169,6 +192,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:12:37.374Z",
       "updated_at": "2025-07-24T15:21:28.782Z"
     },
@@ -189,12 +216,16 @@
         1
       ],
       "crop": {
-        "x": 3.749999999999993,
-        "y": 13.625,
-        "size": 95
+        "x": 0,
+        "y": 0.5,
+        "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:12:49.747Z",
-      "updated_at": "2025-07-25T00:20:06.768Z"
+      "updated_at": "2025-07-29T06:31:51.006Z"
     },
     {
       "id": "1753369998854qthhyxrk8",
@@ -216,6 +247,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:13:18.854Z",
       "updated_at": "2025-07-24T15:21:31.616Z"
@@ -241,6 +276,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:13:30.673Z",
       "updated_at": "2025-07-24T15:21:32.361Z"
     },
@@ -264,6 +303,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:13:38.362Z",
       "updated_at": "2025-07-24T15:21:33.505Z"
@@ -289,6 +332,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:13:57.991Z",
       "updated_at": "2025-07-24T15:21:34.688Z"
     },
@@ -309,12 +356,16 @@
         2
       ],
       "crop": {
-        "x": 36.199999999999996,
+        "x": 37.2,
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:14:12.111Z",
-      "updated_at": "2025-07-24T23:57:32.761Z"
+      "updated_at": "2025-07-25T01:35:59.414Z"
     },
     {
       "id": "1753370553793jnet5knyf",
@@ -336,6 +387,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:22:33.793Z",
       "updated_at": "2025-07-24T15:30:44.913Z"
@@ -361,6 +416,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:22:55.515Z",
       "updated_at": "2025-07-24T15:30:45.864Z"
     },
@@ -384,6 +443,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:23:03.082Z",
       "updated_at": "2025-07-24T15:30:46.723Z"
@@ -409,6 +472,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:23:16.615Z",
       "updated_at": "2025-07-24T15:30:50.256Z"
     },
@@ -432,6 +499,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:23:26.774Z",
       "updated_at": "2025-07-24T15:30:49.528Z"
@@ -457,6 +528,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:25:02.042Z",
       "updated_at": "2025-07-24T15:30:48.632Z"
     },
@@ -480,6 +555,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:25:08.645Z",
       "updated_at": "2025-07-24T15:30:47.952Z"
@@ -505,6 +584,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:25:59.293Z",
       "updated_at": "2025-07-24T15:30:51.432Z"
     },
@@ -528,6 +611,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:26:13.047Z",
       "updated_at": "2025-07-24T15:30:52.088Z"
@@ -553,6 +640,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:26:25.774Z",
       "updated_at": "2025-07-24T15:41:30.622Z"
     },
@@ -576,6 +667,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:26:52.796Z",
       "updated_at": "2025-07-24T15:30:54.160Z"
@@ -601,6 +696,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:27:01.845Z",
       "updated_at": "2025-07-24T15:30:56.865Z"
     },
@@ -624,6 +723,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:27:09.490Z",
       "updated_at": "2025-07-24T15:30:55.895Z"
@@ -649,6 +752,10 @@
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:27:28.793Z",
       "updated_at": "2025-07-24T15:43:39.118Z"
     },
@@ -659,7 +766,6 @@
       "position": 0,
       "selected": true,
       "category": [
-        "Dance",
         "Circus"
       ],
       "alt": "Image Dance,Circus",
@@ -667,15 +773,19 @@
       "sousTitre": "",
       "dimension": [
         1,
-        1
+        2
       ],
       "crop": {
         "x": 0,
         "y": 0,
         "size": 100
       },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
       "created_at": "2025-07-24T15:44:59.518Z",
-      "updated_at": "2025-07-24T15:45:15.908Z"
+      "updated_at": "2025-07-29T06:47:02.450Z"
     },
     {
       "id": "1753372269771o6xdi0lcc",
@@ -697,6 +807,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:51:09.771Z",
       "updated_at": "2025-07-24T15:51:09.771Z"
@@ -721,6 +835,10 @@
         "x": 0,
         "y": 0,
         "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:54:35.473Z",
       "updated_at": "2025-07-24T15:55:55.251Z"
