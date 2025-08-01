@@ -146,6 +146,7 @@ const ContactAdmin: React.FC = () => {
 
       // Préparer les champs à sauvegarder
       const allFields = [
+        { key: 'contact.title', current: finalData.contact.title, original: originalTextData.contact.title },
         { key: 'contact.image_url', current: finalData.contact.image_url, original: originalTextData.contact.image_url },
         { key: 'contact.image_alt', current: finalData.contact.image_alt, original: originalTextData.contact.image_alt },
         { key: 'contact.name', current: finalData.contact.name, original: originalTextData.contact.name },
@@ -289,6 +290,18 @@ const ContactAdmin: React.FC = () => {
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+              {/* Titre de la section Contact */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                  Titre de la section
+                </label>
+                <input
+                  type="text"
+                  value={textData.contact.title}
+                  onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, title: e.target.value } }))}
+                  className="w-full text-black p-2 border border-gray-300 rounded-md"
+                />
+              </div>
               {/* Image */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">

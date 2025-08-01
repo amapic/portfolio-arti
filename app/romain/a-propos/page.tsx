@@ -47,6 +47,7 @@ const AboutPage: React.FC = () => {
       <PortfolioHeader 
         title="Romain de Lagarde"
         currentPage="about"
+        showHome={true}
       />
       {/* Contenu principal */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">

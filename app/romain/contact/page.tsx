@@ -41,6 +41,7 @@ const ContactPage: React.FC = () => {
       <PortfolioHeader 
         title="Romain de Lagarde"
         showNavigation={true}
+        showHome={true}
       />
 
       {/* Contenu principal */}

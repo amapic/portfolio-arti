@@ -27,7 +27,7 @@
         "cropHeightPercent": 52.5525
       },
       "created_at": "2025-07-24T03:37:12.530Z",
-      "updated_at": "2025-08-01T08:34:09.929Z"
+      "updated_at": "2025-08-01T08:41:23.999Z"
     },
     {
       "id": "1753328252493dmzb1a9qu",
@@ -101,19 +101,19 @@
       "sousTitre": "k",
       "dimension": [
         1,
-        2
+        1
       ],
       "crop": {
         "x": 16,
         "y": 16,
-        "size": 84
+        "size": 100
       },
       "displayDimensions": {
-        "cropWidthPercent": 100,
+        "cropWidthPercent": 50,
         "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T12:47:02.135Z",
-      "updated_at": "2025-07-29T06:49:17.394Z"
+      "updated_at": "2025-08-01T11:25:26.700Z"
     },
     {
       "id": "1753369928674zlxc9i96d",
@@ -212,7 +212,7 @@
       "titre": "coupe au bol",
       "sousTitre": "",
       "dimension": [
-        2,
+        1,
         1
       ],
       "crop": {
@@ -222,10 +222,10 @@
       },
       "displayDimensions": {
         "cropWidthPercent": 100,
-        "cropHeightPercent": 100
+        "cropHeightPercent": 50
       },
       "created_at": "2025-07-24T15:12:49.747Z",
-      "updated_at": "2025-07-29T06:31:51.006Z"
+      "updated_at": "2025-08-01T11:24:32.168Z"
     },
     {
       "id": "1753369998854qthhyxrk8",
@@ -361,11 +361,11 @@
         "size": 100
       },
       "displayDimensions": {
-        "cropWidthPercent": 100,
+        "cropWidthPercent": 25,
         "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:14:12.111Z",
-      "updated_at": "2025-07-25T01:35:59.414Z"
+      "updated_at": "2025-08-01T11:25:48.630Z"
     },
     {
       "id": "1753370553793jnet5knyf",
@@ -698,10 +698,10 @@
       },
       "displayDimensions": {
         "cropWidthPercent": 100,
-        "cropHeightPercent": 100
+        "cropHeightPercent": 50
       },
       "created_at": "2025-07-24T15:27:01.845Z",
-      "updated_at": "2025-07-24T15:30:56.865Z"
+      "updated_at": "2025-08-01T11:26:21.702Z"
     },
     {
       "id": "1753370829490xupt8buck",

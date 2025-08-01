@@ -293,7 +293,7 @@ const LegoGallery: React.FC = () => {
   return (
     <div className="min-h-screen bg-white font-serif p-0 m-0">
       {/* Header */}
-      <PortfolioHeader />
+      <PortfolioHeader showHome={false} />
 
       {/* Category Navigation */}
       <nav className="font-exposure flex justify-between px-8 pt-12 bg-transparent w-full max-w-[1152px] mx-auto"
