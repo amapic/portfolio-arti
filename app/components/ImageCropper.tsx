@@ -16,6 +16,16 @@ interface ImageCropperProps {
   onDimensionChange?: (dimension: [number, number]) => void;
   // notify parent of the current display dimensions of the crop box
   onDisplayChange?: (displayDimensions: { cropWidthPercent: number; cropHeightPercent: number }) => void;
+  // notify parent of absolute crop data
+  onCropDataChange?: (cropData: {
+    originalWidth: number;
+    originalHeight: number;
+    cropX: number;
+    cropY: number;
+    cropWidth: number;
+    cropHeight: number;
+    aspectRatio: number;
+  }) => void;
 }
 
 const ImageCropper: React.FC<ImageCropperProps> = ({
@@ -24,7 +34,8 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   initialCrop,
   onCropChange,
   onDimensionChange,
-  onDisplayChange
+  onDisplayChange,
+  onCropDataChange
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -162,6 +173,31 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
     setCropSize(cropArea.size);
   }, [cropArea.size, dimension, imageDimensions]);
 
+  // Calculer les données absolues de crop
+  const getAbsoluteCropData = () => {
+    if (!imageDimensions || !containerRef.current) return null;
+    
+    const { width: cropWidth, height: cropHeight } = getCropDimensions();
+    const containerWidth = containerRef.current.offsetWidth;
+    const containerHeight = containerRef.current.offsetHeight;
+    
+    // Convertir les pourcentages en pixels absolus sur l'image originale
+    const cropXPixels = (cropArea.x / 100) * imageDimensions.width;
+    const cropYPixels = (cropArea.y / 100) * imageDimensions.height;
+    const cropWidthPixels = (cropWidth / containerWidth) * imageDimensions.width;
+    const cropHeightPixels = (cropHeight / containerHeight) * imageDimensions.height;
+    
+    return {
+      originalWidth: imageDimensions.width,
+      originalHeight: imageDimensions.height,
+      cropX: cropXPixels,
+      cropY: cropYPixels,
+      cropWidth: cropWidthPixels,
+      cropHeight: cropHeightPixels,
+      aspectRatio: getAspectRatio()
+    };
+  };
+
   // Mettre à jour les dimensions d'affichage quand les paramètres changent
   useEffect(() => {
     if (containerRef.current && imageDimensions) {
@@ -169,6 +205,14 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
       setDisplayDimensions(dims);
       if (onDisplayChange) {
         onDisplayChange(dims);
+      }
+      
+      // Envoyer aussi les données absolues
+      if (onCropDataChange) {
+        const absoluteData = getAbsoluteCropData();
+        if (absoluteData) {
+          onCropDataChange(absoluteData);
+        }
       }
     }
   }, [cropArea, dimension, imageDimensions]);

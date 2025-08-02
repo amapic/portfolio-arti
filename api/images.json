@@ -27,7 +27,7 @@
         "cropHeightPercent": 52.5525
       },
       "created_at": "2025-07-24T03:37:12.530Z",
-      "updated_at": "2025-08-01T08:41:23.999Z"
+      "updated_at": "2025-08-02T16:26:39.129Z"
     },
     {
       "id": "1753328252493dmzb1a9qu",
@@ -56,7 +56,7 @@
         "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T03:37:32.493Z",
-      "updated_at": "2025-07-24T03:38:21.950Z"
+      "updated_at": "2025-08-02T16:26:29.280Z"
     },
     {
       "id": "17533282752508qtfvep3e",
@@ -85,35 +85,42 @@
         "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T03:37:55.250Z",
-      "updated_at": "2025-07-25T01:24:42.371Z"
+      "updated_at": "2025-08-02T16:29:23.879Z"
     },
     {
       "id": "1753361222135xeaqknrx7",
       "projet": "3",
       "image_url": "https://dev2site.net:4001/uploads/3/1753361221747-471950208.jpg",
-      "position": 0,
+      "position": {
+        "Theater": 0,
+        "Dance": 3,
+        "Opera": 1,
+        "Circus": 0,
+        "Event": 0
+      },
       "selected": true,
       "category": [
-        "Dance"
+        "Dance",
+        "Opera"
       ],
       "alt": "Image Theater",
       "titre": "AAA",
       "sousTitre": "k",
       "dimension": [
-        1,
+        2,
         1
       ],
       "crop": {
-        "x": 16,
-        "y": 16,
-        "size": 100
+        "x": 0,
+        "y": 0,
+        "size": 79
       },
       "displayDimensions": {
-        "cropWidthPercent": 50,
-        "cropHeightPercent": 100
+        "cropWidthPercent": 79,
+        "cropHeightPercent": 79
       },
       "created_at": "2025-07-24T12:47:02.135Z",
-      "updated_at": "2025-08-01T11:25:26.700Z"
+      "updated_at": "2025-08-02T16:26:48.558Z"
     },
     {
       "id": "1753369928674zlxc9i96d",
@@ -203,29 +210,35 @@
       "id": "1753369969747oy633kcdk",
       "projet": "3",
       "image_url": "https://dev2site.net:4001/uploads/3/1753369969594-602711235.jpg",
-      "position": 0,
+      "position": {
+        "Theater": 0,
+        "Dance": 0,
+        "Opera": 0,
+        "Circus": 10,
+        "Event": 0
+      },
       "selected": true,
       "category": [
-        "Theater"
+        "Circus"
       ],
       "alt": "Image Theater",
       "titre": "coupe au bol",
       "sousTitre": "",
       "dimension": [
-        1,
+        2,
         1
       ],
       "crop": {
         "x": 0,
-        "y": 0.5,
+        "y": 75,
         "size": 100
       },
       "displayDimensions": {
         "cropWidthPercent": 100,
-        "cropHeightPercent": 50
+        "cropHeightPercent": 25
       },
       "created_at": "2025-07-24T15:12:49.747Z",
-      "updated_at": "2025-08-01T11:24:32.168Z"
+      "updated_at": "2025-08-02T16:29:09.851Z"
     },
     {
       "id": "1753369998854qthhyxrk8",
@@ -356,7 +369,7 @@
         2
       ],
       "crop": {
-        "x": 37.2,
+        "x": 40.2,
         "y": 0,
         "size": 100
       },
@@ -365,7 +378,7 @@
         "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:14:12.111Z",
-      "updated_at": "2025-08-01T11:25:48.630Z"
+      "updated_at": "2025-08-02T16:30:31.016Z"
     },
     {
       "id": "1753370553793jnet5knyf",
@@ -521,7 +534,7 @@
       "sousTitre": "",
       "dimension": [
         1,
-        1
+        2
       ],
       "crop": {
         "x": 0,
@@ -529,11 +542,11 @@
         "size": 100
       },
       "displayDimensions": {
-        "cropWidthPercent": 100,
+        "cropWidthPercent": 25,
         "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:25:02.042Z",
-      "updated_at": "2025-07-24T15:30:48.632Z"
+      "updated_at": "2025-08-01T14:09:37.107Z"
     },
     {
       "id": "1753370708645wwtoin4qt",
@@ -763,7 +776,13 @@
       "id": "1753371899518odudyfea3",
       "projet": "3",
       "image_url": "https://dev2site.net:4001/uploads/3/1753371899357-239052159.jpg",
-      "position": 0,
+      "position": {
+        "Theater": 0,
+        "Dance": 0,
+        "Opera": 0,
+        "Circus": 1,
+        "Event": 0
+      },
       "selected": true,
       "category": [
         "Circus"
@@ -772,20 +791,20 @@
       "titre": "Titre Dance,Circus",
       "sousTitre": "",
       "dimension": [
-        1,
-        2
+        2,
+        1
       ],
       "crop": {
         "x": 0,
-        "y": 0,
+        "y": 37.5,
         "size": 100
       },
       "displayDimensions": {
         "cropWidthPercent": 100,
-        "cropHeightPercent": 100
+        "cropHeightPercent": 25
       },
       "created_at": "2025-07-24T15:44:59.518Z",
-      "updated_at": "2025-07-29T06:47:02.450Z"
+      "updated_at": "2025-08-02T16:29:25.036Z"
     },
     {
       "id": "1753372269771o6xdi0lcc",
@@ -813,14 +832,14 @@
         "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:51:09.771Z",
-      "updated_at": "2025-07-24T15:51:09.771Z"
+      "updated_at": "2025-08-02T16:31:00.450Z"
     },
     {
       "id": "17533724754730fbmx3tlm",
       "projet": "3",
       "image_url": "https://dev2site.net:4001/uploads/3/1753372475336-199244731.jpg",
       "position": 0,
-      "selected": true,
+      "selected": false,
       "category": [
         "Event"
       ],
@@ -841,7 +860,7 @@
         "cropHeightPercent": 100
       },
       "created_at": "2025-07-24T15:54:35.473Z",
-      "updated_at": "2025-07-24T15:55:55.251Z"
+      "updated_at": "2025-08-02T16:31:01.330Z"
     }
   ]
 }

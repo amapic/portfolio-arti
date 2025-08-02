@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ImageComponent from './ImageComponent';
 import PortfolioHeader from './PortfolioHeader';
-import { ImageMeta } from '../types/imageMeta';
+import { ImageMeta, getPositionForCategory } from '../types/imageMeta';
 import { CATEGORIES, CategoryType, getCategoryLabel, imageMatchesCategory, normalizeCategoriesArray } from '../types/categories';
 
 interface GalleryItem {
@@ -22,6 +22,15 @@ interface GalleryItem {
   displayDimensions?: {
     cropWidthPercent: number;
     cropHeightPercent: number;
+  };
+  cropData?: {
+    originalWidth: number;
+    originalHeight: number;
+    cropX: number;
+    cropY: number;
+    cropWidth: number;
+    cropHeight: number;
+    aspectRatio: number;
   };
 }
 
@@ -60,14 +69,23 @@ const LegoGallery: React.FC = () => {
         const response = await fetch(`${API_URL}/api/images?projectId=${PROJECT_ID}`);
         if (response.ok) {
           const data: ImageMeta[] = await response.json();
-          console.log('Images chargées depuis l\'API:', data.length, 'images'); // Debug
-          console.log('Détail des images:', data); // Debug
-          // Filtrer seulement les images sélectionnées et les trier par position
+          // console.log('Images chargées depuis l\'API:', data.length, 'images'); // Debug
+          // console.log('Détail des images:', data); // Debug
+          // Filtrer seulement les images sélectionnées et les trier par position selon la catégorie courante
           const selectedImages = data
             .filter(img => img.selected)
-            .sort((a, b) => a.position - b.position);
-          console.log('Images sélectionnées:', selectedImages.length, 'images'); // Debug
-          console.log('Catégories trouvées:', [...new Set(selectedImages.map(img => img.category))]); // Debug
+            .sort((a, b) => {
+              // Si une catégorie spécifique est sélectionnée, trier par position de cette catégorie
+              if (activeCategory !== 'All') {
+                return getPositionForCategory(a, activeCategory) - getPositionForCategory(b, activeCategory);
+              }
+              // Sinon, utiliser une position globale (moyenne ou première catégorie)
+              const posA = typeof a.position === 'number' ? a.position : getPositionForCategory(a, 'Theater');
+              const posB = typeof b.position === 'number' ? b.position : getPositionForCategory(b, 'Theater');
+              return posA - posB;
+            });
+          // console.log('Images sélectionnées:', selectedImages.length, 'images'); // Debug
+          // console.log('Catégories trouvées:', [...new Set(selectedImages.map(img => img.category))]); // Debug
           setImagesMeta(selectedImages);
         } else {
           console.error('Erreur lors du chargement des images');
@@ -82,7 +100,7 @@ const LegoGallery: React.FC = () => {
     };
 
     loadImages();
-  }, [API_URL, PROJECT_ID]);
+  }, [API_URL, PROJECT_ID, activeCategory]);
 
   // Convertir les métadonnées en items de galerie
   const galleryItems: GalleryItem[] = imagesMeta.map((meta, index) => ({
@@ -94,7 +112,8 @@ const LegoGallery: React.FC = () => {
     sousTitre: meta.sousTitre || '',
     dimension: meta.dimension,
     crop: meta.crop,
-    displayDimensions: meta.displayDimensions
+    displayDimensions: meta.displayDimensions,
+    cropData: meta.cropData
   }));
 
   // Algorithme de placement séquentiel sans trous
@@ -113,15 +132,15 @@ const LegoGallery: React.FC = () => {
     ];
 
     items.forEach((item, index) => {
-      console.log(`\nPlacement image ${index + 1}: ${item.category}`);
+      // console.log(`\nPlacement image ${index + 1}: ${item.category}`);
       
       // Utiliser la dimension de l'API ou par défaut [1, 1]
       const targetDimension: [number, number] = item.dimension || [1, 1];
-      console.log(`Dimension de l'API: ${targetDimension[0]}x${targetDimension[1]}`);
+      // console.log(`Dimension de l'API: ${targetDimension[0]}x${targetDimension[1]}`);
       
       // Trouver la prochaine position libre (de gauche à droite, haut en bas)
       const nextPosition = findNextFreePosition(grid, GRID_WIDTH);
-      console.log(`Position de départ trouvée: [${nextPosition[0]}, ${nextPosition[1]}]`);
+      // console.log(`Position de départ trouvée: [${nextPosition[0]}, ${nextPosition[1]}]`);
       
       // Essayer d'abord la dimension de l'API, puis les autres en fallback
       const dimensionsToTry = [
@@ -138,7 +157,7 @@ const LegoGallery: React.FC = () => {
         
         // Vérifier si cette dimension peut être placée à la position
         if (canPlaceAtPosition(grid, nextPosition, [width, height], GRID_WIDTH)) {
-          console.log(`✓ Dimension ${width}x${height} convient`);
+          // console.log(`✓ Dimension ${width}x${height} convient`);
           
           // Étendre la grille si nécessaire
           extendGridIfNeeded(grid, nextPosition, [width, height], GRID_WIDTH);
@@ -153,11 +172,11 @@ const LegoGallery: React.FC = () => {
             position: nextPosition
           });
           
-          console.log(`Image placée: ${width}x${height} à [${nextPosition[0]}, ${nextPosition[1]}]`);
+          // console.log(`Image placée: ${width}x${height} à [${nextPosition[0]}, ${nextPosition[1]}]`);
           placedSuccessfully = true;
           break;
         } else {
-          console.log(`✗ Dimension ${width}x${height} ne convient pas`);
+          // console.log(`✗ Dimension ${width}x${height} ne convient pas`);
         }
       }
       
@@ -168,7 +187,7 @@ const LegoGallery: React.FC = () => {
 
     // Calculer la hauteur finale de la grille et la retourner
     const finalGridHeight = grid.length;
-    console.log(`Grille finale: ${GRID_WIDTH}x${finalGridHeight}`);
+    // console.log(`Grille finale: ${GRID_WIDTH}x${finalGridHeight}`);
     
     return { placed, gridHeight: finalGridHeight };
   };
@@ -273,7 +292,7 @@ const LegoGallery: React.FC = () => {
       ? galleryItems 
       : galleryItems.filter(item => imageMatchesCategory(item.category, activeCategory));
     
-    console.log(`Filtrage pour catégorie "${activeCategory}":`, filteredItems.length, 'images sur', galleryItems.length, 'total'); // Debug
+    // console.log(`Filtrage pour catégorie "${activeCategory}":`, filteredItems.length, 'images sur', galleryItems.length, 'total'); // Debug
     
     const { placed, gridHeight: newGridHeight } = generateLayout(filteredItems);
     handleFilterTransition(placed, newGridHeight);

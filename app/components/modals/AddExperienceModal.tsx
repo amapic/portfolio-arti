@@ -92,7 +92,7 @@ export const AddExperienceModal = ({ onClose, onAdd }: { onClose: () => void, on
       formData.append("file", file);
 
       // Envoyer l'image au serveur
-      console.log("IMAGE_API_URL",IMAGE_API_URL)
+      // console.log("IMAGE_API_URL",IMAGE_API_URL)
       const response = await fetch(`${IMAGE_API_URL}?projectId=${PROJECT_ID}`, {
         method: "POST",
         body: formData,

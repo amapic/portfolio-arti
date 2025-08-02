@@ -63,7 +63,7 @@ const ContactAdmin: React.FC = () => {
       const response = await fetch(`https://dev2site.net:4000/api/texts?projectId=${PROJECT_ID}`);
       if (response.ok) {
         const data: TextData = await response.json();
-        console.log("get text", data);
+        // console.log("get text", data);
         setTextData(data);
         setOriginalTextData(JSON.parse(JSON.stringify(data))); // Deep copy pour comparaison
       } else {
@@ -160,7 +160,7 @@ const ContactAdmin: React.FC = () => {
       // Filtrer uniquement les champs qui ont changé
       const fieldsToSave = allFields.filter(field => field.current !== field.original);
       
-      console.log(`${fieldsToSave.length} champ(s) modifié(s) sur ${allFields.length}:`, fieldsToSave.map(f => f.key));
+      // console.log(`${fieldsToSave.length} champ(s) modifié(s) sur ${allFields.length}:`, fieldsToSave.map(f => f.key));
 
       if (fieldsToSave.length === 0) {
         alert('Aucune modification détectée.');

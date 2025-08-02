@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CategoryType } from '../types/categories';
 
 interface ImageComponentProps {
@@ -12,6 +12,15 @@ interface ImageComponentProps {
     displayDimensions?: {
       cropWidthPercent: number;
       cropHeightPercent: number;
+    };
+    cropData?: {
+      originalWidth: number;
+      originalHeight: number;
+      cropX: number;
+      cropY: number;
+      cropWidth: number;
+      cropHeight: number;
+      aspectRatio: number;
     };
   };
   dimension: [number, number];
@@ -63,16 +72,34 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
     if (!crop) {
       return {};
     }
-    // Use displayDimensions from prop or API, fallback to full image
+
+    // Utiliser les nouvelles données absolues si disponibles
+    if (item.cropData) {
+      const { originalWidth, originalHeight, cropX, cropY, cropWidth, cropHeight } = item.cropData;
+      
+      // Calculer les pourcentages basés sur l'image originale
+      const bgSizeX = (originalWidth / cropWidth) * 100;
+      const bgSizeY = (originalHeight / cropHeight) * 100;
+      const bgPosX = (cropX / cropWidth) * 100;
+      const bgPosY = (cropY / cropHeight) * 100;
+      
+      return {
+        backgroundImage: `url(${item.imageUrl})`,
+        backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
+        backgroundPosition: `${bgPosX}% ${bgPosY}%`,
+        backgroundRepeat: 'no-repeat'
+      };
+    }
+
+    // Fallback sur l'ancienne méthode pour compatibilité
     const dims = displayDimensions || item.displayDimensions || { cropWidthPercent: 100, cropHeightPercent: 100 };
     const safeW = Math.max(dims.cropWidthPercent, 1);
     const safeH = Math.max(dims.cropHeightPercent, 1);
-    // Compute background size based on display dimensions
     const bgSizeX = 100 / (safeW / 100);
     const bgSizeY = 100 / (safeH / 100);
-    // Compute background position based on crop offsets
     const bgPosX = (crop.x * bgSizeX) / 100;
     const bgPosY = (crop.y * bgSizeY) / 100;
+    
     return {
       backgroundImage: `url(${item.imageUrl})`,
       backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
@@ -94,6 +121,12 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
         return '';
     }
   };
+
+  useEffect(() => {
+    console.log(item.category);
+    console.log('ImageComponent props:', { item, dimension, position, index, isVisible, crop, displayDimensions, transitionState });
+    // Logique d'effet secondaire ici
+  }, []);
 
   return (
     <>
