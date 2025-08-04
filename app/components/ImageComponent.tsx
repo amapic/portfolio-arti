@@ -67,7 +67,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
     gridRow: `${row + 1} / span ${height}`
   };
 
-  // Style pour le crop de l'image
+  // Style pour le crop de l'image (sans zoom/size)
   const getImageStyle = () => {
     if (!crop) {
       return {};
@@ -91,14 +91,16 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
       };
     }
 
-    // Fallback sur l'ancienne méthode pour compatibilité
+    // Fallback simplifié (sans zoom/size) pour compatibilité
     const dims = displayDimensions || item.displayDimensions || { cropWidthPercent: 100, cropHeightPercent: 100 };
     const safeW = Math.max(dims.cropWidthPercent, 1);
     const safeH = Math.max(dims.cropHeightPercent, 1);
+    
+    // Calcul simplifié sans facteur de zoom
     const bgSizeX = 100 / (safeW / 100);
     const bgSizeY = 100 / (safeH / 100);
-    const bgPosX = (crop.x * bgSizeX) / 100;
-    const bgPosY = (crop.y * bgSizeY) / 100;
+    const bgPosX = crop.x;
+    const bgPosY = crop.y;
     
     return {
       backgroundImage: `url(${item.imageUrl})`,

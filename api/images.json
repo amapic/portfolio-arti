@@ -217,7 +217,7 @@
         "Circus": 10,
         "Event": 0
       },
-      "selected": true,
+      "selected": false,
       "category": [
         "Circus"
       ],
@@ -238,7 +238,7 @@
         "cropHeightPercent": 25
       },
       "created_at": "2025-07-24T15:12:49.747Z",
-      "updated_at": "2025-08-02T16:29:09.851Z"
+      "updated_at": "2025-08-03T20:23:31.648Z"
     },
     {
       "id": "1753369998854qthhyxrk8",
@@ -369,16 +369,16 @@
         2
       ],
       "crop": {
-        "x": 40.2,
+        "x": 37.5,
         "y": 0,
-        "size": 100
+        "size": 63
       },
       "displayDimensions": {
-        "cropWidthPercent": 25,
-        "cropHeightPercent": 100
+        "cropWidthPercent": 15.75,
+        "cropHeightPercent": 63
       },
       "created_at": "2025-07-24T15:14:12.111Z",
-      "updated_at": "2025-08-02T16:30:31.016Z"
+      "updated_at": "2025-08-02T16:32:42.861Z"
     },
     {
       "id": "1753370553793jnet5knyf",
@@ -804,7 +804,7 @@
         "cropHeightPercent": 25
       },
       "created_at": "2025-07-24T15:44:59.518Z",
-      "updated_at": "2025-08-02T16:29:25.036Z"
+      "updated_at": "2025-08-03T20:23:53.393Z"
     },
     {
       "id": "1753372269771o6xdi0lcc",

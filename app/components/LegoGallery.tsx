@@ -116,6 +116,38 @@ const LegoGallery: React.FC = () => {
     cropData: meta.cropData
   }));
 
+  // Calculer le crop optimal pour un format 1x1 (carré centré en haut à gauche)
+  const calculateOptimalSquareCrop = (item: GalleryItem): { x: number; y: number; size: number } => {
+    // Si l'image a déjà un crop défini et qu'elle est déjà carrée, la garder
+    if (item.crop && item.dimension && item.dimension[0] === 1 && item.dimension[1] === 1) {
+      return item.crop;
+    }
+
+    // Pour calculer le plus grand carré possible, on se base sur les displayDimensions
+    const dims = item.displayDimensions || { cropWidthPercent: 100, cropHeightPercent: 100 };
+    
+    // Prendre la plus petite dimension pour faire un carré
+    const minDimension = Math.min(dims.cropWidthPercent, dims.cropHeightPercent);
+    
+    // Le crop doit commencer en haut à gauche (0, 0) avec la taille du plus petit côté
+    return {
+      x: 0,
+      y: 0,
+      size: minDimension
+    };
+  };
+
+  // Calculer les displayDimensions pour un carré
+  const calculateSquareDisplayDimensions = (item: GalleryItem): { cropWidthPercent: number; cropHeightPercent: number } => {
+    const dims = item.displayDimensions || { cropWidthPercent: 100, cropHeightPercent: 100 };
+    const minDimension = Math.min(dims.cropWidthPercent, dims.cropHeightPercent);
+    
+    return {
+      cropWidthPercent: minDimension,
+      cropHeightPercent: minDimension
+    };
+  };
+
   // Algorithme de placement séquentiel sans trous
   const generateLayout = (items: GalleryItem[]) => {
     const GRID_WIDTH = 3;
@@ -123,13 +155,6 @@ const LegoGallery: React.FC = () => {
     
     // Grille dynamique qui grandit au besoin
     let grid: number[][] = [];
-    
-    // Dimensions possibles par ordre de priorité (éviter 1x1 si possible)
-    const dimensionPriority: [number, number][] = [
-      [2, 1], // Rectangle horizontal (priorité 1)
-      [1, 2], // Rectangle vertical (priorité 2)  
-      [1, 1]  // Carré (dernier recours)
-    ];
 
     items.forEach((item, index) => {
       // console.log(`\nPlacement image ${index + 1}: ${item.category}`);
@@ -142,15 +167,20 @@ const LegoGallery: React.FC = () => {
       const nextPosition = findNextFreePosition(grid, GRID_WIDTH);
       // console.log(`Position de départ trouvée: [${nextPosition[0]}, ${nextPosition[1]}]`);
       
-      // Essayer d'abord la dimension de l'API, puis les autres en fallback
-      const dimensionsToTry = [
-        targetDimension, // Priorité à la dimension de l'API
-        ...dimensionPriority.filter(dim => 
-          dim[0] !== targetDimension[0] || dim[1] !== targetDimension[1]
-        ) // Autres dimensions en fallback
-      ];
+      // Essaie d'abord la dimension de l'API, puis fallback automatique vers 1x1
+      const dimensionsToTry: [number, number][] = [];
+      
+      // Ajouter la dimension de l'API en premier
+      dimensionsToTry.push(targetDimension);
+      
+      // Si la dimension de l'API n'est pas 1x1, ajouter 1x1 comme fallback automatique
+      if (targetDimension[0] !== 1 || targetDimension[1] !== 1) {
+        dimensionsToTry.push([1, 1]);
+      }
       
       let placedSuccessfully = false;
+      let usedDimension: [number, number] = targetDimension;
+      let adjustedItem = item; // Copie de l'item qui peut être modifiée
       
       for (const dimension of dimensionsToTry) {
         const [width, height] = dimension;
@@ -159,18 +189,32 @@ const LegoGallery: React.FC = () => {
         if (canPlaceAtPosition(grid, nextPosition, [width, height], GRID_WIDTH)) {
           // console.log(`✓ Dimension ${width}x${height} convient`);
           
+          // Si on utilise le fallback 1x1, ajuster le crop et les displayDimensions
+          if (dimension !== targetDimension && width === 1 && height === 1) {
+            console.log(`Image ${index + 1} (${item.titre}): dimension ${targetDimension[0]}x${targetDimension[1]} impossible, fallback vers 1x1 avec crop optimisé`);
+            
+            // Créer une copie de l'item avec le crop optimisé pour un carré
+            adjustedItem = {
+              ...item,
+              crop: calculateOptimalSquareCrop(item),
+              displayDimensions: calculateSquareDisplayDimensions(item)
+            };
+          }
+          
           // Étendre la grille si nécessaire
           extendGridIfNeeded(grid, nextPosition, [width, height], GRID_WIDTH);
           
           // Marquer les cases comme occupées
           markGridCells(grid, nextPosition, [width, height], 1);
           
-          // Ajouter l'image placée
+          // Ajouter l'image placée (avec l'item ajusté si nécessaire)
           placed.push({
-            item,
+            item: adjustedItem,
             dimension: [width, height],
             position: nextPosition
           });
+          
+          usedDimension = [width, height];
           
           // console.log(`Image placée: ${width}x${height} à [${nextPosition[0]}, ${nextPosition[1]}]`);
           placedSuccessfully = true;
