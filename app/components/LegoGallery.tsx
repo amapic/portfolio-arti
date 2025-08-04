@@ -32,6 +32,7 @@ interface GalleryItem {
     cropHeight: number;
     aspectRatio: number;
   };
+  isForcedSquare?: boolean; // Nouvelle propriété pour marquer les images forcées en 1x1
 }
 
 interface PlacedImage {
@@ -53,13 +54,82 @@ const LegoGallery: React.FC = () => {
   const [gridHeight, setGridHeight] = useState(10);
   const [imagesMeta, setImagesMeta] = useState<ImageMeta[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isResizing, setIsResizing] = useState(false);
+  const [imageSize, setImageSize] = useState(400); // Taille de base des images
+  const [gridWidth, setGridWidth] = useState('1152px'); // Largeur de la grille
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
 
   // Utiliser les vraies catégories de l'API + 'All'
   const categories: (CategoryType | 'All')[] = ['All', ...CATEGORIES.map(cat => cat.value)];
+
+  // Fonction pour calculer la taille des images en fonction de la largeur de l'écran
+  const calculateImageSize = (windowWidth: number): { imageSize: number; gridWidth: string } => {
+    if (windowWidth >= 1152) {
+      return { imageSize: 400, gridWidth: '1152px' }; // Taille de base
+    } else {
+      // Calculer le ratio de réduction basé sur la largeur disponible
+      const availableWidth = Math.min(windowWidth - 64, windowWidth * 0.95); // Padding de 32px de chaque côté
+      const gridCols = 3;
+      const gapSize = 8; // 2 * 0.5rem (gap-2)
+      const totalGapWidth = (gridCols - 1) * gapSize;
+      const imageWidth = (availableWidth - totalGapWidth) / gridCols;
+      const finalImageSize = Math.max(200, Math.floor(imageWidth)); // Minimum 200px
+      
+      return { 
+        imageSize: finalImageSize, 
+        gridWidth: `calc(100vw - 64px)` 
+      };
+    }
+  };
+
+  // Effet pour gérer le redimensionnement de la fenêtre
+  useEffect(() => {
+    const handleResize = () => {
+      // Annuler le timeout précédent s'il existe
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+
+      // Marquer qu'on est en train de redimensionner
+      setIsResizing(true);
+
+      // Programmer la fin du redimensionnement après 150ms sans changement
+      resizeTimeoutRef.current = setTimeout(() => {
+        const { imageSize: newSize, gridWidth: newGridWidth } = calculateImageSize(window.innerWidth);
+        
+        // Appliquer les nouvelles tailles avec une transition fluide
+        setImageSize(newSize);
+        setGridWidth(newGridWidth);
+        
+        // Attendre un peu avant de remettre l'opacité normale pour que l'animation soit visible
+        setTimeout(() => {
+          setIsResizing(false);
+        }, 50);
+      }, 150);
+    };
+
+    // Calculer la taille initiale
+    if (typeof window !== 'undefined') {
+      const { imageSize: initialSize, gridWidth: initialGridWidth } = calculateImageSize(window.innerWidth);
+      setImageSize(initialSize);
+      setGridWidth(initialGridWidth);
+    }
+
+    // Ajouter l'écouteur d'événement
+    window.addEventListener('resize', handleResize);
+
+    // Nettoyer à la destruction du composant
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Charger les métadonnées des images depuis l'API
   useEffect(() => {
@@ -148,90 +218,91 @@ const LegoGallery: React.FC = () => {
     };
   };
 
-  // Algorithme de placement séquentiel sans trous
+  // Algorithme de placement intelligent avec recherche d'images compatibles
   const generateLayout = (items: GalleryItem[]) => {
     const GRID_WIDTH = 3;
     const placed: PlacedImage[] = [];
-    
-    // Grille dynamique qui grandit au besoin
     let grid: number[][] = [];
-
-    items.forEach((item, index) => {
-      // console.log(`\nPlacement image ${index + 1}: ${item.category}`);
-      
-      // Utiliser la dimension de l'API ou par défaut [1, 1]
-      const targetDimension: [number, number] = item.dimension || [1, 1];
-      // console.log(`Dimension de l'API: ${targetDimension[0]}x${targetDimension[1]}`);
-      
-      // Trouver la prochaine position libre (de gauche à droite, haut en bas)
+    
+    // Créer une copie des items pour pouvoir les marquer comme placés
+    const availableItems = [...items];
+    const placedItemIds = new Set<string>();
+    
+    while (availableItems.length > placedItemIds.size) {
+      // Trouver la prochaine position libre
       const nextPosition = findNextFreePosition(grid, GRID_WIDTH);
-      // console.log(`Position de départ trouvée: [${nextPosition[0]}, ${nextPosition[1]}]`);
       
-      // Essaie d'abord la dimension de l'API, puis fallback automatique vers 1x1
-      const dimensionsToTry: [number, number][] = [];
+      // Chercher une image compatible avec cette position dans l'ordre de priorité
+      let imageToPlace: GalleryItem | null = null;
+      let itemIndex = -1;
       
-      // Ajouter la dimension de l'API en premier
-      dimensionsToTry.push(targetDimension);
-      
-      // Si la dimension de l'API n'est pas 1x1, ajouter 1x1 comme fallback automatique
-      if (targetDimension[0] !== 1 || targetDimension[1] !== 1) {
-        dimensionsToTry.push([1, 1]);
-      }
-      
-      let placedSuccessfully = false;
-      let usedDimension: [number, number] = targetDimension;
-      let adjustedItem = item; // Copie de l'item qui peut être modifiée
-      
-      for (const dimension of dimensionsToTry) {
-        const [width, height] = dimension;
+      // 1. D'abord, essayer de placer la prochaine image non placée avec sa dimension originale
+      for (let i = 0; i < availableItems.length; i++) {
+        const item = availableItems[i];
+        if (placedItemIds.has(item.id)) continue;
         
-        // Vérifier si cette dimension peut être placée à la position
-        if (canPlaceAtPosition(grid, nextPosition, [width, height], GRID_WIDTH)) {
-          // console.log(`✓ Dimension ${width}x${height} convient`);
-          
-          // Si on utilise le fallback 1x1, ajuster le crop et les displayDimensions
-          if (dimension !== targetDimension && width === 1 && height === 1) {
-            console.log(`Image ${index + 1} (${item.titre}): dimension ${targetDimension[0]}x${targetDimension[1]} impossible, fallback vers 1x1 avec crop optimisé`);
-            
-            // Créer une copie de l'item avec le crop optimisé pour un carré
-            adjustedItem = {
-              ...item,
-              crop: calculateOptimalSquareCrop(item),
-              displayDimensions: calculateSquareDisplayDimensions(item)
-            };
-          }
-          
-          // Étendre la grille si nécessaire
-          extendGridIfNeeded(grid, nextPosition, [width, height], GRID_WIDTH);
-          
-          // Marquer les cases comme occupées
-          markGridCells(grid, nextPosition, [width, height], 1);
-          
-          // Ajouter l'image placée (avec l'item ajusté si nécessaire)
-          placed.push({
-            item: adjustedItem,
-            dimension: [width, height],
-            position: nextPosition
-          });
-          
-          usedDimension = [width, height];
-          
-          // console.log(`Image placée: ${width}x${height} à [${nextPosition[0]}, ${nextPosition[1]}]`);
-          placedSuccessfully = true;
+        const targetDimension: [number, number] = item.dimension || [1, 1];
+        
+        if (canPlaceAtPosition(grid, nextPosition, targetDimension, GRID_WIDTH)) {
+          imageToPlace = item;
+          itemIndex = i;
           break;
-        } else {
-          // console.log(`✗ Dimension ${width}x${height} ne convient pas`);
         }
       }
       
-      if (!placedSuccessfully) {
-        console.error(`Impossible de placer l'image ${index + 1}`);
+      // 2. Si aucune image avec sa dimension originale ne peut être placée,
+      //    chercher n'importe quelle image qui peut être placée en 1x1
+      if (!imageToPlace) {
+        for (let i = 0; i < availableItems.length; i++) {
+          const item = availableItems[i];
+          if (placedItemIds.has(item.id)) continue;
+          
+          if (canPlaceAtPosition(grid, nextPosition, [1, 1], GRID_WIDTH)) {
+            // Marquer cette image comme forcée en 1x1
+            imageToPlace = {
+              ...item,
+              isForcedSquare: true,
+              crop: calculateOptimalSquareCrop(item),
+              displayDimensions: calculateSquareDisplayDimensions(item)
+            };
+            itemIndex = i;
+            break;
+          }
+        }
       }
-    });
+      
+      // Si on a trouvé une image à placer
+      if (imageToPlace && itemIndex !== -1) {
+        const finalDimension: [number, number] = imageToPlace.isForcedSquare ? [1, 1] : (imageToPlace.dimension || [1, 1]);
+        
+        // Étendre la grille si nécessaire
+        extendGridIfNeeded(grid, nextPosition, finalDimension, GRID_WIDTH);
+        
+        // Marquer les cases comme occupées
+        markGridCells(grid, nextPosition, finalDimension, 1);
+        
+        // Ajouter l'image placée
+        placed.push({
+          item: imageToPlace,
+          dimension: finalDimension,
+          position: nextPosition
+        });
+        
+        // Marquer l'image comme placée
+        placedItemIds.add(imageToPlace.id);
+        
+        if (imageToPlace.isForcedSquare) {
+          console.log(`Image forcée en 1x1: ${imageToPlace.titre} (dimension originale: ${availableItems[itemIndex].dimension?.[0] || 1}x${availableItems[itemIndex].dimension?.[1] || 1})`);
+        }
+      } else {
+        // Si on ne peut rien placer, on arrête pour éviter une boucle infinie
+        console.error('Impossible de placer plus d\'images dans la grille');
+        break;
+      }
+    }
 
-    // Calculer la hauteur finale de la grille et la retourner
+    // Calculer la hauteur finale de la grille
     const finalGridHeight = grid.length;
-    // console.log(`Grille finale: ${GRID_WIDTH}x${finalGridHeight}`);
     
     return { placed, gridHeight: finalGridHeight };
   };
@@ -359,7 +430,7 @@ const LegoGallery: React.FC = () => {
       <PortfolioHeader showHome={false} />
 
       {/* Category Navigation */}
-      <nav className="font-exposure flex justify-between px-8 pt-12 bg-transparent w-full max-w-[1152px] mx-auto"
+      <nav className="font-exposure mx-2 flex justify-between px-8 pt-12 bg-transparent w-full max-w-[1152px] mx-auto"
       style={{
             gridTemplateRows: `repeat(${gridHeight}, 400px)`,
             fontFamily: 'ExposureTrial',
@@ -400,11 +471,14 @@ const LegoGallery: React.FC = () => {
       {/* Dynamic Lego Gallery Grid */}
       {!loading && galleryItems.length > 0 && (
         <div 
-          className="grid grid-cols-3 gap-2 p-8 pt-2 mx-auto auto-rows-[400px]"
+          className={`grid grid-cols-3 gap-2 p-8 pt-2 mx-auto transition-all duration-700 ease-out ${
+            isResizing ? 'opacity-100' : 'opacity-100'
+          }`}
           style={{ 
-            gridTemplateRows: `repeat(${gridHeight}, 400px)`,
-            width: '1152px', // Largeur fixe pour éviter les variations
-            maxWidth: '100vw' // Ne pas dépasser la largeur de l'écran
+            gridTemplateRows: `repeat(${gridHeight}, ${imageSize}px)`,
+            width: gridWidth,
+            maxWidth: '100vw',
+            transition: 'all 0.7s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
           {(isTransitioning ? transitioningImages : placedImages).map((placedImage, index) => (
@@ -419,6 +493,7 @@ const LegoGallery: React.FC = () => {
               crop={placedImage.item.crop}
               displayDimensions={placedImage.item.displayDimensions}
               transitionState={isTransitioning ? (placedImage as TransitioningImage).transitionState : 'stable'}
+              isForcedSquare={placedImage.item.isForcedSquare}
             />
           ))}
         </div>

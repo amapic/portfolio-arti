@@ -38,6 +38,7 @@ interface ImageComponentProps {
     cropHeightPercent: number;
   };
   transitionState?: 'stable' | 'entering' | 'exiting';
+  isForcedSquare?: boolean; // Nouvelle propriété pour les images forcées en 1x1
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = ({
@@ -49,7 +50,8 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
   isVisible,
   crop,
   displayDimensions,
-  transitionState = 'stable'
+  transitionState = 'stable',
+  isForcedSquare = false
 }) => {
   const [width, height] = dimension;
   const [col, row] = position;
@@ -198,11 +200,15 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
         style={{ zIndex: 2 }}
       >
-        <h3 className="text-white text-lg font-semibold tracking-wider drop-shadow-lg text-center">
+        <h3 className={`text-lg font-semibold tracking-wider drop-shadow-lg text-center ${
+          isForcedSquare ? 'text-red-500' : 'text-white'
+        }`}>
           {item.titre}
         </h3>
         {item.sousTitre && (
-          <p className="text-white text-sm mt-1 opacity-90 font-light drop-shadow-lg text-center">
+          <p className={`text-sm mt-1 opacity-90 font-light drop-shadow-lg text-center ${
+            isForcedSquare ? 'text-red-400' : 'text-white'
+          }`}>
             {item.sousTitre}
           </p>
         )}

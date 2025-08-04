@@ -13,7 +13,7 @@ export const CATEGORIES: Category[] = [
   { value: 'Dance', label: 'Danse', color: 'bg-black text-white' },
   { value: 'Opera', label: 'Opéra', color: 'bg-black text-white' },
   { value: 'Circus', label: 'Cirque', color: 'bg-black text-white' },
-  { value: 'Event', label: 'Événement', color: 'bg-black text-white' }
+  { value: 'Event', label: 'Event', color: 'bg-black text-white' }
 ];
 
 export const CATEGORY_VALUES = CATEGORIES.map(cat => cat.value);
