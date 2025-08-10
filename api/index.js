@@ -7,6 +7,11 @@ const authRoutes = require('./routes/auth');
 
 const app = express();
 
+// Fonction utilitaire pour générer un ID unique
+function generateUniqueId() {
+  return Math.random().toString(36).substr(2, 9);
+}
+
 // Middleware
 app.use(cors({credentials: true,origin: true}));
 app.use(express.json());
@@ -20,6 +25,7 @@ function getProjectPaths(projectId) {
     experiencePath: path.join(projectDir, 'experience.json'),
     imagesPath: path.join(projectDir, 'images.json'), // Ajout du chemin pour les images
     aboutPath: path.join(projectDir, 'about.json'), // Ajout du chemin pour les données à propos
+    categoriesPath: path.join(projectDir, 'categories.json'), // Ajout du chemin pour les catégories
     projectDir: projectDir
   };
 }
@@ -141,6 +147,38 @@ async function writeAboutData(projectId, data) {
 // Fonction pour générer un ID unique
 function generateUniqueId() {
   return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+}
+
+// Fonctions utilitaires pour les catégories
+async function readCategoriesData(projectId) {
+  try {
+    const { categoriesPath } = getProjectPaths(projectId);
+    const data = await fs.readFile(categoriesPath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading categories data:', error);
+    // Retourner les catégories par défaut si le fichier n'existe pas
+    return {
+      categories: [
+        { id: '1', value: 'Theater', label: 'Théâtre', order: 0, isActive: true },
+        { id: '2', value: 'Dance', label: 'Danse', order: 1, isActive: true },
+        { id: '3', value: 'Opera', label: 'Opéra', order: 2, isActive: true },
+        { id: '4', value: 'Circus', label: 'Cirque', order: 3, isActive: true },
+        { id: '5', value: 'Event', label: 'Event', order: 4, isActive: true }
+      ]
+    };
+  }
+}
+
+async function writeCategoriesData(projectId, data) {
+  try {
+    const { categoriesPath } = getProjectPaths(projectId);
+    await ensureProjectDirectory(projectId);
+    await fs.writeFile(categoriesPath, JSON.stringify(data, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error writing categories data:', error);
+    throw error;
+  }
 }
 
 // Routes pour les textes
@@ -701,6 +739,178 @@ app.put('/api/about', async (req, res) => {
   } catch (error) {
     console.error('Error updating about data:', error);
     res.status(500).json({ error: 'Failed to update about data' });
+  }
+});
+
+// Routes pour les catégories
+
+// GET /api/categories - Récupérer toutes les catégories d'un projet
+app.get('/api/categories', async (req, res) => {
+  try {
+    const projectId = req.query.projectId;
+    if (!projectId) {
+      return res.status(400).json({ error: 'ProjectId manquant' });
+    }
+
+    const data = await readCategoriesData(projectId);
+    res.json(data.categories || []);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des catégories:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// POST /api/categories - Créer une nouvelle catégorie
+app.post('/api/categories', async (req, res) => {
+  try {
+    const projectId = req.query.projectId;
+    if (!projectId) {
+      return res.status(400).json({ error: 'ProjectId manquant' });
+    }
+
+    const { value, label, isActive } = req.body;
+    
+    if (!value || !label) {
+      return res.status(400).json({ error: 'Valeur et label requis' });
+    }
+
+    const data = await readCategoriesData(projectId);
+    
+    // Vérifier l'unicité de la valeur
+    const existingCategory = data.categories.find(cat => cat.value.toLowerCase() === value.toLowerCase());
+    if (existingCategory) {
+      return res.status(400).json({ error: 'Cette valeur de catégorie existe déjà' });
+    }
+
+    // Créer la nouvelle catégorie
+    const newCategory = {
+      id: generateUniqueId(),
+      value: value.trim(),
+      label: label.trim(),
+      order: data.categories.length,
+      isActive: isActive !== undefined ? isActive : true
+    };
+
+    data.categories.push(newCategory);
+    await writeCategoriesData(projectId, data);
+
+    res.status(201).json(newCategory);
+  } catch (error) {
+    console.error('Erreur lors de la création de la catégorie:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// PUT /api/categories/:id - Mettre à jour une catégorie
+app.put('/api/categories/:id', async (req, res) => {
+  try {
+    const projectId = req.query.projectId;
+    if (!projectId) {
+      return res.status(400).json({ error: 'ProjectId manquant' });
+    }
+
+    const categoryId = req.params.id;
+    const { value, label, isActive } = req.body;
+
+    if (!value || !label) {
+      return res.status(400).json({ error: 'Valeur et label requis' });
+    }
+
+    const data = await readCategoriesData(projectId);
+    const categoryIndex = data.categories.findIndex(cat => cat.id === categoryId);
+    
+    if (categoryIndex === -1) {
+      return res.status(404).json({ error: 'Catégorie non trouvée' });
+    }
+
+    // Vérifier l'unicité de la valeur (sauf pour la catégorie actuelle)
+    const existingCategory = data.categories.find(cat => 
+      cat.value.toLowerCase() === value.toLowerCase() && cat.id !== categoryId
+    );
+    if (existingCategory) {
+      return res.status(400).json({ error: 'Cette valeur de catégorie existe déjà' });
+    }
+
+    // Mettre à jour la catégorie
+    data.categories[categoryIndex] = {
+      ...data.categories[categoryIndex],
+      value: value.trim(),
+      label: label.trim(),
+      isActive: isActive !== undefined ? isActive : data.categories[categoryIndex].isActive
+    };
+
+    await writeCategoriesData(projectId, data);
+    res.json(data.categories[categoryIndex]);
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de la catégorie:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// DELETE /api/categories/:id - Supprimer une catégorie
+app.delete('/api/categories/:id', async (req, res) => {
+  try {
+    const projectId = req.query.projectId;
+    if (!projectId) {
+      return res.status(400).json({ error: 'ProjectId manquant' });
+    }
+
+    const categoryId = req.params.id;
+    const data = await readCategoriesData(projectId);
+    const categoryIndex = data.categories.findIndex(cat => cat.id === categoryId);
+    
+    if (categoryIndex === -1) {
+      return res.status(404).json({ error: 'Catégorie non trouvée' });
+    }
+
+    // TODO: Vérifier si la catégorie est utilisée par des images avant de la supprimer
+    // et éventuellement empêcher la suppression ou proposer une migration
+
+    data.categories.splice(categoryIndex, 1);
+    
+    // Réorganiser les ordres
+    data.categories.forEach((cat, index) => {
+      cat.order = index;
+    });
+
+    await writeCategoriesData(projectId, data);
+    res.json({ message: 'Catégorie supprimée avec succès' });
+  } catch (error) {
+    console.error('Erreur lors de la suppression de la catégorie:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// PUT /api/categories - Réorganiser les catégories avec action=reorder
+app.put('/api/categories', async (req, res) => {
+  try {
+    const projectId = req.query.projectId;
+    const action = req.query.action;
+    
+    if (!projectId) {
+      return res.status(400).json({ error: 'ProjectId manquant' });
+    }
+
+    // Si action=reorder, réorganiser les catégories
+    if (action === 'reorder') {
+      const updatedCategories = req.body;
+      
+      if (!Array.isArray(updatedCategories)) {
+        return res.status(400).json({ error: 'Format de données invalide' });
+      }
+
+      const data = await readCategoriesData(projectId);
+      data.categories = updatedCategories;
+
+      await writeCategoriesData(projectId, data);
+      return res.json({ message: 'Ordre des catégories mis à jour avec succès' });
+    }
+
+    // Autres actions PUT futures peuvent être ajoutées ici
+    res.status(400).json({ error: 'Action non supportée' });
+  } catch (error) {
+    console.error('Erreur lors de la réorganisation des catégories:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grille Isotope Interactive</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .filters {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .grid {
+            margin: 0 auto;
+            max-width: 100%;
+        }
+        
+        /* Sizer pour définir la largeur de base */
+        .grid-sizer {
+            width: 20%;
+        }
+        
+        .grid-item {
+            width: 40%;
+            margin-bottom: 1%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            height: 200px;
+        }
+        
+        .grid-item:hover {
+            /* transform: translateY(-5px) scale(1.02); */
+            /* box-shadow: 0 8px 25px rgba(0,0,0,0.3); */
+        }
+        
+        /* Taille 2x1 (largeur 80%) */
+        .grid-item--width4 {
+            width: 60%;
+        }
+        
+        /* Taille 1x2 (largeur 80% et hauteur double) */
+        .grid-item--height2 {
+            width: 40%;
+            height: 410px;
+        }
+        
+        .item-content {
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .design { background: linear-gradient(45deg, #ff6b6b, #feca57); }
+        .photo { background: linear-gradient(45deg, #48cae4, #0077b6); }
+        .web { background: linear-gradient(45deg, #06d6a0, #118ab2); }
+        .art { background: linear-gradient(45deg, #f72585, #b5179e); }
+        
+        .item-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .item-desc {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .item-category {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-sizer,
+            .grid-item,
+            .grid-item--width4,
+            .grid-item--height2 {
+                width: 48%;
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .grid-sizer,
+            .grid-item,
+            .grid-item--width4,
+            .grid-item--height2 {
+                width: 98%;
+                height: 200px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            margin: 50px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Portfolio Créatif</h1>
+        
+        <div class="filters">
+            <button class="filter-btn active" data-filter="*">Tous</button>
+            <button class="filter-btn" data-filter=".design">Design</button>
+            <button class="filter-btn" data-filter=".photo">Photo</button>
+            <button class="filter-btn" data-filter=".web">Web</button>
+            <button class="filter-btn" data-filter=".art">Art</button>
+        </div>
+        
+        <div class="grid">
+            <!-- Élément invisible pour définir la largeur de base -->
+            <div class="grid-sizer"></div>
+            
+            <!-- Taille 1x1 (20%) -->
+            <div class="grid-item design">
+                <div class="item-content">
+                    <div class="item-category">Design</div>
+                    <div class="item-title">Logo Moderne</div>
+                    <div class="item-desc">Création d'une identité visuelle moderne et épurée pour une startup tech.</div>
+                </div>
+            </div>
+            
+            <!-- Taille 2x1 (80%) -->
+            <div class="grid-item photo grid-item--width4">
+                <div class="item-content">
+                    <div class="item-category">Photo</div>
+                    <div class="item-title">Portrait Artistique</div>
+                    <div class="item-desc">Série de portraits en studio avec un éclairage dramatique et des compositions audacieuses pour explorer l'émotion humaine.</div>
+                </div>
+            </div>
+            
+            <!-- Taille 2x2 (80% largeur + hauteur double) -->
+            <div class="grid-item web grid-item--height2">
+                <div class="item-content">
+                    <div class="item-category">Web</div>
+                    <div class="item-title">Plateforme SaaS</div>
+                    <div class="item-desc">Développement complet d'une plateforme SaaS pour la gestion de projets incluant tableau de bord analytique, système de notifications en temps réel, API REST, authentification multi-facteurs, et interface d'administration avancée. Architecture microservices déployée sur le cloud avec monitoring et scalabilité automatique.</div>
+                </div>
+            </div>
+			
+			<div class="grid-item photo grid-item--width4">
+                <div class="item-content">
+                    <div class="item-category">Photo</div>
+                    <div class="item-title">Portrait Artistique</div>
+                    <div class="item-desc">Série de portraits en studio avec un éclairage dramatique et des compositions audacieuses pour explorer l'émotion humaine.</div>
+                </div>
+            </div>
+			
+			<div class="grid-item photo grid-item--width4">
+                <div class="item-content">
+                    <div class="item-category">Photo</div>
+                    <div class="item-title">Portrait Artistique</div>
+                    <div class="item-desc">Série de portraits en studio avec un éclairage dramatique et des compositions audacieuses pour explorer l'émotion humaine.</div>
+                </div>
+            </div>
+			<div class="grid-item photo grid-item--width4">
+                <div class="item-content">
+                    <div class="item-category">Photo</div>
+                    <div class="item-title">Portrait Artistique</div>
+                    <div class="item-desc">Série de portraits en studio avec un éclairage dramatique et des compositions audacieuses pour explorer l'émotion humaine.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Initialisation d'Isotope
+            var $grid = $('.grid').isotope({
+                itemSelector: '.grid-item',
+                layoutMode: 'masonry',
+                percentPosition: true,
+                masonry: {
+                    columnWidth: '.grid-sizer',
+                    gutter: 0
+                }
+            });
+
+            // Gestion des filtres
+            $('.filter-btn').on('click', function() {
+                var filterValue = $(this).attr('data-filter');
+                
+                // Mise à jour des boutons actifs
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                // Application du filtre
+                $grid.isotope({ filter: filterValue });
+            });
+
+            // Animation au survol des éléments
+            $('.grid-item').on('mouseenter', function() {
+                $(this).find('.item-content').css('transform', 'scale(1.05)');
+            }).on('mouseleave', function() {
+                $(this).find('.item-content').css('transform', 'scale(1)');
+            });
+
+            // Réorganisation lors du redimensionnement
+            $(window).on('resize', function() {
+                $grid.isotope('layout');
+            });
+        });
+    </script>
+</body>
+</html>

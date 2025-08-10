@@ -4,6 +4,7 @@ import { ThemeProvider } from './components/ThemeProvider';
 // import { AuthProvider } from './components/AuthProvider';
 import { Metadata } from 'next';
 import localFont from "next/font/local";
+import Script from "next/script";
 import "./globals.css";
 
 // const geistSans = localFont({
@@ -79,6 +80,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
         </ThemeProvider>
+        <Script src="/scripts/isotope.pkgd.min.js" />
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 // import ArtisticGallery from "../components/ArtisticGallery";
-import LegoGallery from "../components/LegoGallery";
+import LegoGallery from "../components/LegoGallery_new";
 
 function Dev() {
   return (

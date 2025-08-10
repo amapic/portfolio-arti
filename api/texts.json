@@ -3,7 +3,7 @@
     "id": "texts_3_complete_example",
     "projet": "3",
     "contact": {
-      "title": "Get In Touch",
+      "title": "Coucou",
       "email": "contact@romaindelagarde.fr",
       "phone": "+33 6 22 42 23 32",
       "address": "1 rue Dumont d'Urville",
@@ -16,7 +16,7 @@
     "about": {
       "image_url": "https://dev2site.net:4001/uploads/3/1753278892778-851292447.png",
       "image_alt": "Portrait2 de Romain de Lagarde, lighting designer, dans son studio",
-      "main_text": "Refléter2, éblouir, éteindre, estomper, suggérer, diffracter, découper, briller, brouiller : la lumière est l'outil qui me permet de sculpter un volume, une expression artistique, dans un dialogue attentif et continu avec ses utilisations : scénographie, chorégraphie, danse, théâtre, musique et chant mais aussi installation événementielle, espace public et habitat.\n\nDepuis 2007, pour chacun des projets qui me sont confiés, je m'interroge avec empathie et sensibilité sur le langage propre de la lumière, sur la façon dont elle interagit avec nos sens et notre perception de l'espace ou encore comment elle influence notre imagination, nos souvenirs vécus, comment elle sublime et singularise notre environnement pour nous conduire à un émerveillement et provoquer une émotion.\n\nMon travail s'articule autour de trois axes principaux : la création artistique, l'accompagnement technique et la transmission pédagogique. Chaque projet est une nouvelle aventure humaine et créative, une occasion de repousser les limites de l'art lumineux.",
+      "main_text": "Refléter, éblouir, éteindre, estomper, suggérer, diffracter, découper, briller, brouiller : la lumière est l'outil qui me permet de sculpter un volume, une expression artistique, dans un dialogue attentif et continu avec ses utilisations : scénographie, chorégraphie, danse, théâtre, musique et chant mais aussi installation événementielle, espace public et habitat.\n\nDepuis 2007, pour chacun des projets qui me sont confiés, je m'interroge avec empathie et sensibilité sur le langage propre de la lumière, sur la façon dont elle interagit avec nos sens et notre perception de l'espace ou encore comment elle influence notre imagination, nos souvenirs vécus, comment elle sublime et singularise notre environnement pour nous conduire à un émerveillement et provoquer une émotion.\n\nMon travail s'articule autour de trois axes principaux : la création artistique, l'accompagnement technique et la transmission pédagogique. Chaque projet est une nouvelle aventure humaine et créative, une occasion de repousser les limites de l'art lumineux.",
       "quote": "Le monde y recommençait tous les jours dans une lumière toujours neuve. Ô lumière ! C'est le cri de tous les personnages placés (...) devant leur destin.",
       "quote_author": "Albert Camus, L'été.",
       "links": {
@@ -31,6 +31,7 @@
     "updated_at": "2025-07-23T15:30:00.000Z",
     "about.image_alt": "Portrait de Romain de Lagarde, lighting designer, dans son studio",
     "about.main_text": "Refléter, éblouir, éteindre, estomper, suggérer, diffracter, découper, briller, brouiller : la lumière est l'outil qui me permet de sculpter un volume, une expression artistique, dans un dialogue attentif et continu avec ses utilisations : scénographie, chorégraphie, danse, théâtre, musique et chant mais aussi installation événementielle, espace public et habitat.\n\nDepuis 2007, pour chacun des projets qui me sont confiés, je m'interroge avec empathie et sensibilité sur le langage propre de la lumière, sur la façon dont elle interagit avec nos sens et notre perception de l'espace ou encore comment elle influence notre imagination, nos souvenirs vécus, comment elle sublime et singularise notre environnement pour nous conduire à un émerveillement et provoquer une émotion.\n\nMon travail s'articule autour de trois axes principaux : la création artistique, l'accompagnement technique et la transmission pédagogique. Chaque projet est une nouvelle aventure humaine et créative, une occasion de repousser les limites de l'art lumineux.",
-    "contact.title": "coucou"
+    "contact.title": "ggg",
+    "contact.name": "Romain de Lagarde2"
   }
 }

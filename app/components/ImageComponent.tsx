@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
-import { CategoryType } from '../types/categories';
 
 interface ImageComponentProps {
   item: {
     id: string;
-    category: CategoryType | CategoryType[];
+    categories: string | string[];
     imageUrl: string;
     alt: string;
     titre: string;
@@ -79,11 +78,19 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
     if (item.cropData) {
       const { originalWidth, originalHeight, cropX, cropY, cropWidth, cropHeight } = item.cropData;
       
-      // Calculer les pourcentages basés sur l'image originale
+      // Calculer les dimensions de fond pour que la zone croppée remplisse le conteneur
       const bgSizeX = (originalWidth / cropWidth) * 100;
       const bgSizeY = (originalHeight / cropHeight) * 100;
-      const bgPosX = (cropX / cropWidth) * 100;
-      const bgPosY = (cropY / cropHeight) * 100;
+      
+      // Calculer la position pour décaler l'image et centrer la zone croppée
+      const bgPosX = -(cropX / cropWidth) * 100;
+      const bgPosY = -(cropY / cropHeight) * 100;
+      
+      console.log(`Crop data pour ${item.titre}:`, {
+        originalWidth, originalHeight, 
+        cropX, cropY, cropWidth, cropHeight,
+        bgSizeX, bgSizeY, bgPosX, bgPosY
+      });
       
       return {
         backgroundImage: `url(${item.imageUrl})`,
@@ -104,6 +111,10 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
     const bgPosX = crop.x;
     const bgPosY = crop.y;
     
+    console.log(`Crop legacy pour ${item.titre}:`, {
+      crop, dims, bgSizeX, bgSizeY, bgPosX, bgPosY
+    });
+    
     return {
       backgroundImage: `url(${item.imageUrl})`,
       backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
@@ -113,7 +124,18 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
   };
 
   const shouldUseBackground = Boolean(crop);
-  // console.log("crop",shouldUseBackground);
+  
+  // Debug pour les images forcées en carré
+  if (isForcedSquare) {
+    console.log(`Image forcée ${item.titre}:`, {
+      isForcedSquare,
+      crop,
+      shouldUseBackground,
+      hasItem: Boolean(item),
+      hasCropData: Boolean(item.cropData),
+      displayDimensions
+    });
+  }
   // Classes CSS pour les transitions
   const getTransitionClasses = () => {
     switch (transitionState) {
@@ -127,7 +149,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
   };
 
   useEffect(() => {
-    console.log(item.category);
+    console.log(item.categories);
     console.log('ImageComponent props:', { item, dimension, position, index, isVisible, crop, displayDimensions, transitionState });
     // Logique d'effet secondaire ici
   }, []);

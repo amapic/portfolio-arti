@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { CategoryNavigation } from './CategoryNavigation';
+import { useAuth } from './AuthProvider';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
 
 export const Header = () => {
+  const { logout } = useAuth();
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith('/admin');
@@ -53,12 +55,29 @@ export const Header = () => {
               >
                 Contact
               </Link>
+              <Link
+                href="/admin/categories"
+                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                  pathname === '/admin/categories' 
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-medium'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800'
+                }`}
+              >
+                Categories
+              </Link>
             </nav>
           )}
         </div>
         
         <div className="flex items-center gap-4">
-          {/* Espace réservé pour d'autres éléments d'interface si nécessaire */}
+          {isAdminPage && (
+            <button
+              onClick={logout}
+              className="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Déconnexion
+            </button>
+          )}
         </div>
       </div>
       

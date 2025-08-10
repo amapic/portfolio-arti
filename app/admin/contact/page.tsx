@@ -221,12 +221,12 @@ const ContactAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Contact
                 </h1>
-                <button
+                {/* <button
                   onClick={logout}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 >
                   Déconnexion
-                </button>
+                </button> */}
               </div>
               {/* Zone blanche pendant le chargement */}
               <div className="bg-white rounded-lg shadow-md p-6 min-h-96">
@@ -251,12 +251,12 @@ const ContactAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Contact
                 </h1>
-                <button
+                {/* <button
                   onClick={logout}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 >
                   Déconnexion
-                </button>
+                </button> */}
               </div>
               {/* Message d'erreur */}
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -281,12 +281,12 @@ const ContactAdmin: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Contact
               </h1>
-              <button
+              {/* <button
                 onClick={logout}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
               >
                 Déconnexion
-              </button>
+              </button> */}
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
