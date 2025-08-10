@@ -308,34 +308,41 @@ const TestIsotopePage: React.FC = () => {
         
         /* Sizer pour définir la largeur de base */
         .grid-sizer {
-          width: 33%;
+          width: 33.33%;
         }
         
         .grid-item {
-          width: 33%;
-          margin-bottom: 1%;
+          width: 33.33%;
+          margin-bottom: 10px;
+          padding-right: 10px;
           border-radius: 15px;
           overflow: hidden;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
           transition: all 0.3s ease;
           cursor: pointer;
           position: relative;
-          height: calc(33vw / 1.2);
-          max-height: calc(396px / 1.2);
+          height: calc(33.33vw - 10px);
+          max-height: 350px;
+          box-sizing: border-box;
+        }
+        
+        .grid-item > .item-content {
+          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+          border-radius: 15px;
+          overflow: hidden;
         }
         
         /* Taille 2x1 (largeur double) - largeur = 2 x hauteur */
         .grid-item--width4 {
-          width: 66%;
-          height: calc(33vw / 1.2);
-          max-height: calc(396px / 1.2);
+          width: 66.66%;
+          height: calc(33.33vw - 10px);
+          max-height: 350px;
         }
         
         /* Taille 1x2 (hauteur double) - hauteur = 2 x largeur */
         .grid-item--height2 {
-          width: 33%;
-          height: calc(66vw / 1.2);
-          max-height: calc(792px / 1.2);
+          width: 33.33%;
+          height: calc((33.33vw - 10px) * 2 + 10px);
+          max-height: 710px;
         }
         
         .item-content {
@@ -402,41 +409,43 @@ const TestIsotopePage: React.FC = () => {
         @media (max-width: 768px) {
           .grid-sizer,
           .grid-item {
-            width: 48%;
-            height: calc(48vw / 2);
-            max-height: 240px;
+            width: 50%;
+            height: calc(50vw - 10px);
+            max-height: 300px;
+            padding-right: 10px;
           }
           
           .grid-item--width4 {
-            width: 98%;
-            height: calc(49vw);
-            max-height: 200px;
+            width: 100%;
+            height: calc(50vw - 10px);
+            max-height: 300px;
           }
           
           .grid-item--height2 {
-            width: 48%;
-            height: calc(96vw / 2);
-            max-height: 400px;
+            width: 50%;
+            height: calc((50vw - 10px) * 2 + 10px);
+            max-height: 610px;
           }
         }
         
         @media (max-width: 480px) {
           .grid-sizer,
           .grid-item {
-            width: 98%;
-            height: calc(98vw / 2);
+            width: 95%;
+            height: calc(95vw / 2);
             max-height: 240px;
+            margin-right: 5%;
           }
           
           .grid-item--width4 {
-            width: 98%;
-            height: calc(49vw);
+            width: 95%;
+            height: calc(47.5vw);
             max-height: 200px;
           }
           
           .grid-item--height2 {
-            width: 98%;
-            height: calc(196vw / 2);
+            width: 95%;
+            height: calc(190vw / 2);
             max-height: 400px;
           }
           
