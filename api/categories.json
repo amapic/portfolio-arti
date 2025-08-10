@@ -4,6 +4,7 @@
       "id": "1",
       "value": "Theater",
       "label": "chine",
+      "color": "bg-black text-white",
       "order": 0,
       "isActive": true
     },
@@ -11,6 +12,7 @@
       "id": "2",
       "value": "Dance",
       "label": "Danse",
+      "color": "bg-black text-white",
       "order": 1,
       "isActive": true
     },
@@ -18,6 +20,7 @@
       "id": "3",
       "value": "Opera",
       "label": "Opéra",
+      "color": "bg-black text-white",
       "order": 2,
       "isActive": true
     },
@@ -25,6 +28,7 @@
       "id": "4",
       "value": "Circus",
       "label": "Cirque",
+      "color": "bg-black text-white",
       "order": 3,
       "isActive": true
     },
@@ -32,6 +36,7 @@
       "id": "5",
       "value": "Event",
       "label": "Event",
+      "color": "bg-black text-white",
       "order": 4,
       "isActive": true
     }

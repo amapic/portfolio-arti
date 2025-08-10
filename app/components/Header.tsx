@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { CategoryNavigation } from './CategoryNavigation';
-import { useAuth } from './AuthProvider';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
 
 export const Header = () => {
-  const { logout } = useAuth();
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith('/admin');
@@ -70,14 +68,7 @@ export const Header = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          {isAdminPage && (
-            <button
-              onClick={logout}
-              className="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Déconnexion
-            </button>
-          )}
+          {/* Espace réservé pour d'autres éléments d'interface si nécessaire */}
         </div>
       </div>
       

@@ -1,4 +1,4 @@
-[
+export [
   {
     "id": "a",
     "row": 0,
@@ -55,4 +55,4 @@
     "h": 1,
     "filter": ["test1", "chart"]
   }
-]
+];

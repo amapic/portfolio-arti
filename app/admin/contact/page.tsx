@@ -15,7 +15,6 @@ const ContactAdmin: React.FC = () => {
     id: '',
     projet: '3',
     contact: {
-      title: 'Get In Touch',
       email: '',
       phone: '',
       address: '',
@@ -63,7 +62,7 @@ const ContactAdmin: React.FC = () => {
       const response = await fetch(`https://dev2site.net:4000/api/texts?projectId=${PROJECT_ID}`);
       if (response.ok) {
         const data: TextData = await response.json();
-        // console.log("get text", data);
+        console.log("get text", data);
         setTextData(data);
         setOriginalTextData(JSON.parse(JSON.stringify(data))); // Deep copy pour comparaison
       } else {
@@ -146,7 +145,6 @@ const ContactAdmin: React.FC = () => {
 
       // Préparer les champs à sauvegarder
       const allFields = [
-        { key: 'contact.title', current: finalData.contact.title, original: originalTextData.contact.title },
         { key: 'contact.image_url', current: finalData.contact.image_url, original: originalTextData.contact.image_url },
         { key: 'contact.image_alt', current: finalData.contact.image_alt, original: originalTextData.contact.image_alt },
         { key: 'contact.name', current: finalData.contact.name, original: originalTextData.contact.name },
@@ -160,7 +158,7 @@ const ContactAdmin: React.FC = () => {
       // Filtrer uniquement les champs qui ont changé
       const fieldsToSave = allFields.filter(field => field.current !== field.original);
       
-      // console.log(`${fieldsToSave.length} champ(s) modifié(s) sur ${allFields.length}:`, fieldsToSave.map(f => f.key));
+      console.log(`${fieldsToSave.length} champ(s) modifié(s) sur ${allFields.length}:`, fieldsToSave.map(f => f.key));
 
       if (fieldsToSave.length === 0) {
         alert('Aucune modification détectée.');
@@ -221,12 +219,12 @@ const ContactAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Contact
                 </h1>
-                {/* <button
+                <button
                   onClick={logout}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 >
                   Déconnexion
-                </button> */}
+                </button>
               </div>
               {/* Zone blanche pendant le chargement */}
               <div className="bg-white rounded-lg shadow-md p-6 min-h-96">
@@ -251,12 +249,12 @@ const ContactAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Contact
                 </h1>
-                {/* <button
+                <button
                   onClick={logout}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 >
                   Déconnexion
-                </button> */}
+                </button>
               </div>
               {/* Message d'erreur */}
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -281,27 +279,15 @@ const ContactAdmin: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Contact
               </h1>
-              {/* <button
+              <button
                 onClick={logout}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
               >
                 Déconnexion
-              </button> */}
+              </button>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
-              {/* Titre de la section Contact */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Titre de la section
-                </label>
-                <input
-                  type="text"
-                  value={textData.contact.title}
-                  onChange={(e) => setTextData(prev => ({ ...prev, contact: { ...prev.contact, title: e.target.value } }))}
-                  className="w-full text-black p-2 border border-gray-300 rounded-md"
-                />
-              </div>
               {/* Image */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">

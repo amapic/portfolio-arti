@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { CategoryType } from '../types/categories';
 
 interface ImageComponentProps {
   item: {
     id: string;
-    categories: string | string[];
+    category: CategoryType | CategoryType[];
     imageUrl: string;
     alt: string;
     titre: string;
@@ -11,15 +12,6 @@ interface ImageComponentProps {
     displayDimensions?: {
       cropWidthPercent: number;
       cropHeightPercent: number;
-    };
-    cropData?: {
-      originalWidth: number;
-      originalHeight: number;
-      cropX: number;
-      cropY: number;
-      cropWidth: number;
-      cropHeight: number;
-      aspectRatio: number;
     };
   };
   dimension: [number, number];
@@ -37,7 +29,6 @@ interface ImageComponentProps {
     cropHeightPercent: number;
   };
   transitionState?: 'stable' | 'entering' | 'exiting';
-  isForcedSquare?: boolean; // Nouvelle propriété pour les images forcées en 1x1
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = ({
@@ -49,8 +40,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
   isVisible,
   crop,
   displayDimensions,
-  transitionState = 'stable',
-  isForcedSquare = false
+  transitionState = 'stable'
 }) => {
   const [width, height] = dimension;
   const [col, row] = position;
@@ -68,74 +58,58 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
     gridRow: `${row + 1} / span ${height}`
   };
 
-  // Style pour le crop de l'image (sans zoom/size)
+  // Style pour le crop de l'image
   const getImageStyle = () => {
     if (!crop) {
       return {};
     }
-
-    // Utiliser les nouvelles données absolues si disponibles
-    if (item.cropData) {
-      const { originalWidth, originalHeight, cropX, cropY, cropWidth, cropHeight } = item.cropData;
-      
-      // Calculer les dimensions de fond pour que la zone croppée remplisse le conteneur
-      const bgSizeX = (originalWidth / cropWidth) * 100;
-      const bgSizeY = (originalHeight / cropHeight) * 100;
-      
-      // Calculer la position pour décaler l'image et centrer la zone croppée
-      const bgPosX = -(cropX / cropWidth) * 100;
-      const bgPosY = -(cropY / cropHeight) * 100;
-      
-      console.log(`Crop data pour ${item.titre}:`, {
-        originalWidth, originalHeight, 
-        cropX, cropY, cropWidth, cropHeight,
-        bgSizeX, bgSizeY, bgPosX, bgPosY
-      });
-      
-      return {
-        backgroundImage: `url(${item.imageUrl})`,
-        backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
-        backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-        backgroundRepeat: 'no-repeat'
-      };
+    // Utiliser displayDimensions si disponibles (venant de l'API)
+    let cropWidthPercent = 100;
+    let cropHeightPercent = 100;
+    if (displayDimensions && displayDimensions.cropWidthPercent && displayDimensions.cropHeightPercent) {
+      cropWidthPercent = displayDimensions.cropWidthPercent;
+      cropHeightPercent = displayDimensions.cropHeightPercent;
+    } else if (item.displayDimensions && item.displayDimensions.cropWidthPercent && item.displayDimensions.cropHeightPercent) {
+      cropWidthPercent = item.displayDimensions.cropWidthPercent;
+      cropHeightPercent = item.displayDimensions.cropHeightPercent;
+    } else {
+      // Fallback: ancienne logique basée sur le ratio de la grille
+      const [cropRatioW, cropRatioH] = dimension;
+      const cropAspectRatio = cropRatioW / cropRatioH;
+      if (cropAspectRatio >= 1) {
+        cropWidthPercent = 100;
+        cropHeightPercent = 100 / cropAspectRatio;
+      } else {
+        cropHeightPercent = 100;
+        cropWidthPercent = 100 * cropAspectRatio;
+      }
     }
-
-    // Fallback simplifié (sans zoom/size) pour compatibilité
-    const dims = displayDimensions || item.displayDimensions || { cropWidthPercent: 100, cropHeightPercent: 100 };
-    const safeW = Math.max(dims.cropWidthPercent, 1);
-    const safeH = Math.max(dims.cropHeightPercent, 1);
-    
-    // Calcul simplifié sans facteur de zoom
-    const bgSizeX = 100 / (safeW / 100);
-    const bgSizeY = 100 / (safeH / 100);
-    const bgPosX = crop.x;
-    const bgPosY = crop.y;
-    
-    console.log(`Crop legacy pour ${item.titre}:`, {
-      crop, dims, bgSizeX, bgSizeY, bgPosX, bgPosY
-    });
-    
+    // Appliquer le pourcentage de size à la taille maximale
+    cropWidthPercent = (cropWidthPercent * crop.size) / 100;
+    cropHeightPercent = (cropHeightPercent * crop.size) / 100;
+    // Calculer le background-size pour afficher la bonne portion
+    const bgSizeX = 100 / (cropWidthPercent / 100);
+    const bgSizeY = 100 / (cropHeightPercent / 100);
+    // Calculer le background-position pour centrer le crop
+    // const bgPosX = -(crop.x * bgSizeX) / 100;
+    // const bgPosY = -(crop.y * bgSizeY) / 100;
+    // const bgPosY = -(crop.y * bgSizeY) / 100;
+    const bgPosX = crop.x * ((100 / 100) + item.displayDimensions.cropWidthPercent / 100);
+    const bgPosY = crop.y * ((100 / 100) + item.displayDimensions.cropHeightPercent / 100);
+    console.log(`cropArea.x: ${crop.x}, cropArea.y: ${crop.y}`);
+    console.log(`displayDimensions: ${item.displayDimensions.cropWidthPercent}% ${item.displayDimensions.cropHeightPercent}%`);
+    console.log(`bgPosition: ${bgPosX}% ${bgPosY}%`);
     return {
       backgroundImage: `url(${item.imageUrl})`,
       backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
       backgroundPosition: `${bgPosX}% ${bgPosY}%`,
+      // bac
       backgroundRepeat: 'no-repeat'
     };
   };
 
   const shouldUseBackground = Boolean(crop);
-  
-  // Debug pour les images forcées en carré
-  if (isForcedSquare) {
-    console.log(`Image forcée ${item.titre}:`, {
-      isForcedSquare,
-      crop,
-      shouldUseBackground,
-      hasItem: Boolean(item),
-      hasCropData: Boolean(item.cropData),
-      displayDimensions
-    });
-  }
+  // console.log("crop",shouldUseBackground);
   // Classes CSS pour les transitions
   const getTransitionClasses = () => {
     switch (transitionState) {
@@ -147,12 +121,6 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
         return '';
     }
   };
-
-  useEffect(() => {
-    console.log(item.categories);
-    console.log('ImageComponent props:', { item, dimension, position, index, isVisible, crop, displayDimensions, transitionState });
-    // Logique d'effet secondaire ici
-  }, []);
 
   return (
     <>
@@ -219,18 +187,14 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
       
       {/* Titre et sous-titre centrés au hover, sans animation */}
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
+        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100"
         style={{ zIndex: 2 }}
       >
-        <h3 className={`text-lg font-semibold tracking-wider drop-shadow-lg text-center ${
-          isForcedSquare ? 'text-red-500' : 'text-white'
-        }`}>
+        <h3 className="text-white text-lg font-semibold tracking-wider drop-shadow-lg text-center">
           {item.titre}
         </h3>
         {item.sousTitre && (
-          <p className={`text-sm mt-1 opacity-90 font-light drop-shadow-lg text-center ${
-            isForcedSquare ? 'text-red-400' : 'text-white'
-          }`}>
+          <p className="text-white text-sm mt-1 opacity-90 font-light drop-shadow-lg text-center">
             {item.sousTitre}
           </p>
         )}

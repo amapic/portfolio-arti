@@ -33,16 +33,9 @@ import NoSSR from '../../components/NoSSR';
 import { Header } from '../../components/Header';
 import { useAuth } from '../../components/AuthProvider';
 import AdminLayout from '../../components/AdminLayout';
+import { CATEGORIES, CATEGORY_VALUES, CategoryType, getCategoryLabel, getCategoryColor, imageMatchesCategory, normalizeCategoriesArray, getCategoriesLabels } from '../../types/categories';
 import PortfolioFooter from '../../components/PortfolioFooter';
 import ImageCropper from '../../components/ImageCropper';
-
-interface ApiCategory {
-  id: string;
-  value: string;
-  label: string;
-  order: number;
-  isActive: boolean;
-}
 
 const ImagesAdmin: React.FC = () => {
   const searchParams = useSearchParams();
@@ -51,71 +44,25 @@ const ImagesAdmin: React.FC = () => {
   
   const [images, setImages] = useState<ImageMeta[]>([]);
   const [filteredImages, setFilteredImages] = useState<ImageMeta[]>([]);
-  const [categories, setCategories] = useState<ApiCategory[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | 'All'>('All');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'All'>('All');
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [editingImage, setEditingImage] = useState<ImageMeta | null>(null);
   const [croppingImage, setCroppingImage] = useState<ImageMeta | null>(null);
-  const [cropData, setCropData] = useState<any>(null);
   const [newImageMeta, setNewImageMeta] = useState({
-    category: ['Theater'] as string[],
+    category: ['Theater'] as CategoryType[],
     alt: '',
     titre: '',
     sousTitre: '',
     dimension: [1, 1] as [number, number],
-    positions: {} as Record<string, number>
+    position: 0
   });
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
-
-  // Fonctions utilitaires pour les catégories
-  const getCategoryLabel = (value: string): string => {
-    const category = categories.find(cat => cat.value === value);
-    return category ? category.label : value;
-  };
-
-  const imageMatchesCategory = (imageCategories: string | string[], filterCategory: string | 'All'): boolean => {
-    if (filterCategory === 'All') return true;
-    const imageCategoriesArray = Array.isArray(imageCategories) ? imageCategories : [imageCategories];
-    return imageCategoriesArray.includes(filterCategory);
-  };
-
-  const normalizeCategoriesArray = (categories: string | string[]): string[] => {
-    return Array.isArray(categories) ? categories : [categories];
-  };
-
-  const getCategoriesLabels = (categories: string | string[]): string => {
-    const categoriesArray = normalizeCategoriesArray(categories);
-    return categoriesArray.map(cat => getCategoryLabel(cat)).join(', ');
-  };
-
-  // Fonctions utilitaires pour les positions (remplacement des anciennes)
-  const getPositionForCategory = (image: ImageMeta, category: string): number => {
-    if (typeof image.position === 'number') {
-      return image.position;
-    } else if (image.position && typeof image.position === 'object') {
-      return (image.position as any)[category] || 0;
-    }
-    return 0;
-  };
-
-  const setPositionForCategory = (image: ImageMeta, category: string, position: number): ImageMeta => {
-    let newPosition: any;
-    if (typeof image.position === 'number') {
-      // Convertir de number vers objet
-      newPosition = { [category]: position };
-    } else if (image.position && typeof image.position === 'object') {
-      newPosition = { ...image.position, [category]: position };
-    } else {
-      newPosition = { [category]: position };
-    }
-    return { ...image, position: newPosition };
-  };
 
   const dimensions = [
     { label: '1x1 (Carré)', value: [1, 1] },
@@ -123,28 +70,13 @@ const ImagesAdmin: React.FC = () => {
     { label: '1x2 (Rectangle vertical)', value: [1, 2] }
   ];
 
-  // Charger les catégories depuis l'API
-  const loadCategories = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/categories?projectId=${PROJECT_ID}`);
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data.sort((a: ApiCategory, b: ApiCategory) => a.order - b.order));
-      }
-    } catch (error) {
-      console.error('Erreur de chargement des catégories:', error);
-    }
-  };
-
   // Charger les images au montage et selon les paramètres d'URL
   useEffect(() => {
-    const categoryFromUrl = searchParams.get('category');
-    loadCategories().then(() => {
-      if (categoryFromUrl) {
-        setSelectedCategory(categoryFromUrl);
-      }
-      loadImages();
-    });
+    const categoryFromUrl = searchParams.get('category') as CategoryType | null;
+    if (categoryFromUrl && CATEGORY_VALUES.includes(categoryFromUrl)) {
+      setSelectedCategory(categoryFromUrl);
+    }
+    loadImages();
   }, [searchParams]);
 
   // Filtrer les images selon la catégorie sélectionnée
@@ -243,7 +175,7 @@ const ImagesAdmin: React.FC = () => {
         dimension: newImageMeta.dimension,
         crop,
         selected: false,
-        position: newImageMeta.positions
+        position: newImageMeta.position
       };
 
       const metaResponse = await fetch(`${API_URL}/api/images?projectId=${PROJECT_ID}`, {
@@ -265,7 +197,7 @@ const ImagesAdmin: React.FC = () => {
         titre: '',
         sousTitre: '',
         dimension: [1, 1],
-        positions: categories.reduce((acc, cat) => ({ ...acc, [cat.value]: 0 }), {} as Record<string, number>)
+        position: 0
       });
 
       // Recharger la liste
@@ -347,7 +279,7 @@ const ImagesAdmin: React.FC = () => {
     }
   };
 
-  const handleCategoryChange = (category: string | 'All') => {
+  const handleCategoryChange = (category: CategoryType | 'All') => {
     setSelectedCategory(category);
     
     const newParams = new URLSearchParams(searchParams.toString());
@@ -387,27 +319,20 @@ const ImagesAdmin: React.FC = () => {
     if (!croppingImage) return;
 
     try {
-      // Inclure les nouvelles données cropData
-      const updatedImage = {
-        ...croppingImage,
-        cropData: cropData
-      };
-
       const response = await fetch(`${API_URL}/api/images/${croppingImage.id}?projectId=${PROJECT_ID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedImage)
+        body: JSON.stringify(croppingImage)
       });
 
       if (response.ok) {
         // Mettre à jour l'état local
         setImages(prevImages => 
           prevImages.map(img => 
-            img.id === croppingImage.id ? updatedImage : img
+            img.id === croppingImage.id ? croppingImage : img
           )
         );
         setCroppingImage(null);
-        setCropData(null);
         alert('Recadrage sauvegardé avec succès');
       } else {
         alert('Erreur lors de la sauvegarde du recadrage');
@@ -430,12 +355,12 @@ const ImagesAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Images
                 </h1>
-                {/* <button
+                <button
                   onClick={logout}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 >
                   Déconnexion
-                </button> */}
+                </button>
               </div>
               {/* Zone blanche pendant le chargement */}
               <div className="bg-white rounded-lg shadow-md p-6 min-h-96">
@@ -459,12 +384,12 @@ const ImagesAdmin: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Images ({filteredImages.length})
               </h1>
-              {/* <button
+              <button
                 onClick={logout}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
               >
                 Déconnexion
-              </button> */}
+              </button>
             </div>
 
             {/* Section Upload */}
@@ -507,27 +432,27 @@ const ImagesAdmin: React.FC = () => {
                       Catégories
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                      {categories.map(cat => (
-                        <label key={cat.value} className="flex items-center space-x-2">
+                      {CATEGORY_VALUES.map(cat => (
+                        <label key={cat} className="flex items-center space-x-2">
                           <input
                             type="checkbox"
-                            checked={newImageMeta.category.includes(cat.value)}
+                            checked={newImageMeta.category.includes(cat)}
                             onChange={(e) => {
                               if (e.target.checked) {
                                 setNewImageMeta(prev => ({ 
                                   ...prev, 
-                                  category: [...prev.category, cat.value] 
+                                  category: [...prev.category, cat] 
                                 }));
                               } else {
                                 setNewImageMeta(prev => ({ 
                                   ...prev, 
-                                  category: prev.category.filter(c => c !== cat.value) 
+                                  category: prev.category.filter(c => c !== cat) 
                                 }));
                               }
                             }}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
-                          <span className="text-sm text-gray-900">{getCategoryLabel(cat.value)}</span>
+                          <span className="text-sm text-gray-900">{getCategoryLabel(cat)}</span>
                         </label>
                       ))}
                     </div>
@@ -591,26 +516,16 @@ const ImagesAdmin: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Positions par catégorie
+                      Position
                     </label>
-                    <div className="space-y-2">
-                      {categories.map(cat => (
-                        <div key={cat.value} className="flex items-center space-x-2">
-                          <label className="w-20 text-sm text-gray-700">{getCategoryLabel(cat.value)}:</label>
-                          <input
-                            type="number"
-                            value={newImageMeta.positions[cat.value]}
-                            onChange={(e) => setNewImageMeta(prev => ({ 
-                              ...prev, 
-                              positions: { ...prev.positions, [cat.value]: parseInt(e.target.value) || 0 }
-                            }))}
-                            className="flex-1 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                            placeholder="Position"
-                            min="0"
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    <input
+                      type="number"
+                      value={newImageMeta.position}
+                      onChange={(e) => setNewImageMeta(prev => ({ ...prev, position: parseInt(e.target.value) || 0 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                      placeholder="Position dans l'ordre d'affichage"
+                      min="0"
+                    />
                   </div>
 
                   <button
@@ -637,21 +552,21 @@ const ImagesAdmin: React.FC = () => {
                 >
                   Toutes ({images.length})
                 </button>
-                {categories.map(category => {
-                  // console.log(category);
-                  const count = images.filter(img => imageMatchesCategory(img.category, category.value)).length;
-                  console.log(count);
+                {CATEGORY_VALUES.map(category => {
+                  console.log(category);
+                  const count = images.filter(img => imageMatchesCategory(img.category, category)).length;
+                  const colorClass = getCategoryColor(category);
                   return (
                     <button
-                      key={category.value}
-                      onClick={() => handleCategoryChange(category.value)}
+                      key={category}
+                      onClick={() => handleCategoryChange(category)}
                       className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                        selectedCategory === category.value
-                          ? 'bg-gray-800 text-white'
+                        selectedCategory === category
+                          ? `${colorClass} text-white`
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                       }`}
                     >
-                      {getCategoryLabel(category.value)} ({count})
+                      {getCategoryLabel(category)} ({count})
                     </button>
                   );
                 })}
@@ -719,54 +634,44 @@ const ImagesAdmin: React.FC = () => {
                         <div>
                           <label className="block text-xs font-medium text-gray-700 mb-1">Catégories</label>
                           <div className="grid grid-cols-2 gap-1">
-                            {categories.map(cat => (
-                              <label key={cat.value} className="flex items-center space-x-1 text-xs">
+                            {CATEGORY_VALUES.map(cat => (
+                              <label key={cat} className="flex items-center space-x-1 text-xs">
                                 <input
                                   type="checkbox"
-                                  checked={normalizeCategoriesArray(editingImage.category).includes(cat.value)}
+                                  checked={normalizeCategoriesArray(editingImage.category).includes(cat)}
                                   onChange={(e) => {
                                     const currentCategories = normalizeCategoriesArray(editingImage.category);
                                     if (e.target.checked) {
                                       setEditingImage(prev => prev ? { 
                                         ...prev, 
-                                        category: [...currentCategories, cat.value] as any
+                                        category: [...currentCategories, cat] 
                                       } : null);
                                     } else {
                                       setEditingImage(prev => prev ? { 
                                         ...prev, 
-                                        category: currentCategories.filter(c => c !== cat.value) as any
+                                        category: currentCategories.filter(c => c !== cat) 
                                       } : null);
                                     }
                                   }}
                                   className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                 />
-                                <span className="text-gray-900">{getCategoryLabel(cat.value)}</span>
+                                <span className="text-gray-900">{getCategoryLabel(cat)}</span>
                               </label>
                             ))}
                           </div>
                         </div>
                         
-                        {/* Positions par catégorie */}
+                        {/* Position */}
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Positions par catégorie</label>
-                          <div className="space-y-1">
-                            {categories.map(cat => (
-                              <div key={cat.value} className="flex items-center space-x-1">
-                                <label className="w-12 text-xs text-gray-600">{getCategoryLabel(cat.value)}:</label>
-                                <input
-                                  type="number"
-                                  value={getPositionForCategory(editingImage, cat.value)}
-                                  onChange={(e) => {
-                                    const newPosition = parseInt(e.target.value) || 0;
-                                    setEditingImage(prev => prev ? setPositionForCategory(prev, cat.value, newPosition) : null);
-                                  }}
-                                  className="flex-1 px-1 py-0.5 text-xs border border-gray-300 rounded text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                  placeholder="0"
-                                  min="0"
-                                />
-                              </div>
-                            ))}
-                          </div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Position</label>
+                          <input
+                            type="number"
+                            value={editingImage.position}
+                            onChange={(e) => setEditingImage(prev => prev ? { ...prev, position: parseInt(e.target.value) || 0 } : null)}
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Position"
+                            min="0"
+                          />
                         </div>
                         <div className="flex gap-1">
                           <button
@@ -796,11 +701,7 @@ const ImagesAdmin: React.FC = () => {
                           <h3 className="font-medium text-sm truncate text-black">{image.titre || 'Sans titre'}</h3>
                           <p className="text-xs text-gray-600 truncate">{image.sousTitre || 'Sans sous-titre'}</p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {image.dimension.join('×')} • Positions: {
-                              typeof image.position === 'number' 
-                                ? image.position 
-                                : Object.entries(image.position).map(([cat, pos]) => `${getCategoryLabel(cat)}: ${pos}`).join(', ')
-                            } • {image.selected ? 'Sélectionné' : 'Non sélectionné'}
+                            {image.dimension.join('×')} • Position: {image.position} • {image.selected ? 'Sélectionné' : 'Non sélectionné'}
                           </p>
                         </div>
                       </div>
@@ -832,12 +733,6 @@ const ImagesAdmin: React.FC = () => {
                     initialCrop={croppingImage.crop}
                     onCropChange={handleCropChange}
                     onDimensionChange={handleDimensionChange}
-                    onDisplayChange={(dims) => {
-                      setCroppingImage(prev => prev ? { ...prev, displayDimensions: dims } : null);
-                    }}
-                    onCropDataChange={(data) => {
-                      setCropData(data);
-                    }}
                   />
                   
                   <div className="flex gap-2 mt-6 pt-4 border-t">
