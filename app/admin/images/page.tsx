@@ -1,4 +1,3 @@
-
 "use client";
 
 // Calcule le crop maximal centré pour un ratio donné et des dimensions d'image
@@ -33,7 +32,14 @@ import NoSSR from '../../components/NoSSR';
 import { Header } from '../../components/Header';
 import { useAuth } from '../../components/AuthProvider';
 import AdminLayout from '../../components/AdminLayout';
-import { CATEGORIES, CATEGORY_VALUES, CategoryType, getCategoryLabel, getCategoryColor, imageMatchesCategory, normalizeCategoriesArray, getCategoriesLabels } from '../../types/categories';
+// Types pour les catégories (maintenant chargées dynamiquement)
+interface Category {
+  id: string;
+  value: string;
+  label: string;
+  order: number;
+  isActive: boolean;
+}
 import PortfolioFooter from '../../components/PortfolioFooter';
 import ImageCropper from '../../components/ImageCropper';
 
@@ -44,7 +50,8 @@ const ImagesAdmin: React.FC = () => {
   
   const [images, setImages] = useState<ImageMeta[]>([]);
   const [filteredImages, setFilteredImages] = useState<ImageMeta[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'All'>('All');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -52,7 +59,7 @@ const ImagesAdmin: React.FC = () => {
   const [editingImage, setEditingImage] = useState<ImageMeta | null>(null);
   const [croppingImage, setCroppingImage] = useState<ImageMeta | null>(null);
   const [newImageMeta, setNewImageMeta] = useState({
-    category: ['Theater'] as CategoryType[],
+    category: [] as string[],
     alt: '',
     titre: '',
     sousTitre: '',
@@ -70,12 +77,56 @@ const ImagesAdmin: React.FC = () => {
     { label: '1x2 (Rectangle vertical)', value: [1, 2] }
   ];
 
+  // Fonctions utilitaires pour les catégories
+  const getCategoryLabel = (value: string): string => {
+    const category = categories.find(cat => cat.value === value);
+    return category ? category.label : value;
+  };
+
+  const getCategoryColor = (value: string): string => {
+    // Couleur par défaut, peut être étendue plus tard
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  const normalizeCategoriesArray = (categories: string | string[]): string[] => {
+    return Array.isArray(categories) ? categories : [categories];
+  };
+
+  const imageMatchesCategory = (imageCategory: string | string[], filterCategory: string): boolean => {
+    if (filterCategory === 'All') return true;
+    const imageCategoriesArray = normalizeCategoriesArray(imageCategory);
+    return imageCategoriesArray.includes(filterCategory);
+  };
+
+  const isValidCategory = (categoryValue: string): boolean => {
+    return categories.some(cat => cat.value === categoryValue && cat.isActive);
+  };
+
+  // Charger les catégories depuis l'API
+  const loadCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/categories?projectId=${PROJECT_ID}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data.sort((a: Category, b: Category) => a.order - b.order));
+      } else {
+        console.error('Erreur lors du chargement des catégories');
+        // Fallback : catégories par défaut si l'API échoue
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error('Erreur de connexion à l\'API des catégories:', error);
+      setCategories([]);
+    }
+  };
+
   // Charger les images au montage et selon les paramètres d'URL
   useEffect(() => {
-    const categoryFromUrl = searchParams.get('category') as CategoryType | null;
-    if (categoryFromUrl && CATEGORY_VALUES.includes(categoryFromUrl)) {
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl) {
       setSelectedCategory(categoryFromUrl);
     }
+    loadCategories();
     loadImages();
   }, [searchParams]);
 
@@ -279,7 +330,7 @@ const ImagesAdmin: React.FC = () => {
     }
   };
 
-  const handleCategoryChange = (category: CategoryType | 'All') => {
+  const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
     
     const newParams = new URLSearchParams(searchParams.toString());
@@ -432,27 +483,27 @@ const ImagesAdmin: React.FC = () => {
                       Catégories
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                      {CATEGORY_VALUES.map(cat => (
-                        <label key={cat} className="flex items-center space-x-2">
+                      {categories.filter(cat => cat.isActive).map(cat => (
+                        <label key={cat.value} className="flex items-center space-x-2">
                           <input
                             type="checkbox"
-                            checked={newImageMeta.category.includes(cat)}
+                            checked={newImageMeta.category.includes(cat.value)}
                             onChange={(e) => {
                               if (e.target.checked) {
                                 setNewImageMeta(prev => ({ 
                                   ...prev, 
-                                  category: [...prev.category, cat] 
+                                  category: [...prev.category, cat.value] 
                                 }));
                               } else {
                                 setNewImageMeta(prev => ({ 
                                   ...prev, 
-                                  category: prev.category.filter(c => c !== cat) 
+                                  category: prev.category.filter(c => c !== cat.value) 
                                 }));
                               }
                             }}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
-                          <span className="text-sm text-gray-900">{getCategoryLabel(cat)}</span>
+                          <span className="text-sm text-gray-900">{cat.label}</span>
                         </label>
                       ))}
                     </div>
@@ -552,21 +603,39 @@ const ImagesAdmin: React.FC = () => {
                 >
                   Toutes ({images.length})
                 </button>
-                {CATEGORY_VALUES.map(category => {
-                  console.log(category);
-                  const count = images.filter(img => imageMatchesCategory(img.category, category)).length;
-                  const colorClass = getCategoryColor(category);
+                {categories.filter(cat => cat.isActive).map(category => {
+                  const count = images.filter(img => imageMatchesCategory(img.category, category.value)).length;
+                  const colorClass = getCategoryColor(category.value);
                   return (
                     <button
-                      key={category}
-                      onClick={() => handleCategoryChange(category)}
+                      key={category.value}
+                      onClick={() => handleCategoryChange(category.value)}
                       className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                        selectedCategory === category
-                          ? `${colorClass} text-white`
+                        selectedCategory === category.value
+                          ? `${colorClass} bg-blue-600 text-white`
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                       }`}
                     >
-                      {getCategoryLabel(category)} ({count})
+                      {category.label} ({count})
+                    </button>
+                  );
+                })}
+                {/* Affichage des catégories supprimées si des images y sont associées */}
+                {categories.filter(cat => !cat.isActive).map(category => {
+                  const count = images.filter(img => imageMatchesCategory(img.category, category.value)).length;
+                  if (count === 0) return null;
+                  return (
+                    <button
+                      key={category.value}
+                      onClick={() => handleCategoryChange(category.value)}
+                      className={`px-3 py-1 rounded-full text-sm transition-colors opacity-50 ${
+                        selectedCategory === category.value
+                          ? 'bg-red-600 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                      title="Catégorie supprimée - contient encore des images"
+                    >
+                      {category.label} ({count}) [Supprimée]
                     </button>
                   );
                 })}
@@ -634,28 +703,48 @@ const ImagesAdmin: React.FC = () => {
                         <div>
                           <label className="block text-xs font-medium text-gray-700 mb-1">Catégories</label>
                           <div className="grid grid-cols-2 gap-1">
-                            {CATEGORY_VALUES.map(cat => (
-                              <label key={cat} className="flex items-center space-x-1 text-xs">
+                            {categories.filter(cat => cat.isActive).map(cat => (
+                              <label key={cat.value} className="flex items-center space-x-1 text-xs">
                                 <input
                                   type="checkbox"
-                                  checked={normalizeCategoriesArray(editingImage.category).includes(cat)}
+                                  checked={normalizeCategoriesArray(editingImage.category).includes(cat.value)}
                                   onChange={(e) => {
                                     const currentCategories = normalizeCategoriesArray(editingImage.category);
                                     if (e.target.checked) {
                                       setEditingImage(prev => prev ? { 
                                         ...prev, 
-                                        category: [...currentCategories, cat] 
+                                        category: [...currentCategories, cat.value] as any
                                       } : null);
                                     } else {
                                       setEditingImage(prev => prev ? { 
                                         ...prev, 
-                                        category: currentCategories.filter(c => c !== cat) 
+                                        category: currentCategories.filter(c => c !== cat.value) as any
                                       } : null);
                                     }
                                   }}
                                   className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                 />
-                                <span className="text-gray-900">{getCategoryLabel(cat)}</span>
+                                <span className="text-gray-900">{cat.label}</span>
+                              </label>
+                            ))}
+                            {/* Affichage des catégories supprimées pour les images qui y sont associées */}
+                            {categories.filter(cat => !cat.isActive && normalizeCategoriesArray(editingImage.category).includes(cat.value)).map(cat => (
+                              <label key={cat.value} className="flex items-center space-x-1 text-xs opacity-50">
+                                <input
+                                  type="checkbox"
+                                  checked={true}
+                                  onChange={(e) => {
+                                    if (!e.target.checked) {
+                                      const currentCategories = normalizeCategoriesArray(editingImage.category);
+                                      setEditingImage(prev => prev ? { 
+                                        ...prev, 
+                                        category: currentCategories.filter(c => c !== cat.value) as any
+                                      } : null);
+                                    }
+                                  }}
+                                  className="h-3 w-3 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                                />
+                                <span className="text-red-700">{cat.label} [Supprimée]</span>
                               </label>
                             ))}
                           </div>

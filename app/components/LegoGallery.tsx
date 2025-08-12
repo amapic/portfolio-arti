@@ -25,26 +25,10 @@ interface GalleryItem {
   };
 }
 
-interface PlacedImage {
-  item: GalleryItem;
-  dimension: [number, number]; // [width, height]
-  position: [number, number]; // [col, row]
-}
-
-interface TransitioningImage extends PlacedImage {
-  transitionState?: 'stable' | 'entering' | 'exiting';
-}
-
 const LegoGallery: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<CategoryType | 'All'>('All');
-  const [visibleItems, setVisibleItems] = useState<number[]>([]);
-  const [placedImages, setPlacedImages] = useState<PlacedImage[]>([]);
-  const [transitioningImages, setTransitioningImages] = useState<TransitioningImage[]>([]);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [gridHeight, setGridHeight] = useState(10);
   const [imagesMeta, setImagesMeta] = useState<ImageMeta[]>([]);
   const [loading, setLoading] = useState(true);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
@@ -60,14 +44,11 @@ const LegoGallery: React.FC = () => {
         const response = await fetch(`${API_URL}/api/images?projectId=${PROJECT_ID}`);
         if (response.ok) {
           const data: ImageMeta[] = await response.json();
-          console.log('Images chargées depuis l\'API:', data.length, 'images'); // Debug
-          console.log('Détail des images:', data); // Debug
-          // Filtrer seulement les images sélectionnées et les trier par position
+          console.log('Images chargées depuis l\'API:', data.length, 'images');
           const selectedImages = data
             .filter(img => img.selected)
             .sort((a, b) => a.position - b.position);
-          console.log('Images sélectionnées:', selectedImages.length, 'images'); // Debug
-          console.log('Catégories trouvées:', [...new Set(selectedImages.map(img => img.category))]); // Debug
+          console.log('Images sélectionnées:', selectedImages.length, 'images');
           setImagesMeta(selectedImages);
         } else {
           console.error('Erreur lors du chargement des images');
@@ -97,271 +78,239 @@ const LegoGallery: React.FC = () => {
     displayDimensions: meta.displayDimensions
   }));
 
-  // Algorithme de placement séquentiel sans trous
-  const generateLayout = (items: GalleryItem[]) => {
-    const GRID_WIDTH = 3;
-    const placed: PlacedImage[] = [];
-    
-    // Grille dynamique qui grandit au besoin
-    let grid: number[][] = [];
-    
-    // Dimensions possibles par ordre de priorité (éviter 1x1 si possible)
-    const dimensionPriority: [number, number][] = [
-      [2, 1], // Rectangle horizontal (priorité 1)
-      [1, 2], // Rectangle vertical (priorité 2)  
-      [1, 1]  // Carré (dernier recours)
-    ];
+  // Obtenir les classes CSS pour les dimensions (système Isotope)
+  const getDimensionClass = (dimension: [number, number]) => {
+    const [w, h] = dimension;
+    if (w === 2 && h === 1) return "grid-item--width4";
+    if (w === 1 && h === 2) return "grid-item--height2";
+    return "";
+  };
 
-    items.forEach((item, index) => {
-      console.log(`\nPlacement image ${index + 1}: ${item.category}`);
-      
-      // Utiliser la dimension de l'API ou par défaut [1, 1]
-      const targetDimension: [number, number] = item.dimension || [1, 1];
-      console.log(`Dimension de l'API: ${targetDimension[0]}x${targetDimension[1]}`);
-      
-      // Trouver la prochaine position libre (de gauche à droite, haut en bas)
-      const nextPosition = findNextFreePosition(grid, GRID_WIDTH);
-      console.log(`Position de départ trouvée: [${nextPosition[0]}, ${nextPosition[1]}]`);
-      
-      // Essayer d'abord la dimension de l'API, puis les autres en fallback
-      const dimensionsToTry = [
-        targetDimension, // Priorité à la dimension de l'API
-        ...dimensionPriority.filter(dim => 
-          dim[0] !== targetDimension[0] || dim[1] !== targetDimension[1]
-        ) // Autres dimensions en fallback
-      ];
-      
-      let placedSuccessfully = false;
-      
-      for (const dimension of dimensionsToTry) {
-        const [width, height] = dimension;
-        
-        // Vérifier si cette dimension peut être placée à la position
-        if (canPlaceAtPosition(grid, nextPosition, [width, height], GRID_WIDTH)) {
-          console.log(`✓ Dimension ${width}x${height} convient`);
+  // Initialiser Isotope après le chargement
+  useEffect(() => {
+    if (!loading && galleryItems.length > 0) {
+      const initIsotope = () => {
+        const $ = (window as any).$;
+        if ($ && typeof $.fn.isotope === 'function') {
+          console.log("🎨 Initialisation d'Isotope avec les données API");
           
-          // Étendre la grille si nécessaire
-          extendGridIfNeeded(grid, nextPosition, [width, height], GRID_WIDTH);
-          
-          // Marquer les cases comme occupées
-          markGridCells(grid, nextPosition, [width, height], 1);
-          
-          // Ajouter l'image placée
-          placed.push({
-            item,
-            dimension: [width, height],
-            position: nextPosition
+          const $grid = $('.lego-grid').isotope({
+            itemSelector: '.lego-grid-item',
+            layoutMode: 'masonry',
+            percentPosition: true,
+            masonry: {
+              columnWidth: '.lego-grid-sizer',
+              gutter: 0
+            }
           });
-          
-          console.log(`Image placée: ${width}x${height} à [${nextPosition[0]}, ${nextPosition[1]}]`);
-          placedSuccessfully = true;
-          break;
-        } else {
-          console.log(`✗ Dimension ${width}x${height} ne convient pas`);
+
+          // Gestion des filtres
+          $('.lego-filter-btn').off('click').on('click', function() {
+            const filterValue = $(this).attr('data-filter');
+            
+            // Mise à jour des boutons actifs
+            $('.lego-filter-btn').removeClass('active');
+            $(this).addClass('active');
+            
+            // Application du filtre
+            $grid.isotope({ filter: filterValue });
+          });
+
+          // Réorganisation lors du redimensionnement
+          $(window).off('resize.isotope').on('resize.isotope', function() {
+            $grid.isotope('layout');
+          });
         }
-      }
-      
-      if (!placedSuccessfully) {
-        console.error(`Impossible de placer l'image ${index + 1}`);
-      }
-    });
+      };
 
-    // Calculer la hauteur finale de la grille et la retourner
-    const finalGridHeight = grid.length;
-    console.log(`Grille finale: ${GRID_WIDTH}x${finalGridHeight}`);
-    
-    return { placed, gridHeight: finalGridHeight };
-  };
-
-  // Trouver la prochaine position libre (balayage de gauche à droite, haut en bas)
-  const findNextFreePosition = (grid: number[][], gridWidth: number): [number, number] => {
-    // Si la grille est vide, commencer à [0, 0]
-    if (grid.length === 0) {
-      return [0, 0];
+      // Attendre que les éléments soient rendus
+      setTimeout(initIsotope, 300);
     }
-    
-    // Balayer la grille ligne par ligne
-    for (let row = 0; row < grid.length; row++) {
-      for (let col = 0; col < gridWidth; col++) {
-        if (grid[row][col] === 0) {
-          return [col, row];
-        }
-      }
-    }
-    
-    // Si aucune position libre, retourner la première position de la nouvelle ligne
-    return [0, grid.length];
-  };
+  }, [loading, galleryItems]);
 
-  // Vérifier si une dimension peut être placée à une position donnée
-  const canPlaceAtPosition = (grid: number[][], [col, row]: [number, number], [width, height]: [number, number], gridWidth: number): boolean => {
-    // Vérifier que ça ne dépasse pas la largeur de la grille
-    if (col + width > gridWidth) {
-      return false;
-    }
-    
-    // Vérifier que toutes les cases nécessaires sont libres
-    for (let r = row; r < row + height; r++) {
-      for (let c = col; c < col + width; c++) {
-        // Si on sort de la grille existante, c'est OK (on va l'étendre)
-        if (r >= grid.length) {
-          continue;
-        }
-        // Si la case est occupée, on ne peut pas placer
-        if (grid[r][c] !== 0) {
-          return false;
-        }
-      }
-    }
-    
-    return true;
-  };
-
-  // Étendre la grille si nécessaire pour accueillir une image
-  const extendGridIfNeeded = (grid: number[][], [col, row]: [number, number], [width, height]: [number, number], gridWidth: number) => {
-    const requiredHeight = row + height;
-    
-    // Ajouter des lignes si nécessaire
-    while (grid.length < requiredHeight) {
-      grid.push(Array(gridWidth).fill(0));
-    }
-  };
-
-  // Marquer les cases de la grille comme occupées ou libres
-  const markGridCells = (grid: number[][], [col, row]: [number, number], [width, height]: [number, number], value: number) => {
-    for (let r = row; r < row + height; r++) {
-      for (let c = col; c < col + width; c++) {
-        if (grid[r] && grid[r][c] !== undefined) {
-          grid[r][c] = value;
-        }
-      }
-    }
-  };
-
-  // Gérer les transitions lors du changement de filtre
-  const handleFilterTransition = (newLayout: PlacedImage[], newGridHeight: number) => {
-    setIsTransitioning(true);
-    
-    // Toutes les nouvelles images apparaissent avec l'animation d'entrée
-    const transitionImages: TransitioningImage[] = newLayout.map(placedImage => ({
-      ...placedImage,
-      transitionState: 'entering'
-    }));
-    
-    // Mettre à jour immédiatement avec les positions finales
-    setTransitioningImages(transitionImages);
-    setPlacedImages(newLayout);
-    setGridHeight(newGridHeight);
-    
-    // Finir la transition après l'animation
-    setTimeout(() => {
-      setIsTransitioning(false);
-      setTransitioningImages([]);
-    }, 600); // 500ms animation + 100ms buffer
-  };
-
-  // Générer le layout quand les items changent
-  useEffect(() => {
-    // Ne générer le layout que si on a des images de l'API
-    if (galleryItems.length === 0) {
-      setPlacedImages([]);
-      setTransitioningImages([]);
-      return;
-    }
-
-    const filteredItems = activeCategory === 'All' 
-      ? galleryItems 
-      : galleryItems.filter(item => imageMatchesCategory(item.category, activeCategory));
-    
-    console.log(`Filtrage pour catégorie "${activeCategory}":`, filteredItems.length, 'images sur', galleryItems.length, 'total'); // Debug
-    
-    const { placed, gridHeight: newGridHeight } = generateLayout(filteredItems);
-    handleFilterTransition(placed, newGridHeight);
-  }, [activeCategory, imagesMeta]); // Ajouter imagesMeta comme dépendance
-
-  // Intersection Observer (commenté pour l'instant)
-  useEffect(() => {
-    return () => {
-      itemRefs.current.forEach((ref) => {
-        if (ref) {
-          // observer.unobserve(ref);
-        }
-      });
-    };
-  }, []);
+  // Filtrer les images selon la catégorie active
+  const filteredItems = activeCategory === 'All' 
+    ? galleryItems 
+    : galleryItems.filter(item => imageMatchesCategory(item.category, activeCategory));
 
   return (
-    <div className="min-h-screen bg-white font-serif p-0 m-0">
-      {/* Header */}
-      <PortfolioHeader />
+    <>
+      {/* CSS pour le système Isotope - forcé avec !important */}
+      <style jsx global>{`
+        /* IMPORTANT: Reset pour Isotope - Override les styles existants */
+        .lego-grid .lego-grid-item {
+          position: relative !important;
+          left: auto !important;
+          top: auto !important;
+          transform: none !important;
+          display: block !important;
+        }
+        
+        /* Sizer pour définir la largeur de base */
+        .lego-grid-sizer {
+          width: 33.33% !important;
+        }
+        
+        .lego-grid-item {
+          width: 33.33% !important;
+          margin-bottom: 10px !important;
+          padding-right: 10px !important;
+          transition: all 0.3s ease !important;
+          position: relative !important;
+          height: calc(33.33vw - 10px) !important;
+          max-height: 350px !important;
+          box-sizing: border-box !important;
+          /* Reset grid CSS */
+          grid-column: unset !important;
+          grid-row: unset !important;
+        }
+        
+        /* Taille 2x1 (largeur double) */
+        .lego-grid-item.grid-item--width4 {
+          width: 66.66% !important;
+          height: calc(33.33vw - 10px) !important;
+          max-height: 350px !important;
+        }
+        
+        /* Taille 1x2 (hauteur double) */
+        .lego-grid-item.grid-item--height2 {
+          width: 33.33% !important;
+          height: calc((33.33vw - 10px) * 2 + 10px) !important;
+          max-height: 710px !important;
+        }
+        
+        @media (max-width: 768px) {
+          .lego-grid-sizer,
+          .lego-grid-item {
+            width: 50% !important;
+            height: calc(50vw - 10px) !important;
+            max-height: 300px !important;
+            padding-right: 10px !important;
+          }
+          
+          .lego-grid-item.grid-item--width4 {
+            width: 100% !important;
+            height: calc(50vw - 10px) !important;
+            max-height: 300px !important;
+          }
+          
+          .lego-grid-item.grid-item--height2 {
+            width: 50% !important;
+            height: calc((50vw - 10px) * 2 + 10px) !important;
+            max-height: 610px !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .lego-grid-sizer,
+          .lego-grid-item {
+            width: 100% !important;
+            height: calc(100vw - 20px) !important;
+            max-height: 400px !important;
+            padding-right: 0 !important;
+          }
+          
+          .lego-grid-item.grid-item--width4 {
+            width: 100% !important;
+            height: calc(50vw - 10px) !important;
+            max-height: 250px !important;
+          }
+          
+          .lego-grid-item.grid-item--height2 {
+            width: 100% !important;
+            height: calc(100vw - 20px) !important;
+            max-height: 400px !important;
+          }
+        }
+      `}</style>
 
-      {/* Category Navigation */}
-      <nav className="flex justify-center gap-12 pt-12 bg-transparent mx-auto"
-      style={{ 
-            gridTemplateRows: `repeat(${gridHeight}, 400px)`,
-            width: '1152px'
-      }}
-      >
-        {categories.map((category) => (
-          <button
-            key={category}
-            className={`
-              bg-none border-none text-xl font-light text-black cursor-pointer 
-               py-2 tracking-wide font-serif relative text-center w-[50px] md:w-[90px]
-              hover:font-[600] transition-opacity duration-200
-              ${activeCategory === category ? 'font-semibold opacity-100' : ''}
-            `}
-            onClick={() => setActiveCategory(category)}
-          >
-            {category === 'All' ? 'Toutes' : getCategoryLabel(category as CategoryType)}
-          </button>
-        ))}
-      </nav>
+      <div className="min-h-screen bg-white font-serif p-0 m-0">
+        {/* Header */}
+        <PortfolioHeader />
 
-      {/* Loading Indicator */}
-      {loading && (
-        <div className="flex justify-center items-center py-20">
-          {/* <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div> */}
-          {/* <span className="ml-4 text-black opacity-70">Chargement des images...</span> */}
-        </div>
-      )}
-
-      {/* No Images Message */}
-      {!loading && galleryItems.length === 0 && (
-        <div className="flex flex-col justify-center items-center py-20">
-          <h2 className="text-2xl font-light text-black opacity-70 mb-4">Aucune image disponible</h2>
-          <p className="text-lg text-black opacity-50">Veuillez ajouter des images via l'interface d'administration.</p>
-        </div>
-      )}
-
-      {/* Dynamic Lego Gallery Grid */}
-      {!loading && galleryItems.length > 0 && (
-        <div 
-          className="grid grid-cols-3 gap-2 p-8 pt-2 mx-auto auto-rows-[400px]"
-          style={{ 
-            gridTemplateRows: `repeat(${gridHeight}, 400px)`,
-            width: '1152px', // Largeur fixe pour éviter les variations
-            maxWidth: '100vw' // Ne pas dépasser la largeur de l'écran
-          }}
+        {/* Category Navigation */}
+        <nav className="flex justify-center gap-12 pt-12 bg-transparent mx-auto"
+        style={{ 
+              width: '1152px'
+        }}
         >
-          {(isTransitioning ? transitioningImages : placedImages).map((placedImage, index) => (
-            <ImageComponent
-              key={placedImage.item.id}
-              item={placedImage.item}
-              dimension={placedImage.dimension}
-              position={placedImage.position}
-              index={index}
-              onImageRef={(idx, el) => { itemRefs.current[idx] = el; }}
-              isVisible={visibleItems.includes(index)}
-              crop={placedImage.item.crop}
-              displayDimensions={placedImage.item.displayDimensions}
-              transitionState={isTransitioning ? (placedImage as TransitioningImage).transitionState : 'stable'}
-            />
+          {categories.map((category) => (
+            <button
+              key={category}
+              className={`
+                lego-filter-btn bg-none border-none text-xl font-light text-black cursor-pointer 
+                 py-2 tracking-wide font-serif relative text-center w-[50px] md:w-[90px]
+                hover:font-[600] transition-opacity duration-200
+                ${activeCategory === category ? 'font-semibold opacity-100 active' : ''}
+              `}
+              data-filter={category === 'All' ? '*' : `.category-${category}`}
+              onClick={() => setActiveCategory(category)}
+            >
+              {category === 'All' ? 'Toutes' : getCategoryLabel(category as CategoryType)}
+            </button>
           ))}
-        </div>
-      )}
+        </nav>
 
-    </div>
+        {/* Loading Indicator */}
+        {loading && (
+          <div className="flex justify-center items-center py-20">
+            {/* <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div> */}
+            {/* <span className="ml-4 text-black opacity-70">Chargement des images...</span> */}
+          </div>
+        )}
+
+        {/* No Images Message */}
+        {!loading && galleryItems.length === 0 && (
+          <div className="flex flex-col justify-center items-center py-20">
+            <h2 className="text-2xl font-light text-black opacity-70 mb-4">Aucune image disponible</h2>
+            <p className="text-lg text-black opacity-50">Veuillez ajouter des images via l'interface d'administration.</p>
+          </div>
+        )}
+
+        {/* Isotope Gallery Grid */}
+        {!loading && galleryItems.length > 0 && (
+          <div 
+            className="lego-grid p-8 pt-2 mx-auto"
+            style={{ 
+              width: '1152px',
+              maxWidth: '100vw'
+            }}
+          >
+            {/* Élément invisible pour définir la largeur de base */}
+            <div className="lego-grid-sizer"></div>
+            
+            {/* Rendu des images avec Isotope */}
+            {galleryItems.map((item, index) => {
+              const categoryClasses = Array.isArray(item.category)
+                ? item.category.map(cat => `category-${cat}`).join(" ")
+                : `category-${item.category}`;
+              
+              const dimensionClass = getDimensionClass(item.dimension || [1, 1]);
+              
+              return (
+                <div
+                  key={item.id}
+                  className={`lego-grid-item ${categoryClasses} ${dimensionClass}`}
+                >
+                  <ImageComponent
+                    item={item}
+                    dimension={item.dimension || [1, 1]}
+                    position={[0, 0]} // Position pas utilisée avec Isotope
+                    index={index}
+                    onImageRef={(idx, el) => {}}
+                    isVisible={true}
+                    crop={item.crop}
+                    displayDimensions={item.displayDimensions}
+                    transitionState="stable"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+      </div>
+    </>
   );
 };
 

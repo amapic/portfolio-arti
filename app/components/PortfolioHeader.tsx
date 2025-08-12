@@ -37,6 +37,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
            <a 
             href="/romain" 
             className="w-[100px] text-lg text-black no-underline font-[400]  tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"
+            style={{ fontFamily: "ExposureTrial, serif" }}
           >
             home
           </a> 
