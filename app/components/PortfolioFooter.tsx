@@ -12,11 +12,11 @@ const PortfolioFooter: React.FC<PortfolioFooterProps> = ({ aboutData }) => {
 
   // Données par défaut si aucune donnée n'est fournie
   const defaultFooterData = {
-    copyrightText: "© 2025 - Romain de Lagarde - Lighting Designer - Tous droits réservés",
+    copyrightText: "© 2025 - Pierre Besson - Photographe - Tous droits réservés",
     designBy: "Renom",
     designUrl: "https://renom.design",
-    realisationBy: "asap_studio",
-    realisationUrl: "https://asap-studio.com",
+    realisationBy: "dev2site",
+    realisationUrl: "https://dev2site.net",
     mentionsLegalesUrl: "/mentions-legales"
   };
 

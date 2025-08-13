@@ -9,7 +9,7 @@ interface PortfolioHeaderProps {
 }
 
 const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
-  title = "Romain de Lagarde",
+  title = "Pierre Besson",
   showNavigation = true,
 }) => {
   return (
@@ -36,7 +36,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
         <nav className="flex items-center justify-center gap-4">
            <a 
             href="/romain" 
-            className="w-[100px] text-lg text-black no-underline font-[400]  tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"
+            className="w-[100px] text-md lg:text-lg text-black no-underline font-[400]  tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"
             style={{ fontFamily: "ExposureTrial, serif" }}
           >
             home
@@ -44,7 +44,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
            <span className="text-gray-400 font-light">|</span> 
           <a
             href="/romain/a-propos"
-            className="w-[100px] text-lg text-black no-underline font-[400]  tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"
+            className="w-[100px] text-md lg:text-lg text-black no-underline font-[400]  tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"
             style={{ fontFamily: "ExposureTrial, serif" }}
           >
             about
@@ -52,7 +52,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
           <span className="text-black font-light">|</span>
           <a
             href="/romain/contact"
-            className="w-[100px] text-lg  text-black no-underline font-[50] tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"
+            className="w-[100px] text-md lg:text-lg  text-black no-underline font-[50] tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"
             style={{ fontFamily: "ExposureTrial, serif" }}
           >
             contact

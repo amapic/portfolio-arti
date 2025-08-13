@@ -52,7 +52,7 @@ const ContactPage: React.FC = () => {
     <div className="min-h-screen bg-white flex flex-col font-exposure">
       {/* Header */}
       <PortfolioHeader 
-        title="Romain de Lagarde"
+        title="Pierre Besson"
         showNavigation={true}
       />
 
@@ -89,7 +89,7 @@ const ContactPage: React.FC = () => {
             </div>
 
             {/* Instagram */}
-            <div>
+            {/* <div>
               <a
                 href="https://instagram.com/rdelagarde"
                 target="_blank"
@@ -98,7 +98,7 @@ const ContactPage: React.FC = () => {
               >
                 instagram.com/rdelagarde/
               </a>
-            </div>
+            </div> */}
 
             {/* Téléphone */}
             <div className="pt-4">

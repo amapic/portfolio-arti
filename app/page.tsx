@@ -1,961 +1,749 @@
 "use client";
 
-import {
-  HiOutlineDocumentSearch,
-  HiOutlineCog,
-  HiDocumentAdd,
-  HiOutlineAcademicCap,
-  HiOutlineLogout,
-  HiOutlineCheck,
-  HiOutlineX
-} from "react-icons/hi";
-import {
-  HiOutlineEnvelope,
-  HiOutlineWrenchScrewdriver,
-  HiOutlineDocumentArrowUp,
-} from "react-icons/hi2";
-import { FaLinkedin } from "react-icons/fa";
-import { HiOutlineDocumentArrowDown } from "react-icons/hi2";
-import { HiOutlineChartBar } from "react-icons/hi2";
-import { HiOutlineCircleStack } from "react-icons/hi2";
-import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { IconType } from "react-icons";
-import * as Hi2Icons from "react-icons/hi2";
-import { HiOutlinePlusCircle } from "react-icons/hi2";
-import { HiOutlineTrash } from "react-icons/hi2";
-import { ExperienceSection } from "./components/experience/ExperienceSection";
-import { AddExperienceModal } from "./components/modals/AddExperienceModal";
-import { Experience } from "./types/experience";
-import { api } from "./services/api";
-import { HiOutlinePencil } from "react-icons/hi2";
-import { LoginModal } from "./components/modals/LoginModal";
-import { EditExperienceModal } from './components/modals/EditExperienceModal';
-import { DarkModeToggle } from './components/DarkModeToggle';
-import { HeroSection } from './components/HeroSection';
-import CardPerso from './components/Card';
-import { ContactSection } from './components/ContactSection';
-
-interface Card {
+import Script from "next/script";
+import PortfolioHeader from "./components/PortfolioHeader"; // Assurez-vous que ce composant existe
+interface ApiCategory {
   id: string;
-  icon: string; // Nom de l'icône
-  title: string;
-  content: string;
+  value: string;
+  label: string;
+  order: number;
+  isActive: boolean;
 }
 
-// Nouveau composant pour la modal de sélection d'icônes
-const IconSelectorModal = ({
-  onSelect,
-  onClose,
-  currentIcon,
-}: {
-  onSelect: (iconName: string) => void;
-  onClose: () => void;
-  currentIcon: string;
-}) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedIcon, setSelectedIcon] = useState(currentIcon);
+interface GalleryItem {
+  id: string;
+  categories: string | string[];
+  imageUrl: string;
+  alt: string;
+  titre: string;
+  sousTitre: string;
+  dimension?: [number, number];
+  crop?: {
+    x: number;
+    y: number;
+    size: number;
+  };
+  displayDimensions?: {
+    cropWidthPercent: number;
+    cropHeightPercent: number;
+  };
+  cropData?: {
+    originalWidth: number;
+    originalHeight: number;
+    cropX: number;
+    cropY: number;
+    cropWidth: number;
+    cropHeight: number;
+    aspectRatio: number;
+  };
+  isForcedSquare?: boolean;
+}
 
-  // Filtrer les icônes outline
-  const outlineIcons = Object.entries(Hi2Icons)
-    .filter(([name]) => name.startsWith("HiOutline"))
-    .filter(([name]) => name.toLowerCase().includes(searchTerm.toLowerCase()));
+const TestIsotopePage: React.FC = () => {
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [categories, setCategories] = useState<ApiCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [itemsVisible, setItemsVisible] = useState<boolean[]>([]);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
+
+  // Charger les données depuis l'API
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+
+        // Charger les catégories
+        const categoriesResponse = await fetch(
+          `${API_URL}/api/categories?projectId=${PROJECT_ID}`
+        );
+        if (categoriesResponse.ok) {
+          const categoriesData = await categoriesResponse.json();
+          setCategories(
+            categoriesData.sort(
+              (a: ApiCategory, b: ApiCategory) => a.order - b.order
+            )
+          );
+        }
+
+        // Charger les images
+        const imagesResponse = await fetch(
+          `${API_URL}/api/images?projectId=${PROJECT_ID}`
+        );
+        if (imagesResponse.ok) {
+          const imagesData = await imagesResponse.json();
+          const selectedImages = imagesData.filter((img: any) => img.selected);
+
+          // Convertir les données API en format pour la galerie
+          const items: GalleryItem[] = selectedImages.map((meta: any) => ({
+            id: meta.id,
+            categories: meta.category,
+            imageUrl: meta.image_url,
+            alt: meta.alt,
+            titre: meta.titre || "",
+            sousTitre: meta.sousTitre || "",
+            dimension: meta.dimension || [1, 1],
+            crop: meta.crop,
+            displayDimensions: meta.displayDimensions,
+            cropData: meta.cropData,
+            isForcedSquare: meta.isForcedSquare,
+          }));
+
+          setGalleryItems(items);
+          
+          // Initialiser le tableau de visibilité
+          setItemsVisible(new Array(items.length).fill(false));
+        }
+      } catch (error) {
+        console.error("Erreur de chargement des données:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [API_URL, PROJECT_ID]);
+
+  // Animation progressive des images après le chargement
+  useEffect(() => {
+    if (!loading && galleryItems.length > 0) {
+      // Petit délai avant de commencer l'animation
+      setTimeout(() => {
+        // Faire apparaître les images progressivement
+        galleryItems.forEach((_, index) => {
+          setTimeout(() => {
+            setItemsVisible(prev => {
+              const newVisible = [...prev];
+              newVisible[index] = true;
+              return newVisible;
+            });
+          }, index * 150); // Délai de 150ms entre chaque image
+        });
+      }, 200); // Délai initial de 200ms
+    }
+  }, [loading, galleryItems]);
+
+  // Initialiser Isotope après le chargement
+  useEffect(() => {
+    if (!loading && galleryItems.length > 0) {
+      const initIsotope = () => {
+        const $ = (window as any).$;
+        if ($ && typeof $.fn.isotope === "function") {
+          console.log("🎨 Initialisation d'Isotope avec les données API");
+
+          const $grid = $(".grid").isotope({
+            itemSelector: ".grid-item",
+            layoutMode: "masonry",
+            percentPosition: true,
+            transitionDuration: 400,
+            hiddenStyle: {
+              opacity: 0
+            },
+            visibleStyle: {
+              opacity: 1
+            },
+            masonry: {
+              columnWidth: ".grid-sizer",
+              gutter: 0,
+            },
+          });
+
+          // Gestion des filtres
+          $(".filter-btn")
+            .off("click")
+            .on("click", function () {
+              const filterValue = $(this).attr("data-filter");
+
+              // Mise à jour des boutons actifs
+              $(".filter-btn").removeClass("active");
+              $(this).addClass("active");
+
+              // Application du filtre avec layout forcé
+              $grid.isotope({ filter: filterValue });
+              
+              // Forcer un re-layout après un court délai pour éviter le micro-repositionnement
+              setTimeout(() => {
+                $grid.isotope("layout");
+              }, 450); // Légèrement après la fin de la transition (400ms)
+            });
+
+          // Réorganisation lors du redimensionnement
+          $(window)
+            .off("resize.isotope")
+            .on("resize.isotope", function () {
+              $grid.isotope("layout");
+            });
+        }
+      };
+
+      // Attendre que les éléments soient rendus et que l'animation soit terminée
+      const totalAnimationTime = 200 + (galleryItems.length * 150) + 600; // délai initial + animations + transition
+      setTimeout(initIsotope, totalAnimationTime);
+    }
+  }, [loading, galleryItems]);
+
+  // Obtenir les classes CSS pour les dimensions
+  const getDimensionClass = (dimension: [number, number]) => {
+    const [w, h] = dimension;
+    if (w === 2 && h === 1) return "grid-item--width4";
+    if (w === 1 && h === 2) return "grid-item--height2";
+    return "";
+  };
+
+  // Obtenir le style de crop intelligent pour l'image
+  const getImageCropStyle = (item: GalleryItem) => {
+    if (!item.crop && !item.cropData) {
+      return {
+        backgroundImage: `url(${item.imageUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      };
+    }
+
+    // Utiliser cropData si disponible (plus précis)
+    if (item.cropData) {
+      const {
+        originalWidth,
+        originalHeight,
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
+      } = item.cropData;
+
+      // Calculer les pourcentages pour background-position et background-size
+      const bgSizeX = (originalWidth / cropWidth) * 100;
+      const bgSizeY = (originalHeight / cropHeight) * 100;
+      const bgPosX = (cropX / (originalWidth - cropWidth)) * 100;
+      const bgPosY = (cropY / (originalHeight - cropHeight)) * 100;
+
+      return {
+        backgroundImage: `url(${item.imageUrl})`,
+        backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
+        backgroundPosition: `${isNaN(bgPosX) ? 50 : bgPosX}% ${
+          isNaN(bgPosY) ? 50 : bgPosY
+        }%`,
+        backgroundRepeat: "no-repeat",
+      };
+    }
+
+    // Utiliser crop classique en fallback
+    if (item.crop) {
+      // Si crop.size est proche de 100, c'est probablement un crop centré simple
+      if (item.crop.size >= 99) {
+        // Crop centré simple - utiliser la position directement
+        return {
+          backgroundImage: `url(${item.imageUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: `${50 + item.crop.x}% ${50 + item.crop.y}%`,
+          backgroundRepeat: "no-repeat",
+        };
+      } else {
+        // Crop avec zoom
+        const scale = 100 / item.crop.size;
+        const translateX = -item.crop.x * scale;
+        const translateY = -item.crop.y * scale;
+
+        return {
+          backgroundImage: `url(${item.imageUrl})`,
+          backgroundSize: `${scale * 100}%`,
+          backgroundPosition: `${translateX}% ${translateY}%`,
+          backgroundRepeat: "no-repeat",
+        };
+      }
+    }
+
+    // Fallback par défaut
+    return {
+      backgroundImage: `url(${item.imageUrl})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+    };
+  };
+
+  // Obtenir la classe de catégorie pour les couleurs
+  const getCategoryColorClass = (category: string | string[]) => {
+    const cat = Array.isArray(category) ? category[0] : category;
+    switch (cat.toLowerCase()) {
+      case "theater":
+      case "théâtre":
+        return "design";
+      case "dance":
+      case "danse":
+        return "photo";
+      case "opera":
+      case "opéra":
+        return "web";
+      case "circus":
+      case "cirque":
+        return "art";
+      default:
+        return "design";
+    }
+  };
+
+  // if (loading) {
+  //   return (
+  //     <div
+  //       style={{
+  //         minHeight: "100vh",
+  //         background: "white",
+  //         display: "flex",
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //       }}
+  //     >
+  //       <div style={{ color: "black", fontSize: "1.2em" }}>
+  //         Chargement des images...
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-4xl w-full mx-4 max-h-[80vh] flex flex-col">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Sélectionner une icône</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+    <>
+      {/* Chargement de jQuery et Isotope */}
+      <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" />
+      <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" />
+
+      {/* CSS exactement comme dans ton HTML */}
+      <style jsx global>{`
+        /* Import font and text-shadow from PortfolioHeader */
+        .hover\\:text-shadow:hover {
+          text-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 1px 0 #fff;
+        }
+        @font-face {
+          font-family: "ExposureTrial";
+          src: url("/ExposureTrial-0.woff2") format("woff2");
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: "Arial", sans-serif;
+          margin: 0;
+          /* padding: 20px; */
+          /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+          min-height: 100vh;
+        }
+
+        /* .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 30px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        } */
+
+        h1 {
+          text-align: center;
+          color: white;
+          margin-bottom: 30px;
+          font-size: 2.5em;
+          /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); */
+        }
+
+        .filters {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 30px;
+        }
+
+        .filter-btn {
+          background: rgba(255, 255, 255, 0.2);
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          color: black;
+          padding: 10px 0px;
+          margin: 5px;
+          /* border-radius: 25px; */
+          cursor: pointer;
+          /* transition: all 0.3s ease; */
+          /* font-weight: bold; */
+          width: 100px;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+          background: rgba(255, 255, 255, 0.3);
+          border-color: rgba(255, 255, 255, 0.6);
+          font-weight: 600;
+          /* transform: translateY(-2px); */
+          /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); */
+        }
+
+        .grid {
+          margin: 0 auto;
+          max-width: 1200px;
+          padding: 0 10px;
+          /* max-width: 100%; */
+        }
+
+        /* Sizer pour définir la largeur de base */
+        .grid-sizer {
+          width: 33.33%;
+        }
+
+        .grid-item {
+          width: calc(33.33% - 10px);
+          margin-bottom: 10px;
+          padding-right: 10px;
+          /* border-radius: 15px; */
+          overflow: hidden;
+          /* Retirer transition qui conflit avec Isotope */
+          /* transition: all 0.3s ease; */
+          cursor: pointer;
+          position: relative;
+          height: calc(33.33vw - 10px);
+          max-height: 350px;
+          box-sizing: border-box;
+          /* Animation progressive */
+          opacity: 0;
+          /* transform: translateY(40px) scale(0.9) rotateX(15deg); */
+          /* transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); */
+        }
+
+        .grid-item.visible {
+          opacity: 1;
+          /* transform: translateY(0) scale(1) rotateX(0deg); */
+        }
+
+        /* Animation avec délai pour les éléments de largeur double */
+        .grid-item--width4 {
+          /* transform: translateY(50px) scale(0.85) rotateY(10deg); */
+          /* transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); */
+        }
+
+        .grid-item--width4.visible {
+          /* transform: translateY(0) scale(1) rotateY(0deg); */
+        }
+
+        /* Animation pour les éléments de hauteur double */
+        .grid-item--height2 {
+          /* transform: translateX(-30px) scale(0.9) rotateZ(5deg); */
+          /* transition: all 0.9s cubic-bezier(0.4, 0, 0.2, 1); */
+        }
+
+        .grid-item--height2.visible {
+          /* transform: translateX(0) scale(1) rotateZ(0deg); */
+        }
+
+        .grid-item > .item-content {
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          /* border-radius: 15px; */
+          overflow: hidden;
+          /* Transition uniquement pour les propriétés hover */
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .grid-item:hover > .item-content {
+          /* transform: translateY(-2px); */
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Taille 2x1 (largeur double) - largeur = 2 x hauteur */
+        .grid-item--width4 {
+          /* width: 66.66%;* */
+          width: calc(66.66% - 14px);
+          height: calc(33.33vw - 10px);
+          max-height: 350px;
+        }
+
+        /* Taille 1x2 (hauteur double) - hauteur = 2 x largeur */
+        .grid-item--height2 {
+          width: calc(33.33% - 7px);
+          height: calc((33.33vw - 10px) * 2 + 10px);
+          max-height: 710px;
+        }
+
+        .item-content {
+          padding: 20px;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+        .item-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          padding: 20px;
+          /* Style de hover comme ImageComponent */
+          opacity: 0;
+          /* transition: opacity 0.3s ease; */
+          pointer-events: none;
+        }
+        
+        /* Hover effect sur les éléments de la grille */
+        .grid-item:hover .item-overlay {
+          opacity: 1;
+        }
+
+        /* Animation pour le texte qui apparaît progressivement */
+        .item-title, .item-desc {
+          /* transform: translateY(20px); */
+          opacity: 0;
+          /* transition: all 0.4s ease; */
+          transition-delay: 0.1s;
+        }
+
+        /* Animation du titre au hover */
+        .grid-item:hover .item-title {
+          /* transform: translateY(0); */
+          opacity: 1;
+          transition-delay: 0.1s;
+        }
+
+        /* Animation du sous-titre au hover avec délai */
+        .grid-item:hover .item-desc {
+          /* transform: translateY(0); */
+          opacity: 1;
+          transition-delay: 0.2s;
+        }
+
+        .design {
+          background: linear-gradient(45deg, #ff6b6b, #feca57);
+        }
+        .photo {
+          background: linear-gradient(45deg, #48cae4, #0077b6);
+        }
+        .web {
+          background: linear-gradient(45deg, #06d6a0, #118ab2);
+        }
+        .art {
+          background: linear-gradient(45deg, #f72585, #b5179e);
+        }
+
+        .item-title {
+          font-size: 1.4em;
+          font-weight: bold;
+          color: white;
+          margin-bottom: 10px;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          z-index: 2;
+          /* Style similaire à ImageComponent */
+          font-weight: 600;
+          letter-spacing: 0.05em;
+          drop-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+          /* Animation initiale - caché */
+          /* transform: translateY(20px); */
+          opacity: 0;
+          /* transition: all 0.4s ease; */
+          transition-delay: 0.1s;
+        }
+
+        .item-desc {
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 0.9em;
+          line-height: 1.4;
+          z-index: 2;
+          /* Style similaire à ImageComponent */
+          margin-top: 0.25rem;
+          font-weight: 300;
+          drop-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+          /* Animation initiale - caché */
+          /* transform: translateY(20px); */
+          opacity: 0;
+          /* transition: all 0.4s ease; */
+          transition-delay: 0.1s;
+        }
+
+        .item-category {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: rgba(0, 0, 0, 0.3);
+          color: white;
+          padding: 5px 10px;
+          /* border-radius: 15px; */
+          font-size: 0.8em;
+          font-weight: bold;
+          z-index: 3;
+        }
+
+        /* .grid{
+            padding-left:10px
+          } */
+
+        @media (max-width: 768px) {
+          /* .grid{
+            padding-left:10px
+          } */
+          .grid-sizer,
+          .grid-item {
+            width: calc(50% - 20px);
+            height: calc(50vw - 20px);
+            max-height: 300px;
+            padding-right: 10px;
+          }
+
+          .grid-item--width4 {
+            width: 100%;
+            height: calc(50vw - 10px);
+            max-height: 300px;
+          }
+
+          .grid-item--height2 {
+            width: 50%;
+            width: calc(50% - 20px);
+            
+            height: calc((50vw - 10px) * 2 + 10px);
+            max-height: 610px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .grid-sizer,
+          .grid-item {
+            width: calc(100% - 20px);
+            height: calc(100vw - 20px);
+            /* max-height: 240px; */
+            padding: 0 0px;
+            /* margin-right: 5%; */
+          }
+
+          .grid-item--width4 {
+            width: calc(100% - 20px);
+            height: calc(50vw - 20px);
+            /* max-height: 200px; */
+          }
+
+          .grid-item--height2 {
+            width: calc(100% - 20px);
+            height: calc(200vw - 20px);
+            /* width: 95%;
+            height: calc(190vw / 2); */
+            /* max-height: 400px; */
+          }
+
+          .container {
+            padding: 15px;
+          }
+
+          h1 {
+            font-size: 2em;
+          }
+        }
+      `}</style>
+
+      <div className="min-h-screen bg-white font-serif p-0 m-0">
+        {/* <h1>🎨 Portfolio avec API</h1> */}
+        <PortfolioHeader />
+        {!loading && ( <>
+        <div
+          className="filters justify-center gap-6 lg:gap-12 pt-12 bg-transparent mx-auto"
+          style={{
+            maxWidth: "1152px",
+          }}
+        >
+          <button 
+            className="filter-btn  active bg-none border-none text-sm lg:text-xl font-light text-black cursor-pointer py-1 tracking-wide relative text-center w-[50px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow" 
+            data-filter="*"
+            style={{ fontFamily: "ExposureTrial, serif" }}
           >
-            ✕
+            Tous
           </button>
-        </div>
-
-        {/* Barre de recherche */}
-        <div className="mb-6">
-          <input
-            type="text"
-            placeholder="Rechercher une icône..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Grille d'icônes */}
-        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-4 overflow-y-auto flex-grow">
-          {outlineIcons.map(([name, Icon]) => (
+          {categories.map((category) => (
             <button
-              key={name}
-              onClick={() => {
-                setSelectedIcon(name);
-                onSelect(name);
-                onClose();
-              }}
-              className={`p-4 rounded-lg flex flex-col items-center gap-2 transition-colors
-                ${
-                  selectedIcon === name
-                    ? "bg-blue-100 dark:bg-blue-900"
-                    : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                }
-              `}
+              key={category.id}
+              className="filter-btn  bg-none border-none text-sm lg:text-xl  text-black cursor-pointer py-1 tracking-wide relative text-center w-[50px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
+              data-filter={`.category-${category.value}`}
+              style={{ fontFamily: "ExposureTrial, serif" }}
             >
-              <Icon className="text-2xl text-blue-600" />
-              <span className="text-xs text-center break-all">
-                {name.replace("HiOutline", "")}
-              </span>
+              {category.label}
             </button>
           ))}
         </div>
 
-        <div className="flex gap-2 justify-end mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          >
-            Annuler
-          </button>
+       
+         
+
+         
+        <div className="grid">
+          {/* Élément invisible pour définir la largeur de base */}
+          <div className="grid-sizer"></div>
+
+          {/* Rendu des images depuis l'API */}
+          {galleryItems.map((item, index) => {
+            const categoryClasses = Array.isArray(item.categories)
+              ? item.categories.map((cat) => `category-${cat}`).join(" ")
+              : `category-${item.categories}`;
+
+            const dimensionClass = getDimensionClass(item.dimension || [1, 1]);
+            const colorClass = getCategoryColorClass(item.categories);
+            const cropStyle = getImageCropStyle(item);
+            const isVisible = itemsVisible[index];
+
+            return (
+              <div
+                key={item.id}
+                className={`grid-item ${categoryClasses} ${dimensionClass} ${isVisible ? 'visible' : ''}`}
+              >
+                <div className={`item-content`} style={cropStyle}>
+                  <div className="item-overlay">
+                    {/* <div className="item-category">
+                      {Array.isArray(item.categories)
+                        ? item.categories[0]
+                        : item.categories}
+                    </div> */}
+                    <div
+                      className={`item-title ${
+                        item.isForcedSquare ? "text-red-400" : ""
+                      }`}
+                    >
+                      {item.titre}
+                    </div>
+                    {item.sousTitre && (
+                      <div
+                        className={`item-desc ${
+                          item.isForcedSquare ? "text-red-300" : ""
+                        }`}
+                      >
+                        {item.sousTitre}
+                      </div>
+                    )}
+                    {item.isForcedSquare && (
+                      <div className="item-forced-indicator">
+                        <span className="text-red-500 text-xs font-bold bg-white bg-opacity-20 px-2 py-1 rounded">
+                          Forcé 1x1
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
+        </>
+        )}
       </div>
-    </div>
+        
+    </>
   );
 };
 
-// Modifiez l'interface des textes pour inclure cvUrl et linkedInUrl
-interface Texts {
-  mainTitle: string;
-  subtitle: string;
-  documentumText: string;
-  headerName: string;
-  headerRole: string;
-  cvUrl: string;
-  linkedInUrl: string;
-  contactEmail: string;
-}
-
-export default function Home() {
-  // Définition des longueurs maximales pour chaque champ
-  const MAX_LENGTHS = {
-    mainTitle: 50,
-    subtitle: 120,
-    documentumText: 40,
-    headerName: 30,
-    headerRole: 20,
-    contactEmail: 100,
-  };
-
-  // Modifiez l'état initial des textes
-  const [texts, setTexts] = useState<Texts>({
-    mainTitle: "",
-    subtitle: "",
-    documentumText: "",
-    headerName: "",
-    headerRole: "",
-    cvUrl: "/path-to-your-cv.pdf",
-    linkedInUrl: "https://www.linkedin.com/in/amaurypichat/",
-    contactEmail: "",
-  });
-  const [titleError, setTitleError] = useState("");
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [editingStates, setEditingStates] = useState({
-    mainTitle: false,
-    headerName: false,
-    subtitle: false,
-    documentumText: false,
-    contactEmail: false,
-  });
-  const [cards, setCards] = useState<Card[]>([]);
-  const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [cardToDelete, setCardToDelete] = useState<string | null>(null);
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [isAddExperienceModalOpen, setIsAddExperienceModalOpen] =
-    useState(false);
-  const [isDeleteExperienceModalOpen, setIsDeleteExperienceModalOpen] =
-    useState(false);
-  const [experienceToDelete, setExperienceToDelete] = useState<string | null>(
-    null
-  );
-  const [isEditingCvUrl, setIsEditingCvUrl] = useState(false);
-  const [isEditingLinkedInUrl, setIsEditingLinkedInUrl] = useState(false);
-  const [isEditingExperience, setIsEditingExperience] = useState(false);
-  const [experienceToEdit, setExperienceToEdit] = useState<Experience | null>(
-    null
-  );
-  const [isEditingContact, setIsEditingContact] = useState(false);
-
-  // Au début du composant, ajoutez une constante pour l'URL de l'API
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
-
-  useEffect(() => {
-  
-  alert("En restant connecté, modifiez et créez n'importe quel champ ou valeur. Les valeurs sont réinitialisées toutes les 10 minutes")
-    fetch(`${API_URL}/api/texts?projectId=${PROJECT_ID}`)
-      .then((res) => res.json())
-      .then((data) => setTexts(data))
-      .catch((error) => console.error("Error loading texts:", error));
-  }, []);
-
-  // Charger les cartes au démarrage
-  useEffect(() => {
-    fetch(`${API_URL}/api/cards?projectId=${PROJECT_ID}`)
-      .then((res) => res.json())
-      .then((data) => setCards(data))
-      .catch((error) => console.error("Error loading cards:", error));
-  }, []);
-
-  // Charger les expériences au démarrage
-  useEffect(() => {
-    api.experiences.getAll().then(setExperiences);
-  }, []);
-
-  // Fonction helper pour vérifier la longueur
-  const checkLength = (value: string, field: string) => {
-    if (value.length > MAX_LENGTHS[field as keyof typeof MAX_LENGTHS]) {
-      setTitleError(
-        `Le texte ne doit pas dépasser ${
-          MAX_LENGTHS[field as keyof typeof MAX_LENGTHS]
-        } caractères`
-      );
-      return true;
-    }
-    setTitleError("");
-    return false;
-  };
-
-  // Fonction helper pour gérer l'édition
-  const toggleEditing = (field: string, value: boolean) => {
-    setEditingStates((prev) => ({ ...prev, [field]: value }));
-    if (!value) setTitleError(""); // Reset error when canceling edit
-  };
-
-  // Modification du handleTextUpdate pour inclure la vérification de longueur
-  const handleTextUpdate = async (key: string, value: string) => {
-    if (checkLength(value, key)) return;
-
-    try {
-      const response = await fetch(`${API_URL}/api/texts?projectId=${PROJECT_ID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ key, value }),
-      });
-
-      if (!response.ok) throw new Error("Failed to update text");
-
-      setTexts((prev) => ({ ...prev, [key]: value }));
-      setEditingStates((prev) => ({ ...prev, [key]: false }));
-      setTitleError("");
-    } catch (error) {
-      console.error("Error updating text:", error);
-      alert("Failed to update text. Please try again.");
-    }
-  };
-
-  // Modal d'ajout de carte
-  const AddCardModal = () => {
-    const [newCard, setNewCard] = useState<Omit<Card, "id">>({
-      icon: "HiOutlineWrenchScrewdriver",
-      title: "",
-      content: "",
-    });
-    const [showIconSelector, setShowIconSelector] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/cards?projectId=${PROJECT_ID}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newCard),
-          }
-        );
-
-        if (!response.ok) throw new Error("Failed to add card");
-
-        const savedCard = await response.json();
-        setCards((prev) => [...prev, savedCard]);
-        setIsAddCardModalOpen(false);
-      } catch (error) {
-        console.error("Error adding card:", error);
-        alert("Failed to add card");
-      }
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Ajouter une carte</h2>
-            <button
-              onClick={() => setIsAddCardModalOpen(false)}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              ✕
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Icône</label>
-              <button
-                type="button"
-                onClick={() => setShowIconSelector(true)}
-                className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 
-                  focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
-              >
-                {React.createElement(
-                  Hi2Icons[newCard.icon as keyof typeof Hi2Icons],
-                  { className: "text-2xl text-blue-600" }
-                )}
-                <span>{newCard.icon.replace("HiOutline", "")}</span>
-              </button>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Titre</label>
-              <input
-                type="text"
-                value={newCard.title}
-                onChange={(e) =>
-                  setNewCard((prev) => ({ ...prev, title: e.target.value }))
-                }
-                className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
-                maxLength={50}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Contenu</label>
-              <textarea
-                value={newCard.content}
-                onChange={(e) =>
-                  setNewCard((prev) => ({ ...prev, content: e.target.value }))
-                }
-                className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
-                maxLength={200}
-                rows={3}
-                required
-              />
-            </div>
-
-            <div className="flex gap-2 justify-end pt-4">
-              <button
-                type="button"
-                onClick={() => setIsAddCardModalOpen(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              >
-                Annuler
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Ajouter
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Modal de sélection d'icône */}
-        {showIconSelector && (
-          <IconSelectorModal
-            onSelect={(iconName) => {
-              setNewCard((prev) => ({ ...prev, icon: iconName }));
-            }}
-            onClose={() => setShowIconSelector(false)}
-            currentIcon={newCard.icon}
-          />
-        )}
-      </div>
-    );
-  };
-
-  // Modal de confirmation de suppression
-  const DeleteConfirmationModal = () => {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4">
-          <h2 className="text-2xl font-bold mb-6">Confirmer la suppression</h2>
-          <p className="mb-6">
-            Êtes-vous sûr de vouloir supprimer cette carte ?
-          </p>
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => setIsDeleteModalOpen(false)}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg"
-            >
-              Annuler
-            </button>
-            <button
-              onClick={async () => {
-                if (!cardToDelete) return;
-                try {
-                  const response = await fetch(
-                    `${API_URL}/api/cards/${cardToDelete}?projectId=${PROJECT_ID}`,
-                    {
-                      method: "DELETE",
-                    }
-                  );
-
-                  if (!response.ok) throw new Error("Failed to delete card");
-
-                  setCards((prev) =>
-                    prev.filter((card) => card.id !== cardToDelete)
-                  );
-                  setIsDeleteModalOpen(false);
-                  setCardToDelete(null);
-                } catch (error) {
-                  console.error("Error deleting card:", error);
-                  alert("Failed to delete card");
-                }
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg"
-            >
-              Supprimer
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const DeleteExperienceConfirmationModal = ({
-    onConfirm,
-    onCancel,
-    message,
-  }: {
-    onConfirm: () => void;
-    onCancel: () => void;
-    message: string;
-  }) => {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-            Confirmer la suppression
-          </h2>
-          <p className="mb-6 text-gray-600 dark:text-gray-300">{message}</p>
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 
-                dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
-            >
-              Annuler
-            </button>
-            <button
-              onClick={onConfirm}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 
-                transition-colors"
-            >
-              Supprimer
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Ajoutez ces fonctions de gestion
-  const handleDeleteExperience = (id: string) => {
-    setExperienceToDelete(id);
-    setIsDeleteExperienceModalOpen(true);
-  };
-
-  const handleConfirmDeleteExperience = async () => {
-    if (!experienceToDelete) return;
-
-    try {
-      const response = await fetch(
-        `${API_URL}/api/experiences/${experienceToDelete}?projectId=${PROJECT_ID}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to delete experience");
-
-      setExperiences((prev) =>
-        prev.filter((exp) => exp.id !== experienceToDelete)
-      );
-      setIsDeleteExperienceModalOpen(false);
-      setExperienceToDelete(null);
-    } catch (error) {
-      console.error("Error deleting experience:", error);
-      alert("Failed to delete experience");
-    }
-  };
-
-  const handleAddExperience = async (newExperience: Omit<Experience, "id">) => {
-    try {
-      const experience = await api.experiences.add(newExperience);
-      setExperiences((prev) => [...prev, experience]);
-      setIsAddExperienceModalOpen(false);
-    } catch (error) {
-      console.error("Error adding experience:", error);
-      alert("Failed to add experience");
-    }
-  };
-
-  // Modifiez la fonction handleCvUrlUpdate
-  const handleCvUrlUpdate = async (newUrl: string) => {
-    try {
-      const response = await fetch(`${API_URL}/api/texts?projectId=${PROJECT_ID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ key: "cvUrl", value: newUrl }),
-      });
-
-      if (!response.ok) throw new Error("Failed to update CV URL");
-
-      setTexts((prev) => ({ ...prev, cvUrl: newUrl }));
-      setIsEditingCvUrl(false);
-    } catch (error) {
-      console.error("Error updating CV URL:", error);
-      alert("Failed to update CV URL");
-    }
-  };
-
-  const handleLinkedInUrlUpdate = async (newUrl: string) => {
-    try {
-      const response = await fetch(`${API_URL}/api/texts?projectId=${PROJECT_ID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ key: "linkedInUrl", value: newUrl }),
-      });
-
-      if (!response.ok) throw new Error("Failed to update LinkedIn URL");
-
-      setTexts((prev) => ({ ...prev, linkedInUrl: newUrl }));
-      setIsEditingLinkedInUrl(false);
-    } catch (error) {
-      console.error("Error updating LinkedIn URL:", error);
-      alert("Failed to update LinkedIn URL");
-    }
-  };
-
-  const handleEditExperience = async (updatedExperience: Experience) => {
-    try {
-      const response = await fetch(
-        `${API_URL}/api/experiences/${updatedExperience.id}?projectId=${PROJECT_ID}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedExperience),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to update experience");
-
-      const updated = await response.json();
-      setExperiences((prev) =>
-        prev.map((exp) => (exp.id === updated.id ? updated : exp))
-      );
-      setIsEditingExperience(false);
-      setExperienceToEdit(null);
-    } catch (error) {
-      console.error("Error updating experience:", error);
-      alert("Failed to update experience");
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/logout?projectId=${PROJECT_ID}`, {
-        method: 'POST',
-        // credentials: 'include', // Retiré temporairement pour éviter l'erreur CORS
-      });
-
-      if (response.ok) {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="w-full px-8 py-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm fixed top-0 z-50 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div>
-            {isLoggedIn && !editingStates.headerName ? (
-              <div className="group relative">
-                <h1 className="text-2xl font-bold">{texts.headerName}</h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {texts.headerRole}
-                </p>
-                <button
-                  onClick={() => toggleEditing("headerName", true)}
-                  className="absolute -right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  ✏️
-                </button>
-              </div>
-            ) : isLoggedIn && editingStates.headerName ? (
-              <div className="space-y-2">
-                <div className="flex gap-2 items-start">
-                  <div>
-                    <input
-                      type="text"
-                      value={texts.headerName}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setTexts((prev) => ({ ...prev, headerName: newValue }));
-                        checkLength(newValue, "headerName");
-                      }}
-                      className={`text-2xl font-bold bg-transparent border-b-2 
-                        ${titleError ? "border-red-500" : "border-blue-500"} 
-                        focus:outline-none focus:border-blue-700 w-full mb-2`}
-                      autoFocus
-                    />
-                    <input
-                      type="text"
-                      value={texts.headerRole}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setTexts((prev) => ({ ...prev, headerRole: newValue }));
-                        checkLength(newValue, "headerRole");
-                      }}
-                      className="text-gray-600 dark:text-gray-400 bg-transparent border-b-2 border-blue-500 focus:outline-none focus:border-blue-700 w-full"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => {
-                        handleTextUpdate("headerName", texts.headerName);
-                        handleTextUpdate("headerRole", texts.headerRole);
-                        toggleEditing("headerName", false);
-                      }}
-                      className={`px-4 py-2 ${
-                        titleError
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 hover:bg-blue-700"
-                      } text-white rounded-lg transition-colors`}
-                      disabled={!!titleError}
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => toggleEditing("headerName", false)}
-                      className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-
-                {titleError && (
-                  <div className="text-red-500 text-sm">{titleError}</div>
-                )}
-              </div>
-            ) : (
-              <>
-                <h1 className="text-2xl font-bold">{texts.headerName}</h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {texts.headerRole}
-                </p>
-              </>
-            )}
-          </div>
-          <div className="flex gap-6">
-            {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 
-                  hover:bg-red-50 dark:hover:bg-red-900/20 
-                  text-red-600 dark:text-red-400
-                  transition-colors flex items-center gap-2"
-              >
-                <HiOutlineLogout className="text-xl" />
-                Déconnexion
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsLoginModalOpen(true)}
-                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 
-                  hover:bg-gray-100 dark:hover:bg-gray-800 
-                  transition-colors flex items-center gap-2"
-              >
-                <HiOutlineCog className="text-xl" />
-                Connexion
-              </button>
-            )}
-            {isLoggedIn && isEditingCvUrl ? (
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={texts.cvUrl}
-                  onChange={(e) =>
-                    setTexts((prev) => ({ ...prev, cvUrl: e.target.value }))
-                  }
-                  className="px-4 py-2 rounded-lg border border-blue-500 dark:border-blue-400 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 
-                    bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  placeholder="URL du CV"
-                />
-                <button
-                  onClick={() => handleCvUrlUpdate(texts.cvUrl)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditingCvUrl(false);
-                    setTexts((prev) => ({ ...prev, cvUrl: prev.cvUrl })); // Reset to previous value
-                  }}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <a
-                  href={texts.cvUrl}
-                  className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 
-                    hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors 
-                    flex items-center gap-2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <HiOutlineDocumentArrowDown className="text-xl" />
-                  CV
-                </a>
-                {isLoggedIn && (
-                  <button
-                    onClick={() => setIsEditingCvUrl(true)}
-                    className="p-2 text-blue-500 hover:text-blue-700 
-                      rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/50"
-                    aria-label="Modifier l'URL du CV"
-                  >
-                    <HiOutlinePencil className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-            )}
-            {isLoggedIn && isEditingLinkedInUrl ? (
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={texts.linkedInUrl}
-                  onChange={(e) =>
-                    setTexts((prev) => ({
-                      ...prev,
-                      linkedInUrl: e.target.value,
-                    }))
-                  }
-                  className="px-4 py-2 rounded-lg border border-blue-500 dark:border-blue-400 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 
-                    bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  placeholder="URL LinkedIn"
-                />
-                <button
-                  onClick={() => handleLinkedInUrlUpdate(texts.linkedInUrl)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditingLinkedInUrl(false);
-                    setTexts((prev) => ({
-                      ...prev,
-                      linkedInUrl: prev.linkedInUrl,
-                    })); // Reset to previous value
-                  }}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <a
-                  href={texts.linkedInUrl}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <FaLinkedin className="text-xl" />
-                  LinkedIn
-                </a>
-                {isLoggedIn && (
-                  <button
-                    onClick={() => setIsEditingLinkedInUrl(true)}
-                    className="p-2 text-white hover:text-blue-100 
-                      rounded-full hover:bg-blue-700"
-                    aria-label="Modifier l'URL LinkedIn"
-                  >
-                    <HiOutlinePencil className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-            )}
-            <DarkModeToggle />
-          </div>
-        </div>
-      </header>
-
-      {/* Login Modal */}
-      {isLoginModalOpen && (
-        <LoginModal
-          onClose={() => setIsLoginModalOpen(false)}
-          onLogin={(success) => {
-            if (success) {
-              setIsLoggedIn(true);
-              setIsLoginModalOpen(false);
-            }
-          }}
-        />
-      )}
-
-      {/* Main Content */}
-      <main className="pt-32 px-8">
-        <div className="max-w-6xl mx-auto">
-          <HeroSection
-            texts={texts}
-            isLoggedIn={isLoggedIn}
-            editingStates={editingStates}
-            titleError={titleError}
-            MAX_LENGTHS={MAX_LENGTHS}
-            toggleEditing={toggleEditing}
-            handleTextUpdate={handleTextUpdate}
-            setTexts={setTexts}
-            setTitleError={setTitleError}
-          />
-
-          {/* Services Section */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            {cards.map((card) => (
-              <CardPerso
-                key={card.id}
-                id={card.id}
-                icon={card.icon}
-                title={card.title}
-                content={card.content}
-                isLoggedIn={isLoggedIn}
-                onDelete={(id) => {
-                  setCardToDelete(id);
-                  setIsDeleteModalOpen(true);
-                }}
-              />
-            ))}
-
-            {isLoggedIn && (
-              <button
-                onClick={() => setIsAddCardModalOpen(true)}
-                className="p-6 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600
-                  hover:border-blue-500 dark:hover:border-blue-500
-                  transition-colors flex flex-col items-center justify-center gap-4
-                  text-gray-500 dark:text-gray-400 hover:text-blue-500
-                  transform perspective-1000 hover:scale-105"
-              >
-                <HiOutlinePlusCircle className="text-4xl" />
-                <span>Ajouter une carte</span>
-              </button>
-            )}
-          </section>
-
-          {/* Contact Section */}
-          <ContactSection
-            texts={texts}
-            isLoggedIn={isLoggedIn}
-            editingStates={editingStates}
-            titleError={titleError}
-            MAX_LENGTHS={MAX_LENGTHS}
-            handleTextUpdate={handleTextUpdate}
-            toggleEditing={toggleEditing}
-            setTexts={setTexts}
-            setTitleError={setTitleError}
-          />
-        </div>
-      </main>
-
-      {/* Professional Experience Section */}
-      <ExperienceSection
-        experiences={experiences}
-        isLoggedIn={isLoggedIn}
-        onDelete={handleDeleteExperience}
-        onAdd={() => setIsAddExperienceModalOpen(true)}
-        setExperienceToEdit={setExperienceToEdit}
-        setIsEditingExperience={setIsEditingExperience}
-      />
-
-      {isAddExperienceModalOpen && (
-        <AddExperienceModal
-          onClose={() => setIsAddExperienceModalOpen(false)}
-          onAdd={handleAddExperience}
-        />
-      )}
-
-      {isDeleteExperienceModalOpen && (
-        <DeleteExperienceConfirmationModal
-          onConfirm={handleConfirmDeleteExperience}
-          onCancel={() => {
-            setIsDeleteExperienceModalOpen(false);
-            setExperienceToDelete(null);
-          }}
-          message="Êtes-vous sûr de vouloir supprimer cette expérience ?"
-        />
-      )}
-
-      {isEditingExperience && experienceToEdit && (
-        <EditExperienceModal
-          experience={experienceToEdit}
-          onClose={() => {
-            setIsEditingExperience(false);
-            setExperienceToEdit(null);
-          }}
-          onSave={handleEditExperience}
-        />
-      )}
-
-      {/* Floating Menu */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
-        <a
-          href="#experience"
-          className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 flex items-center gap-2 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
-        >
-          <HiOutlineDocumentSearch className="text-xl text-blue-600" />
-          <span className="pr-2">Expérience</span>
-        </a>
-        {/* <a
-          href="#formation"
-          className="p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 flex items-center gap-2 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
-        >
-          <HiOutlineAcademicCap className="text-xl text-blue-600" />
-          <span className="pr-2">Formation</span>
-        </a> */}
-      </div>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-700 py-8 px-8">
-        <div className="max-w-6xl mx-auto text-center text-gray-600 dark:text-gray-400">
-          {/* © {new Date().getFullYear()} Amaury PICHAT - Consultant GED */}
-        </div>
-      </footer>
-
-      {isAddCardModalOpen && <AddCardModal />}
-      {isDeleteModalOpen && <DeleteConfirmationModal />}
-    </div>
-  );
-}
+export default TestIsotopePage;

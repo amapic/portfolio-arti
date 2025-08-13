@@ -22,6 +22,7 @@ const TextAdmin: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
@@ -106,7 +107,8 @@ const TextAdmin: React.FC = () => {
       localStorage.setItem('adminAuth', JSON.stringify(authData));
       setIsAuthenticated(true);
     } else {
-      alert('Mot de passe incorrect');
+      setNotification({ message: 'Mot de passe incorrect', type: 'error' });
+      setTimeout(() => setNotification(null), 3000);
     }
   };
 
@@ -128,13 +130,16 @@ const TextAdmin: React.FC = () => {
       });
 
       if (response.ok) {
-        alert('Données sauvegardées avec succès !');
+        setNotification({ message: 'Données sauvegardées avec succès !', type: 'success' });
+        setTimeout(() => setNotification(null), 3000);
       } else {
-        alert('Erreur lors de la sauvegarde');
+        setNotification({ message: 'Erreur lors de la sauvegarde', type: 'error' });
+        setTimeout(() => setNotification(null), 3000);
       }
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
-      alert('Erreur lors de la sauvegarde');
+      setNotification({ message: 'Erreur lors de la sauvegarde', type: 'error' });
+      setTimeout(() => setNotification(null), 3000);
     } finally {
       setSaving(false);
     }
@@ -170,6 +175,11 @@ const TextAdmin: React.FC = () => {
   return (
     <NoSSR>
       <div className="min-h-screen bg-gray-50 py-8">
+        {notification && (
+          <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white text-center font-semibold transition-all ${notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+            {notification.message}
+          </div>
+        )}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200">

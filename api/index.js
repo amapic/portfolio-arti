@@ -124,13 +124,7 @@ app.get('/api/texts', async (req, res) => {
 
 // Fonction pour définir une propriété imbriquée ou plate
 function setProperty(obj, key, value) {
-  // Si la clé existe directement (clé plate), l'utiliser
-  if (key in obj) {
-    obj[key] = value;
-    return true;
-  }
-  
-  // Sinon, essayer de naviguer dans l'objet imbriqué (ancien format)
+  // Essayer d'abord le chemin imbriqué
   if (key.includes('.')) {
     const keys = key.split('.');
     let current = obj;
@@ -149,6 +143,12 @@ function setProperty(obj, key, value) {
       current[lastKey] = value;
       return true;
     }
+  }
+  
+  // Si pas de chemin imbriqué ou si ça n'a pas marché, essayer la clé directe
+  if (key in obj) {
+    obj[key] = value;
+    return true;
   }
   
   return false;

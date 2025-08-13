@@ -57,7 +57,7 @@ const AboutPage: React.FC = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <PortfolioHeader 
-        title="Romain de Lagarde"
+        title="Pierre Besson"
         showNavigation={true}
       />
 

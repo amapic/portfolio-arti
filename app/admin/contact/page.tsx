@@ -46,6 +46,7 @@ const ContactAdmin: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
@@ -80,11 +81,11 @@ const ContactAdmin: React.FC = () => {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Veuillez sélectionner une image");
+      setNotification({ message: "Veuillez sélectionner une image", type: 'error' });
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert("L'image ne doit pas dépasser 5MB");
+      setNotification({ message: "L'image ne doit pas dépasser 5MB", type: 'error' });
       return;
     }
 
@@ -122,7 +123,7 @@ const ContactAdmin: React.FC = () => {
       return imageUrl;
     } catch (error) {
       console.error('Erreur upload image:', error);
-      alert('Erreur lors de l\'upload de l\'image');
+      setNotification({ message: 'Erreur lors de l\'upload de l\'image', type: 'error' });
       return null;
     }
   };
@@ -161,7 +162,7 @@ const ContactAdmin: React.FC = () => {
       console.log(`${fieldsToSave.length} champ(s) modifié(s) sur ${allFields.length}:`, fieldsToSave.map(f => f.key));
 
       if (fieldsToSave.length === 0) {
-        alert('Aucune modification détectée.');
+        setNotification({ message: 'Aucune modification détectée.', type: 'error' });
         setSaving(false);
         return;
       }
@@ -195,13 +196,13 @@ const ContactAdmin: React.FC = () => {
         await loadTextData();
         setSelectedImageFile(null);
         setImagePreview('');
-        alert(`${fieldsToSave.length} modification(s) sauvegardée(s) avec succès !`);
+        setNotification({ message: `${fieldsToSave.length} modification(s) sauvegardée(s) avec succès !`, type: 'success' });
       } else {
-        alert('Certaines données n\'ont pas pu être sauvegardées. Vérifiez la console pour plus de détails.');
+        setNotification({ message: 'Certaines données n\'ont pas pu être sauvegardées. Vérifiez la console pour plus de détails.', type: 'error' });
       }
     } catch (error) {
       console.error('Erreur sauvegarde:', error);
-      alert('Erreur lors de la sauvegarde');
+      setNotification({ message: 'Erreur lors de la sauvegarde', type: 'error' });
     } finally {
       setSaving(false);
     }
