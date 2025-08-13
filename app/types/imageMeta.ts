@@ -1,12 +1,10 @@
-import { CategoryType } from './categories';
-
 export interface ImageMeta {
   id: string;
   projet: string; // Ajout du champ projet
   image_url: string;
   position: number;
   selected: boolean;
-  category: CategoryType | CategoryType[]; // Support pour catégories multiples
+  category: string | string[]; // Support pour catégories multiples (récupérées depuis l'API)
   alt: string;
   titre: string; // Nouveau champ titre
   sousTitre: string; // Nouveau champ sous-titre

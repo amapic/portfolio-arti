@@ -44,6 +44,7 @@ const TestIsotopePage: React.FC = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [itemsVisible, setItemsVisible] = useState<boolean[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
@@ -91,6 +92,9 @@ const TestIsotopePage: React.FC = () => {
           }));
 
           setGalleryItems(items);
+          
+          // Initialiser le tableau de visibilité
+          setItemsVisible(new Array(items.length).fill(false));
         }
       } catch (error) {
         console.error("Erreur de chargement des données:", error);
@@ -101,6 +105,25 @@ const TestIsotopePage: React.FC = () => {
 
     loadData();
   }, [API_URL, PROJECT_ID]);
+
+  // Animation progressive des images après le chargement
+  useEffect(() => {
+    if (!loading && galleryItems.length > 0) {
+      // Petit délai avant de commencer l'animation
+      setTimeout(() => {
+        // Faire apparaître les images progressivement
+        galleryItems.forEach((_, index) => {
+          setTimeout(() => {
+            setItemsVisible(prev => {
+              const newVisible = [...prev];
+              newVisible[index] = true;
+              return newVisible;
+            });
+          }, index * 150); // Délai de 150ms entre chaque image
+        });
+      }, 200); // Délai initial de 200ms
+    }
+  }, [loading, galleryItems]);
 
   // Initialiser Isotope après le chargement
   useEffect(() => {
@@ -114,6 +137,13 @@ const TestIsotopePage: React.FC = () => {
             itemSelector: ".grid-item",
             layoutMode: "masonry",
             percentPosition: true,
+            transitionDuration: 400,
+            hiddenStyle: {
+              opacity: 0
+            },
+            visibleStyle: {
+              opacity: 1
+            },
             masonry: {
               columnWidth: ".grid-sizer",
               gutter: 0,
@@ -130,8 +160,13 @@ const TestIsotopePage: React.FC = () => {
               $(".filter-btn").removeClass("active");
               $(this).addClass("active");
 
-              // Application du filtre
+              // Application du filtre avec layout forcé
               $grid.isotope({ filter: filterValue });
+              
+              // Forcer un re-layout après un court délai pour éviter le micro-repositionnement
+              setTimeout(() => {
+                $grid.isotope("layout");
+              }, 450); // Légèrement après la fin de la transition (400ms)
             });
 
           // Réorganisation lors du redimensionnement
@@ -143,8 +178,9 @@ const TestIsotopePage: React.FC = () => {
         }
       };
 
-      // Attendre que les éléments soient rendus
-      setTimeout(initIsotope, 300);
+      // Attendre que les éléments soient rendus et que l'animation soit terminée
+      const totalAnimationTime = 200 + (galleryItems.length * 150) + 600; // délai initial + animations + transition
+      setTimeout(initIsotope, totalAnimationTime);
     }
   }, [loading, galleryItems]);
 
@@ -196,16 +232,28 @@ const TestIsotopePage: React.FC = () => {
 
     // Utiliser crop classique en fallback
     if (item.crop) {
-      const scale = 100 / item.crop.size;
-      const translateX = -item.crop.x * scale;
-      const translateY = -item.crop.y * scale;
+      // Si crop.size est proche de 100, c'est probablement un crop centré simple
+      if (item.crop.size >= 99) {
+        // Crop centré simple - utiliser la position directement
+        return {
+          backgroundImage: `url(${item.imageUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: `${50 + item.crop.x}% ${50 + item.crop.y}%`,
+          backgroundRepeat: "no-repeat",
+        };
+      } else {
+        // Crop avec zoom
+        const scale = 100 / item.crop.size;
+        const translateX = -item.crop.x * scale;
+        const translateY = -item.crop.y * scale;
 
-      return {
-        backgroundImage: `url(${item.imageUrl})`,
-        backgroundSize: `${scale * 100}%`,
-        backgroundPosition: `${translateX}% ${translateY}%`,
-        backgroundRepeat: "no-repeat",
-      };
+        return {
+          backgroundImage: `url(${item.imageUrl})`,
+          backgroundSize: `${scale * 100}%`,
+          backgroundPosition: `${translateX}% ${translateY}%`,
+          backgroundRepeat: "no-repeat",
+        };
+      }
     }
 
     // Fallback par défaut
@@ -283,7 +331,7 @@ const TestIsotopePage: React.FC = () => {
         body {
           font-family: "Arial", sans-serif;
           margin: 0;
-          padding: 20px;
+          /* padding: 20px; */
           /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
           min-height: 100vh;
         }
@@ -303,7 +351,7 @@ const TestIsotopePage: React.FC = () => {
           color: white;
           margin-bottom: 30px;
           font-size: 2.5em;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+          /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); */
         }
 
         .filters {
@@ -316,7 +364,7 @@ const TestIsotopePage: React.FC = () => {
           background: rgba(255, 255, 255, 0.2);
           border: 2px solid rgba(255, 255, 255, 0.3);
           color: black;
-          padding: 10px 20px;
+          padding: 10px 0px;
           margin: 5px;
           /* border-radius: 25px; */
           cursor: pointer;
@@ -351,18 +399,55 @@ const TestIsotopePage: React.FC = () => {
           padding-right: 10px;
           /* border-radius: 15px; */
           overflow: hidden;
-          transition: all 0.3s ease;
+          /* Retirer transition qui conflit avec Isotope */
+          /* transition: all 0.3s ease; */
           cursor: pointer;
           position: relative;
           height: calc(33.33vw - 10px);
           max-height: 350px;
           box-sizing: border-box;
+          /* Animation progressive */
+          opacity: 0;
+          /* transform: translateY(40px) scale(0.9) rotateX(15deg); */
+          /* transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); */
+        }
+
+        .grid-item.visible {
+          opacity: 1;
+          /* transform: translateY(0) scale(1) rotateX(0deg); */
+        }
+
+        /* Animation avec délai pour les éléments de largeur double */
+        .grid-item--width4 {
+          /* transform: translateY(50px) scale(0.85) rotateY(10deg); */
+          /* transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); */
+        }
+
+        .grid-item--width4.visible {
+          /* transform: translateY(0) scale(1) rotateY(0deg); */
+        }
+
+        /* Animation pour les éléments de hauteur double */
+        .grid-item--height2 {
+          /* transform: translateX(-30px) scale(0.9) rotateZ(5deg); */
+          /* transition: all 0.9s cubic-bezier(0.4, 0, 0.2, 1); */
+        }
+
+        .grid-item--height2.visible {
+          /* transform: translateX(0) scale(1) rotateZ(0deg); */
         }
 
         .grid-item > .item-content {
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
           /* border-radius: 15px; */
           overflow: hidden;
+          /* Transition uniquement pour les propriétés hover */
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .grid-item:hover > .item-content {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         /* Taille 2x1 (largeur double) - largeur = 2 x hauteur */
@@ -417,22 +502,22 @@ const TestIsotopePage: React.FC = () => {
 
         /* Animation pour le texte qui apparaît progressivement */
         .item-title, .item-desc {
-          transform: translateY(20px);
+          /* transform: translateY(20px); */
           opacity: 0;
-          transition: all 0.4s ease;
+          /* transition: all 0.4s ease; */
           transition-delay: 0.1s;
         }
 
         /* Animation du titre au hover */
         .grid-item:hover .item-title {
-          transform: translateY(0);
+          /* transform: translateY(0); */
           opacity: 1;
           transition-delay: 0.1s;
         }
 
         /* Animation du sous-titre au hover avec délai */
         .grid-item:hover .item-desc {
-          transform: translateY(0);
+          /* transform: translateY(0); */
           opacity: 1;
           transition-delay: 0.2s;
         }
@@ -462,9 +547,9 @@ const TestIsotopePage: React.FC = () => {
           letter-spacing: 0.05em;
           drop-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
           /* Animation initiale - caché */
-          transform: translateY(20px);
+          /* transform: translateY(20px); */
           opacity: 0;
-          transition: all 0.4s ease;
+          /* transition: all 0.4s ease; */
           transition-delay: 0.1s;
         }
 
@@ -478,9 +563,9 @@ const TestIsotopePage: React.FC = () => {
           font-weight: 300;
           drop-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
           /* Animation initiale - caché */
-          transform: translateY(20px);
+          /* transform: translateY(20px); */
           opacity: 0;
-          transition: all 0.4s ease;
+          /* transition: all 0.4s ease; */
           transition-delay: 0.1s;
         }
 
@@ -561,7 +646,7 @@ const TestIsotopePage: React.FC = () => {
           }}
         >
           <button 
-            className="filter-btn  active bg-none border-none text-xl font-light text-black cursor-pointer py-2 tracking-wide relative text-center w-[50px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow" 
+            className="filter-btn  active bg-none border-none text-xl font-light text-black cursor-pointer py-1 tracking-wide relative text-center w-[50px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow" 
             data-filter="*"
             style={{ fontFamily: "ExposureTrial, serif" }}
           >
@@ -570,7 +655,7 @@ const TestIsotopePage: React.FC = () => {
           {categories.map((category) => (
             <button
               key={category.id}
-              className="filter-btn  bg-none border-none text-xl  text-black cursor-pointer py-2 tracking-wide relative text-center w-[50px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
+              className="filter-btn  bg-none border-none text-xl  text-black cursor-pointer py-1 tracking-wide relative text-center w-[50px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
               data-filter={`.category-${category.value}`}
               style={{ fontFamily: "ExposureTrial, serif" }}
             >
@@ -588,7 +673,7 @@ const TestIsotopePage: React.FC = () => {
           <div className="grid-sizer"></div>
 
           {/* Rendu des images depuis l'API */}
-          {galleryItems.map((item) => {
+          {galleryItems.map((item, index) => {
             const categoryClasses = Array.isArray(item.categories)
               ? item.categories.map((cat) => `category-${cat}`).join(" ")
               : `category-${item.categories}`;
@@ -596,11 +681,12 @@ const TestIsotopePage: React.FC = () => {
             const dimensionClass = getDimensionClass(item.dimension || [1, 1]);
             const colorClass = getCategoryColorClass(item.categories);
             const cropStyle = getImageCropStyle(item);
+            const isVisible = itemsVisible[index];
 
             return (
               <div
                 key={item.id}
-                className={`grid-item ${categoryClasses} ${dimensionClass}`}
+                className={`grid-item ${categoryClasses} ${dimensionClass} ${isVisible ? 'visible' : ''}`}
               >
                 <div className={`item-content`} style={cropStyle}>
                   <div className="item-overlay">

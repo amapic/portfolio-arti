@@ -204,6 +204,7 @@ const ImagesAdmin: React.FC = () => {
 
       // Charger l'image pour obtenir ses dimensions réelles
       let crop = { x: 0, y: 0, size: 100 };
+      let cropData = null;
       try {
         const img = new window.Image();
         await new Promise((resolve, reject) => {
@@ -211,9 +212,42 @@ const ImagesAdmin: React.FC = () => {
           img.onerror = reject;
           img.src = imageUrl;
         });
+        
+        // Générer crop basique
         crop = getCenteredMaxCrop(img.naturalWidth, img.naturalHeight, newImageMeta.dimension);
+        
+        // Générer cropData détaillé pour le rendu optimal
+        const [rw, rh] = newImageMeta.dimension;
+        const cropAspect = rw / rh;
+        let cropW = img.naturalWidth;
+        let cropH = img.naturalHeight;
+        
+        if (img.naturalWidth / img.naturalHeight > cropAspect) {
+          // Image plus large que le ratio : hauteur limite
+          cropH = img.naturalHeight;
+          cropW = cropH * cropAspect;
+        } else {
+          // Image plus haute (ou égale) que le ratio : largeur limite
+          cropW = img.naturalWidth;
+          cropH = cropW / cropAspect;
+        }
+        
+        // Position centrée
+        const cropX = (img.naturalWidth - cropW) / 2;
+        const cropY = (img.naturalHeight - cropH) / 2;
+        
+        cropData = {
+          originalWidth: img.naturalWidth,
+          originalHeight: img.naturalHeight,
+          cropX: cropX,
+          cropY: cropY,
+          cropWidth: cropW,
+          cropHeight: cropH,
+          aspectRatio: cropAspect
+        };
       } catch (e) {
         // fallback crop par défaut
+        console.error('Erreur lors du calcul du crop:', e);
       }
 
       // Création des métadonnées
@@ -225,6 +259,7 @@ const ImagesAdmin: React.FC = () => {
         sousTitre: newImageMeta.sousTitre,
         dimension: newImageMeta.dimension,
         crop,
+        cropData,
         selected: false,
         position: newImageMeta.position
       };
@@ -319,7 +354,12 @@ const ImagesAdmin: React.FC = () => {
 
       if (response.ok) {
         setEditingImage(null);
-        loadImages();
+        // Mettre à jour seulement l'état local sans recharger depuis l'API
+        setImages(prevImages => 
+          prevImages.map(img => 
+            img.id === updatedImage.id ? updatedImage : img
+          )
+        );
         alert('Image mise à jour avec succès');
       } else {
         alert('Erreur lors de la mise à jour');
@@ -341,7 +381,7 @@ const ImagesAdmin: React.FC = () => {
     }
     
     const newUrl = `/admin/images${newParams.toString() ? '?' + newParams.toString() : ''}`;
-    router.push(newUrl);
+    router.replace(newUrl, { scroll: false });
   };
 
   const handleCropChange = (crop: { x: number; y: number; size: number }) => {
@@ -598,7 +638,7 @@ const ImagesAdmin: React.FC = () => {
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${
                     selectedCategory === 'All'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-700'
                   }`}
                 >
                   Toutes ({images.length})
@@ -612,7 +652,7 @@ const ImagesAdmin: React.FC = () => {
                       onClick={() => handleCategoryChange(category.value)}
                       className={`px-3 py-1 rounded-full text-sm transition-colors ${
                         selectedCategory === category.value
-                          ? `${colorClass} bg-blue-600 text-white`
+                          ? `${colorClass} bg-blue-300 text-black`
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                       }`}
                     >
@@ -788,9 +828,9 @@ const ImagesAdmin: React.FC = () => {
                         </button>
                         <div className="ml-6">
                           <h3 className="font-medium text-sm truncate text-black">{image.titre || 'Sans titre'}</h3>
-                          <p className="text-xs text-gray-600 truncate">{image.sousTitre || 'Sans sous-titre'}</p>
+                           <p className="text-xs text-gray-600 truncate">{image.sousTitre || 'Sans sous-titre'}</p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {image.dimension.join('×')} • Position: {image.position} • {image.selected ? 'Sélectionné' : 'Non sélectionné'}
+                            {Array.isArray(image.dimension) ? image.dimension.join('×') : '1×1'} • Position: {typeof image.position === 'object' ? '0' : image.position} • {image.selected ? 'Sélectionné' : 'Non sélectionné'}
                           </p>
                         </div>
                       </div>

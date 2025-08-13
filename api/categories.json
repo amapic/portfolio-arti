@@ -11,7 +11,7 @@
     {
       "id": "2",
       "value": "Dance",
-      "label": "Danse",
+      "label": "Dansee",
       "color": "bg-black text-white",
       "order": 1,
       "isActive": true
@@ -34,10 +34,17 @@
     },
     {
       "id": "5",
-      "value": "Event",
-      "label": "Event",
+      "value": "Voiture",
+      "label": "Voiture2",
       "color": "bg-black text-white",
       "order": 4,
+      "isActive": true
+    },
+    {
+      "id": "17544683426247zdokh08c",
+      "value": "test",
+      "label": "test",
+      "order": 5,
       "isActive": true
     }
   ]

@@ -1,111 +1,23 @@
 {
   "images": [
     {
-      "id": "17533282325305egqi0gyp",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753328232385-732829621.jpg",
-      "position": 3,
-      "selected": true,
-      "category": [
-        "Theater",
-        "Opera"
-      ],
-      "alt": "b",
-      "titre": "Agg",
-      "sousTitre": "Agg",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 91,
-        "cropHeightPercent": 52.5525
-      },
-      "created_at": "2025-07-24T03:37:12.530Z",
-      "updated_at": "2025-08-02T16:26:39.129Z"
-    },
-    {
-      "id": "1753328252493dmzb1a9qu",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753328252302-681976093.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater",
-        "Opera"
-      ],
-      "alt": "Image Theater",
-      "titre": "r",
-      "sousTitre": "f",
-      "dimension": [
-        2,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T03:37:32.493Z",
-      "updated_at": "2025-08-02T16:26:29.280Z"
-    },
-    {
-      "id": "17533282752508qtfvep3e",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753328275060-610330646.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater",
-        "Circus"
-      ],
-      "alt": "gg",
-      "titre": "t",
-      "sousTitre": "g",
-      "dimension": [
-        1,
-        2
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T03:37:55.250Z",
-      "updated_at": "2025-08-02T16:29:23.879Z"
-    },
-    {
-      "id": "1753361222135xeaqknrx7",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753361221747-471950208.jpg",
+      "id": "1754348678402yc25hyyx4",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754348678049-221558472.webp",
       "position": {
         "Theater": 0,
-        "Dance": 3,
-        "Opera": 1,
+        "Dance": 0,
+        "Opera": 0,
         "Circus": 0,
         "Event": 0
       },
       "selected": true,
       "category": [
-        "Dance",
-        "Opera"
+        "Theater"
       ],
       "alt": "Image Theater",
-      "titre": "AAA",
-      "sousTitre": "k",
+      "titre": "Titre Theater",
+      "sousTitre": "",
       "dimension": [
         2,
         1
@@ -113,116 +25,109 @@
       "crop": {
         "x": 0,
         "y": 0,
-        "size": 79
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 79,
-        "cropHeightPercent": 79
-      },
-      "created_at": "2025-07-24T12:47:02.135Z",
-      "updated_at": "2025-08-02T16:26:48.558Z"
-    },
-    {
-      "id": "1753369928674zlxc9i96d",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753369928536-588824564.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
         "size": 100
       },
       "displayDimensions": {
         "cropWidthPercent": 100,
         "cropHeightPercent": 100
       },
-      "created_at": "2025-07-24T15:12:08.674Z",
-      "updated_at": "2025-07-24T15:21:30.393Z"
+      "created_at": "2025-08-04T23:04:38.402Z",
+      "updated_at": "2025-08-06T17:48:21.647Z",
+      "cropData": {
+        "originalWidth": 2160,
+        "originalHeight": 1080,
+        "cropX": 0,
+        "cropY": 0,
+        "cropWidth": 2160,
+        "cropHeight": 1080,
+        "aspectRatio": 2
+      }
     },
     {
-      "id": "1753369937747tk531cg0e",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753369937623-509336760.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:12:17.747Z",
-      "updated_at": "2025-07-24T15:21:29.433Z"
-    },
-    {
-      "id": "1753369957373h5pveis6p",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753369957214-316527995.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:12:37.374Z",
-      "updated_at": "2025-07-24T15:21:28.782Z"
-    },
-    {
-      "id": "1753369969747oy633kcdk",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753369969594-602711235.jpg",
+      "id": "1754348825061dxylepepq",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754348824188-358989829.webp",
       "position": {
         "Theater": 0,
         "Dance": 0,
         "Opera": 0,
-        "Circus": 10,
+        "Circus": 0,
+        "Event": 0
+      },
+      "selected": true,
+      "category": [
+        "Dance"
+      ],
+      "alt": "Image Dance",
+      "titre": "bali",
+      "sousTitre": "",
+      "dimension": [
+        2,
+        1
+      ],
+      "crop": {
+        "x": 0,
+        "y": 12.423312883435583,
+        "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 75.07507507507508
+      },
+      "created_at": "2025-08-04T23:07:05.061Z",
+      "updated_at": "2025-08-04T23:09:03.961Z"
+    },
+    {
+      "id": "1754348840520dfbcgujb9",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754348839962-975144603.jpg",
+      "position": {
+        "Theater": 0,
+        "Dance": 0,
+        "Opera": 0,
+        "Circus": 0,
         "Event": 0
       },
       "selected": false,
       "category": [
-        "Circus"
+        "Theater"
       ],
       "alt": "Image Theater",
-      "titre": "coupe au bol",
+      "titre": "Titre Theater",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        1
+      ],
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "size": 100
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 100
+      },
+      "created_at": "2025-08-04T23:07:20.520Z",
+      "updated_at": "2025-08-04T23:08:56.946Z"
+    },
+    {
+      "id": "1754348852198yz26k3t7m",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754348851803-161358779.jpg",
+      "position": {
+        "Theater": 0,
+        "Dance": 0,
+        "Opera": 0,
+        "Circus": 0,
+        "Event": 0
+      },
+      "selected": true,
+      "category": [
+        "Dance"
+      ],
+      "alt": "Image Dance",
+      "titre": "Titre Dance",
       "sousTitre": "",
       "dimension": [
         2,
@@ -230,420 +135,76 @@
       ],
       "crop": {
         "x": 0,
-        "y": 75,
+        "y": 12.52927400468384,
         "size": 100
       },
       "displayDimensions": {
         "cropWidthPercent": 100,
-        "cropHeightPercent": 25
+        "cropHeightPercent": 74.8502994011976
       },
-      "created_at": "2025-07-24T15:12:49.747Z",
-      "updated_at": "2025-08-03T20:23:31.648Z"
+      "created_at": "2025-08-04T23:07:32.198Z",
+      "updated_at": "2025-08-04T23:09:08.489Z"
     },
     {
-      "id": "1753369998854qthhyxrk8",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753369998745-390579660.jpg",
-      "position": 0,
+      "id": "1754821013070rhqbd4x0q",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754821010782-376596253.jpg",
+      "position": {
+        "Voiture": 1
+      },
       "selected": true,
       "category": [
-        "Theater"
+        "Voiture",
+        "Opera",
+        "Dance"
       ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
+      "alt": "Image Voiture",
+      "titre": "Titre Voiture",
       "sousTitre": "",
       "dimension": [
         1,
         1
       ],
       "crop": {
-        "x": 0,
-        "y": 0,
+        "x": 10.399999999999999,
+        "y": 0.033411293017039156,
         "size": 100
       },
+      "cropData": {
+        "originalWidth": 1732,
+        "originalHeight": 1296,
+        "cropX": 180.12799999999996,
+        "cropY": 0.4330103575008275,
+        "cropWidth": 1295.536,
+        "cropHeight": 1296,
+        "aspectRatio": 1
+      },
       "displayDimensions": {
-        "cropWidthPercent": 100,
+        "cropWidthPercent": 74.8,
         "cropHeightPercent": 100
       },
-      "created_at": "2025-07-24T15:13:18.854Z",
-      "updated_at": "2025-07-24T15:21:31.616Z"
+      "created_at": "2025-08-10T10:16:53.070Z",
+      "updated_at": "2025-08-10T10:47:05.609Z"
     },
     {
-      "id": "175337001067294t0hixh5",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370010556-751239565.jpg",
-      "position": 0,
+      "id": "1754837077076uxxvpka1e",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754837076806-744345039.webp",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 2,
+        "test": 0
+      },
       "selected": true,
       "category": [
-        "Theater"
+        "Voiture"
       ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:13:30.673Z",
-      "updated_at": "2025-07-24T15:21:32.361Z"
-    },
-    {
-      "id": "1753370018362wi39rw9lf",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370018242-292806853.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:13:38.362Z",
-      "updated_at": "2025-07-24T15:21:33.505Z"
-    },
-    {
-      "id": "1753370037991avapcqew7",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370037867-798710379.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:13:57.991Z",
-      "updated_at": "2025-07-24T15:21:34.688Z"
-    },
-    {
-      "id": "1753370052111a5lodypmc",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370051979-946131761.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Event"
-      ],
-      "alt": "Image Theater",
-      "titre": "noir",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        2
-      ],
-      "crop": {
-        "x": 37.5,
-        "y": 0,
-        "size": 63
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 15.75,
-        "cropHeightPercent": 63
-      },
-      "created_at": "2025-07-24T15:14:12.111Z",
-      "updated_at": "2025-08-02T16:32:42.861Z"
-    },
-    {
-      "id": "1753370553793jnet5knyf",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370553620-57297014.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:22:33.793Z",
-      "updated_at": "2025-07-24T15:30:44.913Z"
-    },
-    {
-      "id": "17533705755148gael5i7a",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370575386-721021684.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:22:55.515Z",
-      "updated_at": "2025-07-24T15:30:45.864Z"
-    },
-    {
-      "id": "17533705830819wb3tcf30",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370582970-997213159.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:23:03.082Z",
-      "updated_at": "2025-07-24T15:30:46.723Z"
-    },
-    {
-      "id": "1753370596615qvong2n8t",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370596451-581326464.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:23:16.615Z",
-      "updated_at": "2025-07-24T15:30:50.256Z"
-    },
-    {
-      "id": "1753370606774pxz19kv8s",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370606602-870702470.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:23:26.774Z",
-      "updated_at": "2025-07-24T15:30:49.528Z"
-    },
-    {
-      "id": "1753370702042gag74dkyj",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370701862-941718069.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        2
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 25,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:25:02.042Z",
-      "updated_at": "2025-08-01T14:09:37.107Z"
-    },
-    {
-      "id": "1753370708645wwtoin4qt",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370708464-599139895.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:25:08.645Z",
-      "updated_at": "2025-07-24T15:30:47.952Z"
-    },
-    {
-      "id": "1753370759293rqrq03quw",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370759028-239719431.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:25:59.293Z",
-      "updated_at": "2025-07-24T15:30:51.432Z"
-    },
-    {
-      "id": "17533707730474brmj0oex",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370772930-748675121.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:26:13.047Z",
-      "updated_at": "2025-07-24T15:30:52.088Z"
-    },
-    {
-      "id": "1753370785774l0qc74czs",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370785613-138586000.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
+      "alt": "Image Voiture",
+      "titre": "Titre Voiture 2",
+      "sousTitre": "gfjfg",
       "dimension": [
         2,
         1
@@ -653,142 +214,32 @@
         "y": 0,
         "size": 100
       },
+      "cropData": null,
       "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:26:25.774Z",
-      "updated_at": "2025-07-24T15:41:30.622Z"
-    },
-    {
-      "id": "1753370812796lxysxo91u",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370812646-975677776.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:26:52.796Z",
-      "updated_at": "2025-07-24T15:30:54.160Z"
-    },
-    {
-      "id": "1753370821845keum9r2eg",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370821671-388176409.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
+        "cropWidthPercent": 50,
         "cropHeightPercent": 50
       },
-      "created_at": "2025-07-24T15:27:01.845Z",
-      "updated_at": "2025-08-01T11:26:21.702Z"
+      "created_at": "2025-08-10T14:44:37.076Z",
+      "updated_at": "2025-08-12T15:18:55.923Z"
     },
     {
-      "id": "1753370829490xupt8buck",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370829352-8229088.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        1
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:27:09.490Z",
-      "updated_at": "2025-07-24T15:30:55.895Z"
-    },
-    {
-      "id": "1753370848793p7248kre9",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753370848626-899694029.jpg",
-      "position": 0,
-      "selected": true,
-      "category": [
-        "Theater"
-      ],
-      "alt": "Image Theater",
-      "titre": "Titre Theater",
-      "sousTitre": "",
-      "dimension": [
-        1,
-        2
-      ],
-      "crop": {
-        "x": 0,
-        "y": 0,
-        "size": 100
-      },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
-      },
-      "created_at": "2025-07-24T15:27:28.793Z",
-      "updated_at": "2025-07-24T15:43:39.118Z"
-    },
-    {
-      "id": "1753371899518odudyfea3",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753371899357-239052159.jpg",
+      "id": "1754837149525d4618dz2s",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754837149269-935396694.webp",
       "position": {
+        "Opera": 0,
         "Theater": 0,
         "Dance": 0,
-        "Opera": 0,
-        "Circus": 1,
-        "Event": 0
+        "Circus": 0,
+        "Voiture": 3,
+        "test": 0
       },
       "selected": true,
       "category": [
-        "Circus"
+        "Voiture"
       ],
-      "alt": "Image Dance,Circus",
-      "titre": "Titre Dance,Circus",
+      "alt": "Image Theater",
+      "titre": "Bugatti de course",
       "sousTitre": "",
       "dimension": [
         2,
@@ -796,27 +247,583 @@
       ],
       "crop": {
         "x": 0,
-        "y": 37.5,
+        "y": 5.577689243027888,
         "size": 100
+      },
+      "cropData": {
+        "originalWidth": 892,
+        "originalHeight": 502,
+        "cropX": 0,
+        "cropY": 27.999999999999996,
+        "cropWidth": 892,
+        "cropHeight": 446.61921708185054,
+        "aspectRatio": 2
       },
       "displayDimensions": {
         "cropWidthPercent": 100,
-        "cropHeightPercent": 25
+        "cropHeightPercent": 88.96797153024912
       },
-      "created_at": "2025-07-24T15:44:59.518Z",
-      "updated_at": "2025-08-03T20:23:53.393Z"
+      "created_at": "2025-08-10T14:45:49.526Z",
+      "updated_at": "2025-08-10T14:59:11.730Z"
     },
     {
-      "id": "1753372269771o6xdi0lcc",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753372269668-523454188.jpg",
-      "position": 0,
-      "selected": false,
+      "id": "1754837315565ixxk7eyof",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754837315064-70711764.webp",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 8,
+        "test": 0
+      },
+      "selected": true,
       "category": [
-        "Event"
+        "Voiture"
       ],
-      "alt": "Image Event",
-      "titre": "Titre Event",
+      "alt": "Image Voiture",
+      "titre": "8c la più bella",
+      "sousTitre": "",
+      "dimension": [
+        2,
+        1
+      ],
+      "crop": {
+        "x": 0,
+        "y": 18.192048012003,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 2000,
+        "originalHeight": 1333,
+        "cropX": 0,
+        "cropY": 242.49999999999997,
+        "cropWidth": 2000,
+        "cropHeight": 1000.7507507507507,
+        "aspectRatio": 2
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 75.07507507507508
+      },
+      "created_at": "2025-08-10T14:48:35.565Z",
+      "updated_at": "2025-08-10T15:05:27.328Z"
+    },
+    {
+      "id": "1754837496306r051856v3",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754837495896-423757382.jpg",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 0,
+        "test": 0
+      },
+      "selected": true,
+      "category": [
+        "Voiture"
+      ],
+      "alt": "Image Theater",
+      "titre": "Titre Theater",
+      "sousTitre": "",
+      "dimension": [
+        2,
+        1
+      ],
+      "crop": {
+        "x": 0,
+        "y": 12.04933586337761,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 1600,
+        "originalHeight": 1054,
+        "cropX": 0,
+        "cropY": 127.00000000000001,
+        "cropWidth": 1600,
+        "cropHeight": 800.9118541033436,
+        "aspectRatio": 2
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 75.98784194528876
+      },
+      "created_at": "2025-08-10T14:51:36.306Z",
+      "updated_at": "2025-08-10T14:51:58.506Z"
+    },
+    {
+      "id": "17548376162511jqhj4hl5",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754837615952-291281606.jpg",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 4,
+        "test": 0
+      },
+      "selected": true,
+      "category": [
+        "Voiture"
+      ],
+      "alt": "Image Voiture",
+      "titre": "Titre Voiture",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        1
+      ],
+      "crop": {
+        "x": 8.5,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 1440,
+        "originalHeight": 720,
+        "cropX": 122.4,
+        "cropY": 0,
+        "cropWidth": 720,
+        "cropHeight": 720,
+        "aspectRatio": 1
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 100
+      },
+      "created_at": "2025-08-10T14:53:36.251Z",
+      "updated_at": "2025-08-10T15:05:59.055Z"
+    },
+    {
+      "id": "1754837805364lowkxn77b",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754837804678-565975274.jpg",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 5,
+        "test": 0
+      },
+      "selected": true,
+      "category": [
+        "Voiture"
+      ],
+      "alt": "Image Theater",
+      "titre": "Titre Theater",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        1
+      ],
+      "crop": {
+        "x": 16.4,
+        "y": 0.09843903810995869,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 1500,
+        "originalHeight": 1000,
+        "cropX": 245.99999999999997,
+        "cropY": 0.9843903810995869,
+        "cropWidth": 999,
+        "cropHeight": 1000,
+        "aspectRatio": 1
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 66.60000000000001,
+        "cropHeightPercent": 100
+      },
+      "created_at": "2025-08-10T14:56:45.364Z",
+      "updated_at": "2025-08-10T15:04:42.989Z"
+    },
+    {
+      "id": "1754839668765i655e4gak",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754839668420-24528248.jpg",
+      "position": {},
+      "selected": true,
+      "category": [
+        "Circus",
+        "Légo"
+      ],
+      "alt": "Image Circus",
+      "titre": "Titre Circus",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        2
+      ],
+      "crop": {
+        "x": 14.7092547092547,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 1144,
+        "originalHeight": 1599,
+        "cropX": 168.27387387387378,
+        "cropY": 0,
+        "cropWidth": 800,
+        "cropHeight": 1599,
+        "aspectRatio": 0.5
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 69.93006993006993,
+        "cropHeightPercent": 100
+      },
+      "created_at": "2025-08-10T15:27:48.765Z",
+      "updated_at": "2025-08-12T19:22:02.155Z"
+    },
+    {
+      "id": "1754839700111wkmypb1dx",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754839699830-475329251.jpg",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 0,
+        "test": 0
+      },
+      "selected": true,
+      "category": [
+        "Circus",
+        "Légo"
+      ],
+      "alt": "Image Circus",
+      "titre": "Titre Circus",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        2
+      ],
+      "crop": {
+        "x": 21.26278201590651,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 361,
+        "originalHeight": 500,
+        "cropX": 76.75864307742249,
+        "cropY": 0,
+        "cropWidth": 249.82698961937714,
+        "cropHeight": 500,
+        "aspectRatio": 0.5
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 69.20415224913495,
+        "cropHeightPercent": 100
+      },
+      "created_at": "2025-08-10T15:28:20.111Z",
+      "updated_at": "2025-08-12T19:21:50.781Z"
+    },
+    {
+      "id": "1754839710450oabcg7zot",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754839710059-145468898.jpg",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 0,
+        "test": 0
+      },
+      "selected": true,
+      "category": [
+        "Circus",
+        "Légo"
+      ],
+      "alt": "Image Circus",
+      "titre": "Titre Circus",
+      "sousTitre": "",
+      "dimension": [
+        2,
+        1
+      ],
+      "crop": {
+        "x": 0,
+        "y": 23.60000000000001,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 1024,
+        "originalHeight": 768,
+        "cropX": 0,
+        "cropY": 181.24800000000008,
+        "cropWidth": 1024,
+        "cropHeight": 512,
+        "aspectRatio": 2
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 100,
+        "cropHeightPercent": 66.66666666666666
+      },
+      "created_at": "2025-08-10T15:28:30.450Z",
+      "updated_at": "2025-08-12T19:21:57.296Z"
+    },
+    {
+      "id": "1754840431922z8wwqvp9o",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754840431493-916153635.jpg",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 0,
+        "test": 0
+      },
+      "selected": true,
+      "category": [
+        "Circus",
+        "Légo"
+      ],
+      "alt": "Image Theater",
+      "titre": "Titre Theater",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        1
+      ],
+      "crop": {
+        "x": 26.800000000000004,
+        "y": 0.12448870709586402,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 3763,
+        "originalHeight": 2645,
+        "cropX": 1008.484,
+        "cropY": 3.292726302685603,
+        "cropWidth": 2641.6259999999997,
+        "cropHeight": 2645,
+        "aspectRatio": 1
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 70.19999999999999,
+        "cropHeightPercent": 100
+      },
+      "created_at": "2025-08-10T15:40:31.922Z",
+      "updated_at": "2025-08-12T19:20:44.342Z"
+    },
+    {
+      "id": "1754840729314tah3gl9ft",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754840728625-25717710.jpg",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 0,
+        "test": 0
+      },
+      "selected": true,
+      "category": [
+        "Circus",
+        "Légo"
+      ],
+      "alt": "Image Theater",
+      "titre": "Titre Theater",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        1
+      ],
+      "crop": {
+        "x": 13.79999999999999,
+        "y": 0.037523452157600445,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 1600,
+        "originalHeight": 1066,
+        "cropX": 220.79999999999984,
+        "cropY": 0.40000000000002073,
+        "cropWidth": 1065.6000000000001,
+        "cropHeight": 1066,
+        "aspectRatio": 1
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 66.60000000000001,
+        "cropHeightPercent": 100
+      },
+      "created_at": "2025-08-10T15:45:29.314Z",
+      "updated_at": "2025-08-12T19:20:53.203Z"
+    },
+    {
+      "id": "1754841251043jof3fxe3w",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1754841250603-553112552.jpg",
+      "position": {
+        "Opera": 0,
+        "Theater": 0,
+        "Dance": 0,
+        "Circus": 0,
+        "Voiture": 0,
+        "test": 0
+      },
+      "selected": true,
+      "category": [
+        "Circus",
+        "Légo"
+      ],
+      "alt": "Image Theater",
+      "titre": "Titre Theater",
+      "sousTitre": "",
+      "dimension": [
+        2,
+        1
+      ],
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": null,
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
+      },
+      "created_at": "2025-08-10T15:54:11.043Z",
+      "updated_at": "2025-08-12T19:19:52.933Z"
+    },
+    {
+      "id": "1755013691165k4p09tiwo",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1755013689979-878012469.jpg",
+      "position": 0,
+      "selected": true,
+      "category": [
+        "Theater"
+      ],
+      "alt": "Image Theater",
+      "titre": "vallée",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        2
+      ],
+      "crop": {
+        "x": 16.97648507593972,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": null,
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
+      },
+      "created_at": "2025-08-12T15:48:11.165Z",
+      "updated_at": "2025-08-12T15:53:08.081Z"
+    },
+    {
+      "id": "1755013724936hndatypyj",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1755013723284-647656177.jpg",
+      "position": 0,
+      "selected": true,
+      "category": [
+        "Theater"
+      ],
+      "alt": "Image Theater",
+      "titre": "Sommet isolé",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        1
+      ],
+      "crop": {
+        "x": 15.300000000000004,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": null,
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
+      },
+      "created_at": "2025-08-12T15:48:44.936Z",
+      "updated_at": "2025-08-12T15:53:00.092Z"
+    },
+    {
+      "id": "1755013740738ze163h3pf",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1755013740230-944583023.jpeg",
+      "position": 0,
+      "selected": true,
+      "category": [
+        "Theater"
+      ],
+      "alt": "Image Theater",
+      "titre": "Mur de chine",
+      "sousTitre": "",
+      "dimension": [
+        1,
+        1
+      ],
+      "crop": {
+        "x": 15.100000000000001,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": null,
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
+      },
+      "created_at": "2025-08-12T15:49:00.738Z",
+      "updated_at": "2025-08-12T15:51:47.949Z"
+    },
+    {
+      "id": "1755013822281dqcvzxhnl",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1755013820961-744366278.webp",
+      "position": 0,
+      "selected": true,
+      "category": [
+        "Theater"
+      ],
+      "alt": "Image Theater",
+      "titre": "Vallée de Guilin",
+      "sousTitre": "",
+      "dimension": [
+        2,
+        1
+      ],
+      "crop": {
+        "x": 54.4,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": null,
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
+      },
+      "created_at": "2025-08-12T15:50:22.281Z",
+      "updated_at": "2025-08-12T15:52:08.822Z"
+    },
+    {
+      "id": "1755013837191ymt3s2sx0",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1755013836068-38141522.jpeg",
+      "position": 0,
+      "selected": true,
+      "category": [
+        "Theater"
+      ],
+      "alt": "Image Theater",
+      "titre": "Titre Theater",
       "sousTitre": "",
       "dimension": [
         1,
@@ -827,40 +834,125 @@
         "y": 0,
         "size": 100
       },
+      "cropData": null,
       "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
       },
-      "created_at": "2025-07-24T15:51:09.771Z",
-      "updated_at": "2025-08-02T16:31:00.450Z"
+      "created_at": "2025-08-12T15:50:37.191Z",
+      "updated_at": "2025-08-12T15:52:14.228Z"
     },
     {
-      "id": "17533724754730fbmx3tlm",
-      "projet": "3",
-      "image_url": "https://dev2site.net:4001/uploads/3/1753372475336-199244731.jpg",
-      "position": 0,
+      "id": "1755017698969kkspndigl",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1755017698149-281896591.jpeg",
+      "position": 1,
       "selected": false,
       "category": [
-        "Event"
+        "Spectacle"
       ],
-      "alt": "Image Event",
+      "alt": "Image Spectacle",
+      "titre": "Titre Spectacle",
+      "sousTitre": "",
+      "dimension": [
+        2,
+        1
+      ],
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 1920,
+        "originalHeight": 950,
+        "cropX": 10,
+        "cropY": 0,
+        "cropWidth": 1900,
+        "cropHeight": 950,
+        "aspectRatio": 2
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
+      },
+      "created_at": "2025-08-12T16:54:58.969Z",
+      "updated_at": "2025-08-12T19:37:37.368Z"
+    },
+    {
+      "id": "175501772446949i8oi4g7",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1755017723363-559793926.jpg",
+      "position": 2,
+      "selected": true,
+      "category": [
+        "Spectacle",
+        "Voiture"
+      ],
+      "alt": "Image Spectacle",
       "titre": "coucou",
       "sousTitre": "",
       "dimension": [
         1,
+        2
+      ],
+      "crop": {
+        "x": 9.00939368061486,
+        "y": 0,
+        "size": 100
+      },
+      "cropData": {
+        "originalWidth": 1171,
+        "originalHeight": 1920,
+        "cropX": 0,
+        "cropY": 667.25,
+        "cropWidth": 1171,
+        "cropHeight": 585.5,
+        "aspectRatio": 2
+      },
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
+      },
+      "created_at": "2025-08-12T16:55:24.469Z",
+      "updated_at": "2025-08-12T19:38:57.151Z"
+    },
+    {
+      "id": "1755017737159um7v7llec",
+      "projet": "4",
+      "image_url": "https://dev2site.net:4001/uploads/4/1755017736039-504930887.jpg",
+      "position": 3,
+      "selected": false,
+      "category": [
+        "Spectacle"
+      ],
+      "alt": "Image Theater",
+      "titre": "Titre Theater",
+      "sousTitre": "",
+      "dimension": [
+        2,
         1
       ],
       "crop": {
         "x": 0,
-        "y": 0,
+        "y": 10.28257087780338,
         "size": 100
       },
-      "displayDimensions": {
-        "cropWidthPercent": 100,
-        "cropHeightPercent": 100
+      "cropData": {
+        "originalWidth": 1500,
+        "originalHeight": 997,
+        "cropX": 0,
+        "cropY": 123.5,
+        "cropWidth": 1500,
+        "cropHeight": 750,
+        "aspectRatio": 2
       },
-      "created_at": "2025-07-24T15:54:35.473Z",
-      "updated_at": "2025-08-02T16:31:01.330Z"
+      "displayDimensions": {
+        "cropWidthPercent": 50,
+        "cropHeightPercent": 50
+      },
+      "created_at": "2025-08-12T16:55:37.159Z",
+      "updated_at": "2025-08-12T19:37:58.904Z"
     }
   ]
 }
