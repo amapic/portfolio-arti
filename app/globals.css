@@ -14,8 +14,16 @@
 @tailwind utilities;
 
 /* Force la barre de défilement pour éviter le hochement lors des transitions */
+/* Et assure que html/body prennent toujours 100% de la largeur */
 html {
   overflow-y: scroll;
+  width: 100%;
+  min-width: 100%;
+}
+
+body {
+  width: 100%;
+  min-width: 100%;
 }
 
 /* Ajoutez une transition douce pour les changements de thème */

@@ -13,7 +13,7 @@ interface ApiCategory {
 
 interface GalleryItem {
   id: string;
-  categories: string | string[];
+  category: string; // Une seule catégorie maintenant
   imageUrl: string;
   alt: string;
   titre: string;
@@ -38,16 +38,60 @@ interface GalleryItem {
     aspectRatio: number;
   };
   isForcedSquare?: boolean;
+  // Nouvelles positions de tri
+  positions: {
+    all: number; // Position dans le classement "Tous"
+    categoryLarge: number; // Position dans la catégorie pour les grandes tailles (>768px)
+    categoryMedium: number; // Position dans la catégorie pour les tailles intermédiaires (481-768px)
+    categorySmall: number; // Position dans la catégorie pour les petites tailles (≤480px)
+  };
+  /*
+    Exemple de structure API attendue :
+    {
+      "id": "image-1",
+      "category": "photo", // Une seule catégorie maintenant
+      "image_url": "...",
+      "positions": {
+        "all": 1,           // 1ère position dans "Tous"
+        "categoryLarge": 3, // 3ème position dans "photo" sur desktop
+        "categoryMedium": 2,// 2ème position dans "photo" sur tablette  
+        "categorySmall": 5  // 5ème position dans "photo" sur mobile
+      }
+    }
+  */
 }
 
 const TestIsotopePage: React.FC = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [itemsVisible, setItemsVisible] = useState<boolean[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
+
+  // Fonction pour trier les images selon la catégorie et la taille d'écran
+  const sortItems = (items: GalleryItem[], filterCategory: string = "*") => {
+    const screenWidth = window.innerWidth;
+    let positionKey: keyof GalleryItem['positions'];
+    
+    // Déterminer quelle position utiliser selon la taille d'écran
+    if (screenWidth <= 480) {
+      positionKey = 'categorySmall';
+    } else if (screenWidth <= 768) {
+      positionKey = 'categoryMedium';
+    } else {
+      positionKey = 'categoryLarge';
+    }
+    
+    // Si c'est "Tous", utiliser la position "all"
+    if (filterCategory === "*") {
+      positionKey = 'all';
+    }
+    
+    return [...items].sort((a, b) => {
+      return a.positions[positionKey] - b.positions[positionKey];
+    });
+  };
 
   // Charger les données depuis l'API
   useEffect(() => {
@@ -79,7 +123,7 @@ const TestIsotopePage: React.FC = () => {
           // Convertir les données API en format pour la galerie
           const items: GalleryItem[] = selectedImages.map((meta: any) => ({
             id: meta.id,
-            categories: meta.category,
+            category: Array.isArray(meta.category) ? meta.category[0] : meta.category, // Une seule catégorie
             imageUrl: meta.image_url,
             alt: meta.alt,
             titre: meta.titre || "",
@@ -89,12 +133,17 @@ const TestIsotopePage: React.FC = () => {
             displayDimensions: meta.displayDimensions,
             cropData: meta.cropData,
             isForcedSquare: meta.isForcedSquare,
+            // Positions de tri (valeurs par défaut si pas encore définies dans l'API)
+            positions: {
+              all: meta.positions?.all || 0,
+              categoryLarge: meta.positions?.categoryLarge || 0,
+              categoryMedium: meta.positions?.categoryMedium || 0,
+              categorySmall: meta.positions?.categorySmall || 0,
+            },
           }));
 
-          setGalleryItems(items);
-          
-          // Initialiser le tableau de visibilité
-          setItemsVisible(new Array(items.length).fill(false));
+          const sortedItems = sortItems(items);
+          setGalleryItems(sortedItems);
         }
       } catch (error) {
         console.error("Erreur de chargement des données:", error);
@@ -107,37 +156,63 @@ const TestIsotopePage: React.FC = () => {
   }, [API_URL, PROJECT_ID]);
 
   // Animation progressive des images après le chargement
-  useEffect(() => {
-    if (!loading && galleryItems.length > 0) {
-      // Petit délai avant de commencer l'animation
-      setTimeout(() => {
-        // Faire apparaître les images progressivement
-        galleryItems.forEach((_, index) => {
-          setTimeout(() => {
-            setItemsVisible(prev => {
-              const newVisible = [...prev];
-              newVisible[index] = true;
-              return newVisible;
-            });
-          }, index * 150); // Délai de 150ms entre chaque image
-        });
-      }, 200); // Délai initial de 200ms
-    }
-  }, [loading, galleryItems]);
+  
 
   // Initialiser Isotope après le chargement
   useEffect(() => {
     if (!loading && galleryItems.length > 0) {
-      const initIsotope = () => {
+      // Fonction pour attendre que toutes les images soient chargées
+      const waitForImages = () => {
+        return new Promise<void>((resolve) => {
+          const images = document.querySelectorAll('.grid-item .item-content');
+          let loadedCount = 0;
+          const totalImages = images.length;
+
+          if (totalImages === 0) {
+            resolve();
+            return;
+          }
+
+          const checkComplete = () => {
+            loadedCount++;
+            if (loadedCount >= totalImages) {
+              resolve();
+            }
+          };
+
+          images.forEach((element) => {
+            const bgImage = window.getComputedStyle(element).backgroundImage;
+            if (bgImage && bgImage !== 'none') {
+              const imageUrl = bgImage.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+              const img = new Image();
+              img.onload = checkComplete;
+              img.onerror = checkComplete; // Même en cas d'erreur, on continue
+              img.src = imageUrl;
+            } else {
+              checkComplete(); // Pas d'image de fond
+            }
+          });
+        });
+      };
+
+      const initIsotope = async () => {
+        // Attendre que toutes les images soient chargées
+        await waitForImages();
+        
         const $ = (window as any).$;
         if ($ && typeof $.fn.isotope === "function") {
           console.log("🎨 Initialisation d'Isotope avec les données API");
 
+          // Détecter la taille d'écran pour choisir le bon layout
+          const screenWidth = window.innerWidth;
+          const layoutMode = screenWidth <= 768 ? "fitRows" : "masonry";
+
           const $grid = $(".grid").isotope({
             itemSelector: ".grid-item",
-            layoutMode: "masonry",
+            layoutMode: layoutMode,
             percentPosition: true,
             transitionDuration: 400,
+            stagger:100,
             hiddenStyle: {
               opacity: 0
             },
@@ -147,6 +222,9 @@ const TestIsotopePage: React.FC = () => {
             masonry: {
               columnWidth: ".grid-sizer",
               gutter: 0,
+            },
+            fitRows: {
+              gutter: 0
             },
           });
 
@@ -173,16 +251,29 @@ const TestIsotopePage: React.FC = () => {
           $(window)
             .off("resize.isotope")
             .on("resize.isotope", function () {
+              console.log("coucou")
+              // Changer le layout selon la taille d'écran
+              const screenWidth = window.innerWidth;
+              const newLayoutMode = screenWidth <= 768 ? "fitRows" : "masonry";
+              
+              // Re-trier les éléments selon la nouvelle taille d'écran
+              const currentFilter = $(".filter-btn.active").attr("data-filter") || "*";
+              const resortedItems = sortItems(galleryItems, currentFilter);
+              setGalleryItems(resortedItems);
+              
+              $grid.isotope({
+                layoutMode: newLayoutMode
+              });
+              
               $grid.isotope("layout");
             });
         }
       };
 
-      // Attendre que les éléments soient rendus et que l'animation soit terminée
-      const totalAnimationTime = 200 + (galleryItems.length * 150) + 600; // délai initial + animations + transition
-      setTimeout(initIsotope, totalAnimationTime);
+      // Lancer l'initialisation dès que possible
+      initIsotope();
     }
-  }, [loading, galleryItems]);
+  }, [loading]);
 
   // Obtenir les classes CSS pour les dimensions
   const getDimensionClass = (dimension: [number, number]) => {
@@ -266,25 +357,7 @@ const TestIsotopePage: React.FC = () => {
   };
 
   // Obtenir la classe de catégorie pour les couleurs
-  const getCategoryColorClass = (category: string | string[]) => {
-    const cat = Array.isArray(category) ? category[0] : category;
-    switch (cat.toLowerCase()) {
-      case "theater":
-      case "théâtre":
-        return "design";
-      case "dance":
-      case "danse":
-        return "photo";
-      case "opera":
-      case "opéra":
-        return "web";
-      case "circus":
-      case "cirque":
-        return "art";
-      default:
-        return "design";
-    }
-  };
+  
 
   // if (loading) {
   //   return (
@@ -364,13 +437,14 @@ const TestIsotopePage: React.FC = () => {
           background: rgba(255, 255, 255, 0.2);
           border: 2px solid rgba(255, 255, 255, 0.3);
           color: black;
-          padding: 10px 0px;
+          padding: 10px 8px;
           margin: 5px;
           /* border-radius: 25px; */
           cursor: pointer;
           /* transition: all 0.3s ease; */
           /* font-weight: bold; */
-          width: 100px;
+          min-width: 80px;
+          flex: 1;
         }
 
         .filter-btn:hover,
@@ -385,7 +459,7 @@ const TestIsotopePage: React.FC = () => {
         .grid {
           margin: 0 auto;
           max-width: 1200px;
-          padding: 0 10px;
+          padding: 0;
           /* max-width: 100%; */
         }
 
@@ -395,9 +469,9 @@ const TestIsotopePage: React.FC = () => {
         }
 
         .grid-item {
-          width: calc(33.33% - 10px);
-          margin-bottom: 10px;
-          padding-right: 10px;
+          width: 33.33%;
+          margin: 0;
+          padding: 5px;
           /* border-radius: 15px; */
           overflow: hidden;
           /* Retirer transition qui conflit avec Isotope */
@@ -407,15 +481,6 @@ const TestIsotopePage: React.FC = () => {
           height: calc(33.33vw - 10px);
           max-height: 350px;
           box-sizing: border-box;
-          /* Animation progressive */
-          opacity: 0;
-          /* transform: translateY(40px) scale(0.9) rotateX(15deg); */
-          /* transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); */
-        }
-
-        .grid-item.visible {
-          opacity: 1;
-          /* transform: translateY(0) scale(1) rotateX(0deg); */
         }
 
         /* Animation avec délai pour les éléments de largeur double */
@@ -424,18 +489,10 @@ const TestIsotopePage: React.FC = () => {
           /* transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); */
         }
 
-        .grid-item--width4.visible {
-          /* transform: translateY(0) scale(1) rotateY(0deg); */
-        }
-
         /* Animation pour les éléments de hauteur double */
         .grid-item--height2 {
           /* transform: translateX(-30px) scale(0.9) rotateZ(5deg); */
           /* transition: all 0.9s cubic-bezier(0.4, 0, 0.2, 1); */
-        }
-
-        .grid-item--height2.visible {
-          /* transform: translateX(0) scale(1) rotateZ(0deg); */
         }
 
         .grid-item > .item-content {
@@ -454,20 +511,20 @@ const TestIsotopePage: React.FC = () => {
         /* Taille 2x1 (largeur double) - largeur = 2 x hauteur */
         .grid-item--width4 {
           /* width: 66.66%;* */
-          width: calc(66.66% - 14px);
+          width: 66.66%;
           height: calc(33.33vw - 10px);
           max-height: 350px;
         }
 
         /* Taille 1x2 (hauteur double) - hauteur = 2 x largeur */
         .grid-item--height2 {
-          width: calc(33.33% - 7px);
+          width: 33.33%;
           height: calc((33.33vw - 10px) * 2 + 10px);
           max-height: 710px;
         }
 
         .item-content {
-          padding: 20px;
+          /* padding: 20px; */
           height: 100%;
           display: flex;
           flex-direction: column;
@@ -589,15 +646,16 @@ const TestIsotopePage: React.FC = () => {
           } */
 
         @media (max-width: 768px) {
-          /* .grid{
-            padding-left:10px
-          } */
+          .grid{
+            width: calc(100% - 10px);
+          }
           .grid-sizer,
           .grid-item {
-            width: calc(50% - 20px);
-            height: calc(50vw - 20px);
+            width: 50%;
+            height: calc(50vw - 10px);
             max-height: 300px;
-            padding-right: 10px;
+            margin: 0;
+            padding: 5px;
           }
 
           .grid-item--width4 {
@@ -608,7 +666,6 @@ const TestIsotopePage: React.FC = () => {
 
           .grid-item--height2 {
             width: 50%;
-            width: calc(50% - 20px);
             
             height: calc((50vw - 10px) * 2 + 10px);
             max-height: 610px;
@@ -618,22 +675,23 @@ const TestIsotopePage: React.FC = () => {
         @media (max-width: 480px) {
           .grid-sizer,
           .grid-item {
-            width: calc(100% - 20px);
-            height: calc(100vw - 20px);
+            width: 100%;
+            height: calc(100vw - 10px);
             /* max-height: 240px; */
-            padding: 0 0px;
+            margin: 0;
+            padding: 5px;
             /* margin-right: 5%; */
           }
 
           .grid-item--width4 {
-            width: calc(100% - 20px);
-            height: calc(50vw - 20px);
+            width: 100%;
+            height: calc(50vw - 10px);
             /* max-height: 200px; */
           }
 
           .grid-item--height2 {
-            width: calc(100% - 20px);
-            height: calc(200vw - 20px);
+            width: 100%;
+            height: calc(200vw - 10px);
             /* width: 95%;
             height: calc(190vw / 2); */
             /* max-height: 400px; */
@@ -643,18 +701,64 @@ const TestIsotopePage: React.FC = () => {
             padding: 15px;
           }
 
+          .filter-btn {
+            min-width: 60px;
+            padding: 8px 4px;
+            margin: 3px;
+            font-size: 14px;
+          }
+
           h1 {
             font-size: 2em;
           }
         }
+
+        @media (max-width: 360px) {
+          .container {
+            padding: 10px;
+          }
+
+          .grid {
+            margin: 0;
+          }
+
+          .grid-sizer,
+          .grid-item {
+            width: 100%;
+            height: calc(100vw - 20px);
+            margin: 0;
+            padding: 5px;
+          }
+
+          .grid-item--width4 {
+            width: 100%;
+            height: calc(50vw - 20px);
+          }
+
+          .grid-item--height2 {
+            width: 100%;
+            height: calc(200vw - 20px);
+          }
+
+          .filter-btn {
+            min-width: 50px;
+            padding: 6px 4px;
+            margin: 2px;
+            font-size: 13px;
+          }
+
+          h1 {
+            font-size: 1.8em;
+          }
+        }
       `}</style>
 
-      <div className="min-h-screen bg-white font-serif p-0 m-0">
+      <div className="min-h-screen bg-white font-serif p-0 m-0 w-full">
         {/* <h1>🎨 Portfolio avec API</h1> */}
         <PortfolioHeader />
         {!loading && ( <>
         <div
-          className="filters justify-center gap-6 lg:gap-12 pt-12 bg-transparent mx-auto"
+          className="filters justify-center gap-4 lg:gap-12 pt-12 bg-transparent mx-auto"
           style={{
             maxWidth: "1152px",
           }}
@@ -682,25 +786,22 @@ const TestIsotopePage: React.FC = () => {
          
 
          
-        <div className="grid">
+        <div className="grid xl:w-[1200px]">
           {/* Élément invisible pour définir la largeur de base */}
           <div className="grid-sizer"></div>
 
           {/* Rendu des images depuis l'API */}
           {galleryItems.map((item, index) => {
-            const categoryClasses = Array.isArray(item.categories)
-              ? item.categories.map((cat) => `category-${cat}`).join(" ")
-              : `category-${item.categories}`;
+            const categoryClasses = `category-${item.category}`;
 
             const dimensionClass = getDimensionClass(item.dimension || [1, 1]);
-            const colorClass = getCategoryColorClass(item.categories);
+            // const colorClass = getCategoryColorClass(item.category);
             const cropStyle = getImageCropStyle(item);
-            const isVisible = itemsVisible[index];
 
             return (
               <div
                 key={item.id}
-                className={`grid-item ${categoryClasses} ${dimensionClass} ${isVisible ? 'visible' : ''}`}
+                className={`grid-item ${categoryClasses} ${dimensionClass}`}
               >
                 <div className={`item-content`} style={cropStyle}>
                   <div className="item-overlay">
