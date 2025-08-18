@@ -72,22 +72,22 @@ const TestIsotopePage: React.FC = () => {
   // Fonction pour trier les images selon la catégorie et la taille d'écran
   const sortItems = (items: GalleryItem[], filterCategory: string = "*") => {
     const screenWidth = window.innerWidth;
-    let positionKey: keyof GalleryItem['positions'];
-    
+    let positionKey: keyof GalleryItem["positions"];
+
     // Déterminer quelle position utiliser selon la taille d'écran
     if (screenWidth <= 480) {
-      positionKey = 'categorySmall';
-    } else if (screenWidth <= 768) {
+      positionKey = "categorySmall";
+      } else if (screenWidth <= 768) {
       positionKey = 'categoryMedium';
     } else {
-      positionKey = 'categoryLarge';
+      positionKey = "categoryLarge";
     }
-    
+
     // Si c'est "Tous", utiliser la position "all"
     if (filterCategory === "*") {
-      positionKey = 'all';
+      positionKey = "all";
     }
-    
+
     return [...items].sort((a, b) => {
       return a.positions[positionKey] - b.positions[positionKey];
     });
@@ -123,7 +123,9 @@ const TestIsotopePage: React.FC = () => {
           // Convertir les données API en format pour la galerie
           const items: GalleryItem[] = selectedImages.map((meta: any) => ({
             id: meta.id,
-            category: Array.isArray(meta.category) ? meta.category[0] : meta.category, // Une seule catégorie
+            category: Array.isArray(meta.category)
+              ? meta.category[0]
+              : meta.category, // Une seule catégorie
             imageUrl: meta.image_url,
             alt: meta.alt,
             titre: meta.titre || "",
@@ -156,7 +158,6 @@ const TestIsotopePage: React.FC = () => {
   }, [API_URL, PROJECT_ID]);
 
   // Animation progressive des images après le chargement
-  
 
   // Initialiser Isotope après le chargement
   useEffect(() => {
@@ -164,7 +165,7 @@ const TestIsotopePage: React.FC = () => {
       // Fonction pour attendre que toutes les images soient chargées
       const waitForImages = () => {
         return new Promise<void>((resolve) => {
-          const images = document.querySelectorAll('.grid-item .item-content');
+          const images = document.querySelectorAll(".grid-item .item-content");
           let loadedCount = 0;
           const totalImages = images.length;
 
@@ -182,8 +183,8 @@ const TestIsotopePage: React.FC = () => {
 
           images.forEach((element) => {
             const bgImage = window.getComputedStyle(element).backgroundImage;
-            if (bgImage && bgImage !== 'none') {
-              const imageUrl = bgImage.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+            if (bgImage && bgImage !== "none") {
+              const imageUrl = bgImage.replace(/url\(['"]?(.*?)['"]?\)/i, "$1");
               const img = new Image();
               img.onload = checkComplete;
               img.onerror = checkComplete; // Même en cas d'erreur, on continue
@@ -198,40 +199,45 @@ const TestIsotopePage: React.FC = () => {
       const initIsotope = async () => {
         // Attendre que toutes les images soient chargées
         await waitForImages();
-        
+
         const $ = (window as any).$;
         if ($ && typeof $.fn.isotope === "function") {
           console.log("🎨 Initialisation d'Isotope avec les données API");
 
           // Détecter la taille d'écran pour choisir le bon layout
           const screenWidth = window.innerWidth;
-          const layoutMode = screenWidth <= 768 ? "fitRows" : "masonry";
+          const layoutMode = screenWidth <= 768 ? "packery" : "packery";
 
           const $grid = $(".grid").isotope({
             itemSelector: ".grid-item",
             layoutMode: layoutMode,
             percentPosition: true,
             transitionDuration: 400,
-            stagger:100,
+            stagger: 100,
             hiddenStyle: {
-              opacity: 0
+              opacity: 0,
             },
             visibleStyle: {
-              opacity: 1
+              opacity: 1,
             },
-            masonry: {
+            // masonry: {
+            //   columnWidth: ".grid-sizer",
+            //   gutter: 0,
+            // },
+            packery:{
               columnWidth: ".grid-sizer",
-              gutter: 0,
-            },
-            fitRows: {
               gutter: 0
-            },
+            }
+            // fitRows: {
+            //   gutter: 0,
+            // },
           });
 
           // Gestion des filtres
           $(".filter-btn")
             .off("click")
             .on("click", function () {
+              // alert(window.innerWidth)
               const filterValue = $(this).attr("data-filter");
 
               // Mise à jour des boutons actifs
@@ -240,7 +246,7 @@ const TestIsotopePage: React.FC = () => {
 
               // Application du filtre avec layout forcé
               $grid.isotope({ filter: filterValue });
-              
+
               // Forcer un re-layout après un court délai pour éviter le micro-repositionnement
               setTimeout(() => {
                 $grid.isotope("layout");
@@ -251,20 +257,31 @@ const TestIsotopePage: React.FC = () => {
           $(window)
             .off("resize.isotope")
             .on("resize.isotope", function () {
-              console.log("coucou")
+              console.log("coucou");
               // Changer le layout selon la taille d'écran
               const screenWidth = window.innerWidth;
-              const newLayoutMode = screenWidth <= 768 ? "fitRows" : "masonry";
-              
+              const newLayoutMode = screenWidth <= 768 ? "packery" : "packery";
+
               // Re-trier les éléments selon la nouvelle taille d'écran
-              const currentFilter = $(".filter-btn.active").attr("data-filter") || "*";
+              const currentFilter =
+                $(".filter-btn.active").attr("data-filter") || "*";
               const resortedItems = sortItems(galleryItems, currentFilter);
               setGalleryItems(resortedItems);
-              
+
               $grid.isotope({
-                layoutMode: newLayoutMode
+                layoutMode: newLayoutMode,
+                // masonry: {
+                //   columnWidth: ".grid-sizer",
+                //   gutter: 0,
+                // },
+                packery: {
+                  columnWidth: ".grid-sizer",
+                  // gutter: 10,
+                },
+                // itemSelector: '.mini-item',
+                percentPosition: true
               });
-              
+
               $grid.isotope("layout");
             });
         }
@@ -357,7 +374,6 @@ const TestIsotopePage: React.FC = () => {
   };
 
   // Obtenir la classe de catégorie pour les couleurs
-  
 
   // if (loading) {
   //   return (
@@ -380,14 +396,18 @@ const TestIsotopePage: React.FC = () => {
   return (
     <>
       {/* Chargement de jQuery et Isotope */}
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" />
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" />
-
+      {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" /> */}
+      {/* <Script src="https://raw.githubusercontent.com/metafizzy/isotope-packery/master/packery-mode.pkgd.min.js" /> */}
+      {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" /> */}
+      <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js" />
+      <Script src="https://npmcdn.com/isotope-layout@3/dist/isotope.pkgd.js" />
+      <Script src="https://npmcdn.com/isotope-packery@2/packery-mode.pkgd.js" />
+      {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" /> */}
       {/* CSS exactement comme dans ton HTML */}
       <style jsx global>{`
         /* Import font and text-shadow from PortfolioHeader */
         .hover\\:text-shadow:hover {
-          text-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 1px 0 #fff;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 1px 0 #fff;
         }
         @font-face {
           font-family: "ExposureTrial";
@@ -443,7 +463,7 @@ const TestIsotopePage: React.FC = () => {
           cursor: pointer;
           /* transition: all 0.3s ease; */
           /* font-weight: bold; */
-          min-width: 80px;
+          /* min-width: 80px; */
           flex: 1;
         }
 
@@ -479,7 +499,7 @@ const TestIsotopePage: React.FC = () => {
           cursor: pointer;
           position: relative;
           height: calc(33.33vw - 10px);
-          max-height: 350px;
+          /* max-height: 350px; */
           box-sizing: border-box;
         }
 
@@ -496,7 +516,7 @@ const TestIsotopePage: React.FC = () => {
         }
 
         .grid-item > .item-content {
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); */
           /* border-radius: 15px; */
           overflow: hidden;
           /* Transition uniquement pour les propriétés hover */
@@ -505,7 +525,7 @@ const TestIsotopePage: React.FC = () => {
 
         .grid-item:hover > .item-content {
           /* transform: translateY(-2px); */
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+          /* box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);  */
         }
 
         /* Taille 2x1 (largeur double) - largeur = 2 x hauteur */
@@ -513,14 +533,14 @@ const TestIsotopePage: React.FC = () => {
           /* width: 66.66%;* */
           width: 66.66%;
           height: calc(33.33vw - 10px);
-          max-height: 350px;
+          /* max-height: 350px; */
         }
 
         /* Taille 1x2 (hauteur double) - hauteur = 2 x largeur */
         .grid-item--height2 {
           width: 33.33%;
-          height: calc((33.33vw - 10px) * 2 + 10px);
-          max-height: 710px;
+          height: calc((33.33vw - 10px) * 2);
+          /* max-height: 710px; */
         }
 
         .item-content {
@@ -553,14 +573,15 @@ const TestIsotopePage: React.FC = () => {
           /* transition: opacity 0.3s ease; */
           pointer-events: none;
         }
-        
+
         /* Hover effect sur les éléments de la grille */
         .grid-item:hover .item-overlay {
           opacity: 1;
         }
 
         /* Animation pour le texte qui apparaît progressivement */
-        .item-title, .item-desc {
+        .item-title,
+        .item-desc {
           /* transform: translateY(20px); */
           opacity: 0;
           /* transition: all 0.4s ease; */
@@ -653,7 +674,7 @@ const TestIsotopePage: React.FC = () => {
           .grid-item {
             width: 50%;
             height: calc(50vw - 10px);
-            max-height: 300px;
+            /* max-height: 300px; */
             margin: 0;
             padding: 5px;
           }
@@ -661,14 +682,14 @@ const TestIsotopePage: React.FC = () => {
           .grid-item--width4 {
             width: 100%;
             height: calc(50vw - 10px);
-            max-height: 300px;
+            /* max-height: 300px; */
           }
 
           .grid-item--height2 {
             width: 50%;
             
             height: calc((50vw - 10px) * 2 + 10px);
-            max-height: 610px;
+            /* max-height: 610px; */
           }
         }
 
@@ -702,10 +723,12 @@ const TestIsotopePage: React.FC = () => {
           }
 
           .filter-btn {
-            min-width: 60px;
-            padding: 8px 4px;
+            /* min-width: 60px; */
+            padding: 8px 1px;
             margin: 3px;
             font-size: 14px;
+            text-align:center;
+            display: inline-block;
           }
 
           h1 {
@@ -741,7 +764,7 @@ const TestIsotopePage: React.FC = () => {
           }
 
           .filter-btn {
-            min-width: 50px;
+            /* min-width: 50px; */
             padding: 6px 4px;
             margin: 2px;
             font-size: 13px;
@@ -756,93 +779,91 @@ const TestIsotopePage: React.FC = () => {
       <div className="min-h-screen bg-white font-serif p-0 m-0 w-full">
         {/* <h1>🎨 Portfolio avec API</h1> */}
         <PortfolioHeader />
-        {!loading && ( <>
-        <div
-          className="filters justify-center gap-4 lg:gap-12 pt-12 bg-transparent mx-auto"
-          style={{
-            maxWidth: "1152px",
-          }}
-        >
-          <button 
-            className="filter-btn  active bg-none border-none text-sm lg:text-xl font-light text-black cursor-pointer py-1 tracking-wide relative text-center w-[50px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow" 
-            data-filter="*"
-            style={{ fontFamily: "ExposureTrial, serif" }}
-          >
-            Tous
-          </button>
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              className="filter-btn  bg-none border-none text-sm lg:text-xl  text-black cursor-pointer py-1 tracking-wide relative text-center w-[50px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
-              data-filter={`.category-${category.value}`}
-              style={{ fontFamily: "ExposureTrial, serif" }}
+        {!loading && (
+          <>
+            <div
+              className="filters justify-center gap-4 lg:gap-12 pt-12 bg-transparent mx-auto sm:max-w-[100%] md:max-w-[1152px]"
+              style={{
+                // maxWidth: "1152px",
+              }}
             >
-              {category.label}
-            </button>
-          ))}
-        </div>
-
-       
-         
-
-         
-        <div className="grid xl:w-[1200px]">
-          {/* Élément invisible pour définir la largeur de base */}
-          <div className="grid-sizer"></div>
-
-          {/* Rendu des images depuis l'API */}
-          {galleryItems.map((item, index) => {
-            const categoryClasses = `category-${item.category}`;
-
-            const dimensionClass = getDimensionClass(item.dimension || [1, 1]);
-            // const colorClass = getCategoryColorClass(item.category);
-            const cropStyle = getImageCropStyle(item);
-
-            return (
-              <div
-                key={item.id}
-                className={`grid-item ${categoryClasses} ${dimensionClass}`}
+              <button
+                className="filter-btn  active bg-none border-none text-sm lg:text-xl font-light text-black cursor-pointer py-0 md:py-1 tracking-wide relative text-center w-[30px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
+                data-filter="*"
+                style={{ fontFamily: "ExposureTrial, serif" }}
               >
-                <div className={`item-content`} style={cropStyle}>
-                  <div className="item-overlay">
-                    {/* <div className="item-category">
+                Tous
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  className="filter-btn  bg-none border-none text-sm lg:text-xl  text-black cursor-pointer py-0 md:py-1 tracking-wide relative text-center w-[30px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
+                  data-filter={`.category-${category.value}`}
+                  style={{ fontFamily: "ExposureTrial, serif" }}
+                >
+                  {category.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid xl:w-[1200px]">
+              {/* Élément invisible pour définir la largeur de base */}
+              <div className="grid-sizer"></div>
+
+              {/* Rendu des images depuis l'API */}
+              {galleryItems.map((item, index) => {
+                const categoryClasses = `category-${item.category}`;
+
+                const dimensionClass = getDimensionClass(
+                  item.dimension || [1, 1]
+                );
+                // const colorClass = getCategoryColorClass(item.category);
+                const cropStyle = getImageCropStyle(item);
+
+                return (
+                  <div
+                    key={item.id}
+                    className={`grid-item ${categoryClasses} ${dimensionClass}`}
+                  >
+                    <div className={`item-content`} style={cropStyle}>
+                      <div className="item-overlay">
+                        {/* <div className="item-category">
                       {Array.isArray(item.categories)
                         ? item.categories[0]
                         : item.categories}
                     </div> */}
-                    <div
-                      className={`item-title ${
-                        item.isForcedSquare ? "text-red-400" : ""
-                      }`}
-                    >
-                      {item.titre}
+                        <div
+                          className={`item-title ${
+                            item.isForcedSquare ? "text-red-400" : ""
+                          }`}
+                        >
+                          {item.titre}
+                        </div>
+                        {item.sousTitre && (
+                          <div
+                            className={`item-desc ${
+                              item.isForcedSquare ? "text-red-300" : ""
+                            }`}
+                          >
+                            {item.sousTitre}
+                          </div>
+                        )}
+                        {item.isForcedSquare && (
+                          <div className="item-forced-indicator">
+                            <span className="text-red-500 text-xs font-bold bg-white bg-opacity-20 px-2 py-1 rounded">
+                              Forcé 1x1
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    {item.sousTitre && (
-                      <div
-                        className={`item-desc ${
-                          item.isForcedSquare ? "text-red-300" : ""
-                        }`}
-                      >
-                        {item.sousTitre}
-                      </div>
-                    )}
-                    {item.isForcedSquare && (
-                      <div className="item-forced-indicator">
-                        <span className="text-red-500 text-xs font-bold bg-white bg-opacity-20 px-2 py-1 rounded">
-                          Forcé 1x1
-                        </span>
-                      </div>
-                    )}
                   </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        </>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
-        
     </>
   );
 };
