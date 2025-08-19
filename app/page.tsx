@@ -14,6 +14,7 @@ interface ApiCategory {
 interface GalleryItem {
   id: string;
   category: string; // Une seule catégorie maintenant
+  categories: string[]; // Toutes les catégories pour le filtrage
   imageUrl: string;
   alt: string;
   titre: string;
@@ -125,7 +126,10 @@ const TestIsotopePage: React.FC = () => {
             id: meta.id,
             category: Array.isArray(meta.category)
               ? meta.category[0]
-              : meta.category, // Une seule catégorie
+              : meta.category, // Une seule catégorie (première)
+            categories: Array.isArray(meta.category)
+              ? meta.category
+              : [meta.category], // Toutes les catégories pour le filtrage
             imageUrl: meta.image_url,
             alt: meta.alt,
             titre: meta.titre || "",
@@ -233,13 +237,23 @@ const TestIsotopePage: React.FC = () => {
             // },
           });
 
+          // Fonction pour enlever les accents
+          const removeAccents = (str: string) => {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          };
+
           // Gestion des filtres
           $(".filter-btn")
             .off("click")
             .on("click", function () {
               // alert(window.innerWidth)
-              const filterValue = $(this).attr("data-filter");
-
+              let filterValue = $(this).attr("data-filter");
+              
+              // Enlever les accents potentiels dans filterValue
+              if (filterValue && filterValue !== "*") {
+                filterValue = removeAccents(filterValue);
+              }
+              // alert(filterValue)
               // Mise à jour des boutons actifs
               $(".filter-btn").removeClass("active");
               $(this).addClass("active");
@@ -257,7 +271,7 @@ const TestIsotopePage: React.FC = () => {
           $(window)
             .off("resize.isotope")
             .on("resize.isotope", function () {
-              console.log("coucou");
+              // console.log("coucou");
               // Changer le layout selon la taille d'écran
               const screenWidth = window.innerWidth;
               const newLayoutMode = screenWidth <= 768 ? "packery" : "packery";
@@ -499,18 +513,21 @@ const TestIsotopePage: React.FC = () => {
           cursor: pointer;
           position: relative;
           height: calc(33.33vw - 10px);
+          max-height: calc(400px - 10px);
           /* max-height: 350px; */
           box-sizing: border-box;
         }
 
         /* Animation avec délai pour les éléments de largeur double */
         .grid-item--width4 {
+          max-height: calc(400px - 10px);
           /* transform: translateY(50px) scale(0.85) rotateY(10deg); */
           /* transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); */
         }
 
         /* Animation pour les éléments de hauteur double */
         .grid-item--height2 {
+          max-height: calc(800px - 20px);
           /* transform: translateX(-30px) scale(0.9) rotateZ(5deg); */
           /* transition: all 0.9s cubic-bezier(0.4, 0, 0.2, 1); */
         }
@@ -812,7 +829,10 @@ const TestIsotopePage: React.FC = () => {
 
               {/* Rendu des images depuis l'API */}
               {galleryItems.map((item, index) => {
-                const categoryClasses = `category-${item.category}`;
+                // Générer les classes pour toutes les catégories
+                const categoryClasses = item.categories
+                  .map(cat => `category-${cat}`)
+                  .join(' ');
 
                 const dimensionClass = getDimensionClass(
                   item.dimension || [1, 1]

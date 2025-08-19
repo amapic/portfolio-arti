@@ -74,6 +74,9 @@ export default function RootLayout({
             `,
           }}
         />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="icon" type="image/x-icon" href="/sgd.png?v=3" />
       </head>
       <body>
         <ThemeProvider>

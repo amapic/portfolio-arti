@@ -33,7 +33,7 @@ const PortfolioFooter: React.FC<PortfolioFooterProps> = ({ aboutData }) => {
           
           {/* Liens à droite */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span>Design :</span>
+            {/* <span>Design :</span>
             <a 
               href={currentFooterData.designUrl}
               target="_blank"
@@ -41,7 +41,7 @@ const PortfolioFooter: React.FC<PortfolioFooterProps> = ({ aboutData }) => {
               className="text-gray-800 hover:text-black transition-colors underline decoration-1 underline-offset-2"
             >
               {currentFooterData.designBy}
-            </a>
+            </a> */}
             
             <span className="mx-2 text-gray-400">|</span>
             

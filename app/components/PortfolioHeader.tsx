@@ -35,7 +35,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
       {showNavigation && (
         <nav className="flex items-center justify-center gap-4">
            <a 
-            href="/romain" 
+            href="/" 
             className="w-[100px] text-md lg:text-lg text-black no-underline font-[400]  tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"
             style={{ fontFamily: "ExposureTrial, serif" }}
           >
