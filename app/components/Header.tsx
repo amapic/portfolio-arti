@@ -3,11 +3,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { CategoryNavigation } from './CategoryNavigation';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
+import { useAuth } from './AuthProvider';
 
 export const Header = () => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith('/admin');
+  const { logout, user } = useAuth();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 shadow-md">
@@ -68,7 +70,24 @@ export const Header = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          {/* Espace réservé pour d'autres éléments d'interface si nécessaire */}
+          {/* Informations utilisateur et déconnexion pour les pages admin */}
+          {isAdminPage && user && (
+            <>
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                user.role === 'admin' 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-orange-100 text-orange-800'
+              }`}>
+                {user.role === 'admin' ? 'Administrateur' : 'Viewer (Lecture seule)'}
+              </span>
+              <button
+                onClick={logout}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              >
+                Déconnexion
+              </button>
+            </>
+          )}
         </div>
       </div>
       

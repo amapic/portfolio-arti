@@ -1,15 +1,21 @@
 import { useState } from 'react';
-import { HiOutlineLockClosed } from 'react-icons/hi2';
+import { HiOutlineLockClosed, HiOutlineUser } from 'react-icons/hi2';
+
+interface User {
+  username: string;
+  role: 'admin' | 'viewer';
+}
 
 interface LoginModalProps {
   onClose: () => void;
-  onLogin: (success: boolean) => void;
+  onLogin: (success: boolean, userData?: User) => void;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL_LOGIN;
 const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
 
 export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
+  const [userType, setUserType] = useState<'admin' | 'viewer'>('admin');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,17 +32,23 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
           'Content-Type': 'application/json',
         },
         // credentials: 'include',
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username: userType, password }),
       });
-      // console.log(`${API_URL}:4010/login`);
+
       if (!response.ok) {
-        throw new Error('Mot de passe incorrect');
+        throw new Error('Identifiants incorrects');
       }
 
-      onLogin(true);
+      const data = await response.json();
+      const userData: User = {
+        username: data.user.username,
+        role: data.user.role
+      };
+
+      onLogin(true, userData);
       onClose();
     } catch (error) {
-      setError('Mot de passe incorrect');
+      setError('Identifiants incorrects');
       setPassword('');
     } finally {
       setIsLoading(false);
@@ -52,6 +64,30 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Type de compte
+            </label>
+            <div className="relative">
+              <select
+                value={userType}
+                onChange={(e) => setUserType(e.target.value as 'admin' | 'viewer')}
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg 
+                  bg-black text-white border-gray-300
+                  focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                  ${error ? 'border-red-500' : 'border-gray-300'}`}
+                required
+              >
+                <option value="admin">Administrateur</option>
+                <option value="viewer">Viewer (Lecture seule)</option>
+              </select>
+              <HiOutlineUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Mot de passe
+            </label>
             <div className="relative">
               <input
                 type="password"
@@ -63,7 +99,6 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
                   ${error ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="Mot de passe"
                 required
-                autoFocus
               />
               <HiOutlineLockClosed className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             </div>

@@ -35,7 +35,7 @@ const ContactPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Chargement...</div>
+        <div className="text-gray-600">Chargement...</div>
       </div>
     );
   }
@@ -43,7 +43,7 @@ const ContactPage: React.FC = () => {
   if (!contactData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Données de contact non trouvées</div>
+        <div className="text-gray-600">Données de contact non trouvées</div>
       </div>
     );
   }
@@ -57,7 +57,7 @@ const ContactPage: React.FC = () => {
       />
 
       {/* Contenu principal */}
-      <section className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Image à gauche */}
           <div className="order-2 lg:order-1">

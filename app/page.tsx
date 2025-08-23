@@ -212,30 +212,78 @@ const TestIsotopePage: React.FC = () => {
           const screenWidth = window.innerWidth;
           const layoutMode = screenWidth <= 768 ? "packery" : "packery";
 
-          const $grid = $(".grid").isotope({
+          // Créer un objet avec toutes les options Isotope pour la réutilisation
+          const isotopeOptions = {
             itemSelector: ".grid-item",
             layoutMode: layoutMode,
             percentPosition: true,
             transitionDuration: 400,
-            stagger: 100,
+            stagger: 30, // Décalage plus court entre les animations de chaque élément
             hiddenStyle: {
               opacity: 0,
+              transform: 'scale(0.95)'
             },
             visibleStyle: {
               opacity: 1,
+              transform: 'scale(1)'
             },
-            // masonry: {
-            //   columnWidth: ".grid-sizer",
-            //   gutter: 0,
-            // },
             packery:{
               columnWidth: ".grid-sizer",
               gutter: 0
+            },
+            // Configuration du tri par position
+            getSortData: {
+              position: function(itemElem: Element) {
+                const id = $(itemElem).attr('data-id');
+                const item = galleryItems.find(item => item.id === id);
+                // Déterminer quelle position utiliser selon la taille d'écran
+                const screenWidth = window.innerWidth;
+                let positionKey: keyof GalleryItem["positions"] = "all";
+                
+                if (screenWidth <= 480) {
+                  positionKey = "categorySmall";
+                } else if (screenWidth <= 768) {
+                  positionKey = "categoryMedium";
+                } else {
+                  positionKey = "categoryLarge";
+                }
+                
+                return item ? item.positions[positionKey] : 0;
+              }
+            },
+            sortBy: 'position',
+            sortAscending: true,
+            initLayout: false // Désactiver le layout initial pour contrôler l'apparition des éléments
+          };
+          
+          // Masquer la grille avant l'initialisation
+          $(".grid").css({ opacity: 0 });
+          
+          // Initialiser Isotope avec toutes les options, mais sans layout initial
+          const $grid = $(".grid").isotope(isotopeOptions);
+          
+          // Lier l'événement arrangeComplete pour afficher les éléments seulement quand tout est bien positionné
+          $grid.isotope('on', 'arrangeComplete', function(filteredItems: Element[]) {
+            console.log('Arrangement terminé, affichage des éléments');
+            // Afficher la grille une fois que le layout est terminé
+            $(".grid").animate({ opacity: 1 }, 300);
+            
+            // Si nous sommes en train de filtrer, chaque élément visible aura sa propre animation
+            if ($(".grid").hasClass("filtering") || $(".grid").hasClass("resizing")) {
+              // Les animations individuelles sont gérées par Isotope via hiddenStyle et visibleStyle
             }
-            // fitRows: {
-            //   gutter: 0,
-            // },
           });
+          
+          // Déclencher manuellement le layout initial
+          $grid.isotope();
+          
+          // Cliquer sur le premier bouton de filtre actif pour s'assurer que le filtrage initial est correct
+          setTimeout(() => {
+            const $activeFilterBtn = $(".filter-btn.active");
+            if ($activeFilterBtn.length > 0) {
+              $activeFilterBtn.trigger("click");
+            }
+          }, 100);
 
           // Fonction pour enlever les accents
           const removeAccents = (str: string) => {
@@ -243,60 +291,136 @@ const TestIsotopePage: React.FC = () => {
           };
 
           // Gestion des filtres
+          // Variable pour stocker le filtre précédent
+          let previousFilter = "*";
+          
           $(".filter-btn")
             .off("click")
-            .on("click", function () {
-              // alert(window.innerWidth)
-              let filterValue = $(this).attr("data-filter");
+            .on("click", function (this: HTMLElement) {
+              // Obtenir la nouvelle valeur de filtre
+              let newFilterValue = $(this).attr("data-filter");
               
               // Enlever les accents potentiels dans filterValue
-              if (filterValue && filterValue !== "*") {
-                filterValue = removeAccents(filterValue);
+              if (newFilterValue && newFilterValue !== "*") {
+                newFilterValue = removeAccents(newFilterValue);
               }
-              // alert(filterValue)
+              
               // Mise à jour des boutons actifs
               $(".filter-btn").removeClass("active");
               $(this).addClass("active");
 
-              // Application du filtre avec layout forcé
-              $grid.isotope({ filter: filterValue });
-
-              // Forcer un re-layout après un court délai pour éviter le micro-repositionnement
+              // Ajouter une classe pour indiquer que le filtrage est en cours
+              $(".grid").addClass("filtering");
+              
+              // Obtenir tous les éléments de la grille
+              const $items = $grid.isotope('getItemElements');
+              
+              // Déterminer quels éléments doivent être cachés et lesquels doivent être affichés
+              const toHide: Element[] = [];
+              const toShow: Element[] = [];
+              
+              console.log("Previous filter:", previousFilter);
+              console.log("New filter:", newFilterValue);
+              
+              $items.forEach((item: Element) => {
+                const $item = $(item);
+                
+                // Vérifier si l'élément correspond aux filtres en utilisant la méthode matches() du DOM
+                const matchesPrevious = previousFilter === "*" || 
+                  (previousFilter !== "*" && item.matches(previousFilter));
+                
+                const matchesNew = newFilterValue === "*" || 
+                  (newFilterValue !== "*" && item.matches(newFilterValue));
+                
+                // Les éléments qui ne correspondent plus au nouveau filtre doivent être cachés
+                if (matchesPrevious && !matchesNew) {
+                  toHide.push(item);
+                }
+                // Les éléments qui n'étaient pas visibles avant mais qui correspondent maintenant doivent être montrés
+                else if (!matchesPrevious && matchesNew) {
+                  toShow.push(item);
+                }
+              });
+              
+              console.log(`Hiding ${toHide.length} items, showing ${toShow.length} items`);
+              
+              // D'abord cacher les éléments qui ne correspondent plus
+              if (toHide.length > 0) {
+                $grid.isotope('hideItemElements', toHide);
+              }
+              
+              // Ensuite montrer les nouveaux éléments correspondants
+              if (toShow.length > 0) {
+                setTimeout(() => {
+                  $grid.isotope('revealItemElements', toShow);
+                }, 50); // Petit délai pour laisser les éléments cachés disparaître d'abord
+              }
+              
+              // Mettre à jour le tri après avoir modifié les éléments visibles
+              $grid.isotope({
+                sortBy: 'position',
+                sortAscending: true
+              });
+              
+              // Stocker le filtre actuel pour la prochaine fois
+              previousFilter = newFilterValue;
+              
+              // Retirer la classe de filtrage une fois terminé
               setTimeout(() => {
-                $grid.isotope("layout");
-              }, 450); // Légèrement après la fin de la transition (400ms)
+                $(".grid").removeClass("filtering");
+              }, 500); // Après la fin de la transition + délai staggered
             });
 
           // Réorganisation lors du redimensionnement
           $(window)
             .off("resize.isotope")
-            .on("resize.isotope", function () {
+            .on("resize.isotope", function (this: Window) {
               // console.log("coucou");
               // Changer le layout selon la taille d'écran
               const screenWidth = window.innerWidth;
               const newLayoutMode = screenWidth <= 768 ? "packery" : "packery";
 
-              // Re-trier les éléments selon la nouvelle taille d'écran
+              // Réappliquer le filtre et le tri avec les bonnes options selon la taille d'écran
               const currentFilter =
                 $(".filter-btn.active").attr("data-filter") || "*";
-              const resortedItems = sortItems(galleryItems, currentFilter);
-              setGalleryItems(resortedItems);
-
+              
+              // Ajouter une classe pour indiquer que le redimensionnement est en cours
+              $(".grid").addClass("resizing");
+              
+              // Mise à jour du tri pour refléter la nouvelle taille d'écran
               $grid.isotope({
                 layoutMode: newLayoutMode,
+                // Force Isotope à recalculer les positions selon la nouvelle taille d'écran
+                sortBy: 'position', 
+                sortAscending: true,
+                filter: currentFilter,
+                // S'assurer que les animations individuelles sont utilisées
+                hiddenStyle: {
+                  opacity: 0,
+                  transform: 'scale(0.95)'
+                },
+                visibleStyle: {
+                  opacity: 1,
+                  transform: 'scale(1)'
+                },
                 // masonry: {
                 //   columnWidth: ".grid-sizer",
                 //   gutter: 0,
                 // },
                 packery: {
                   columnWidth: ".grid-sizer",
-                  // gutter: 10,
+                  gutter: 0,
                 },
                 // itemSelector: '.mini-item',
                 percentPosition: true
               });
 
               $grid.isotope("layout");
+              
+              // Retirer la classe de redimensionnement une fois terminé
+              setTimeout(() => {
+                $(".grid").removeClass("resizing");
+              }, 500);
             });
         }
       };
@@ -441,6 +565,40 @@ const TestIsotopePage: React.FC = () => {
           /* padding: 20px; */
           /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
           min-height: 100vh;
+        }
+        
+        /* Style pour les éléments pendant le filtrage et le redimensionnement */
+        .grid-item {
+          transition: opacity 0.4s ease, transform 0.4s ease;
+          will-change: transform, opacity;
+        }
+        
+        /* Styles pour les éléments cachés et révélés */
+        .isotope-item {
+          z-index: 2;
+        }
+        
+        .isotope-hidden {
+          z-index: 1;
+          pointer-events: none;
+        }
+        
+        /* Animation pour les éléments qui disparaissent */
+        .isotope-item.isotope-hiding {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        
+        /* Animation pour les éléments qui apparaissent */
+        .isotope-item.isotope-revealing {
+          opacity: 1;
+          transform: scale(1);
+        }
+        
+        /* Effet de fondu pour chaque élément individuel */
+        .filtering .grid-item:not(.isotope-hidden),
+        .resizing .grid-item:not(.isotope-hidden) {
+          z-index: 2;
         }
 
         /* .container {
@@ -823,7 +981,7 @@ const TestIsotopePage: React.FC = () => {
               ))}
             </div>
 
-            <div className="grid xl:w-[1200px]">
+            <div className="grid xl:w-[1200px]" style={{ opacity: 0 }}>
               {/* Élément invisible pour définir la largeur de base */}
               <div className="grid-sizer"></div>
 
@@ -843,6 +1001,7 @@ const TestIsotopePage: React.FC = () => {
                 return (
                   <div
                     key={item.id}
+                    data-id={item.id}
                     className={`grid-item ${categoryClasses} ${dimensionClass}`}
                   >
                     <div className={`item-content`} style={cropStyle}>

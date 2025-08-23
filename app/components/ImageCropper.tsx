@@ -14,6 +14,7 @@ interface ImageCropperProps {
   initialCrop?: CropArea;
   onCropChange: (crop: CropArea) => void;
   onDimensionChange?: (dimension: [number, number]) => void;
+  readOnly?: boolean;
 }
 
 const ImageCropper: React.FC<ImageCropperProps> = ({
@@ -21,7 +22,8 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   dimension,
   initialCrop,
   onCropChange,
-  onDimensionChange
+  onDimensionChange,
+  readOnly = false
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -174,6 +176,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   ];
 
   const handleDimensionChange = (newDimension: [number, number]) => {
+    if (readOnly) return;
     if (onDimensionChange) {
       onDimensionChange(newDimension);
     }
@@ -272,8 +275,9 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
             {dimensions.map((dim) => (
               <button
                 key={`${dim.value[0]}x${dim.value[1]}`}
-                onClick={() => handleDimensionChange(dim.value)}
-                className={`p-2 text-sm border rounded-md transition-colors ${
+                onClick={() => readOnly ? undefined : handleDimensionChange(dim.value)}
+                disabled={readOnly}
+                className={`p-2 text-sm border rounded-md transition-colors ${readOnly ? 'opacity-50 cursor-not-allowed' : ''} ${
                   dimension[0] === dim.value[0] && dimension[1] === dim.value[1]
                     ? 'bg-blue-100 border-blue-500 text-blue-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -292,8 +296,9 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
               min="10"
               max="100"
               value={cropSize}
-              onChange={(e) => handleSizeChange(Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+              onChange={readOnly ? undefined : (e) => handleSizeChange(Number(e.target.value))}
+              disabled={readOnly}
+              className={`flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`}
               style={{
                 background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${cropSize}%, #e5e7eb ${cropSize}%, #e5e7eb 100%)`
               }}
@@ -336,15 +341,16 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
         
         {/* Cadre de recadrage */}
         <div
-          className="absolute border-2 border-blue-500 bg-transparent cursor-move"
+          className="absolute border-2 border-blue-500 bg-transparent"
           style={{
             left: `${cropArea.x}%`,
             top: `${cropArea.y}%`,
             width: `${displayDimensions.cropWidthPercent}%`,
             height: `${displayDimensions.cropHeightPercent}%`,
-            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
+            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+            cursor: readOnly ? 'not-allowed' : 'move'
           }}
-          onMouseDown={handleMouseDown}
+          onMouseDown={readOnly ? undefined : handleMouseDown}
         >
           <div className="absolute inset-0 border border-white border-opacity-50" />
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs bg-blue-500 px-2 py-1 rounded">

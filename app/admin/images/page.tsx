@@ -57,7 +57,7 @@ import ImageCropper from "../../components/ImageCropper";
 const ImagesAdmin: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, user, hasWriteAccess } = useAuth();
 
   const [images, setImages] = useState<ImageMeta[]>([]);
   const [filteredImages, setFilteredImages] = useState<ImageMeta[]>([]);
@@ -85,6 +85,15 @@ const ImagesAdmin: React.FC = () => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
+
+  // Fonction pour afficher l'erreur de permissions pour les viewers
+  const showViewerError = () => {
+    setNotification({
+      message: "Modification impossible en mode viewer",
+      type: "error"
+    });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   const dimensions = [
     { label: "1x1 (Carré)", value: [1, 1] },
@@ -208,6 +217,11 @@ const ImagesAdmin: React.FC = () => {
   };
 
   const handleUpload = async () => {
+    if (!hasWriteAccess) {
+      showViewerError();
+      return;
+    }
+    
     if (!selectedFile) return;
 
     try {
@@ -344,6 +358,11 @@ const ImagesAdmin: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!hasWriteAccess) {
+      showViewerError();
+      return;
+    }
+    
     if (!confirm("Êtes-vous sûr de vouloir supprimer cette image ?")) return;
 
     try {
@@ -375,6 +394,11 @@ const ImagesAdmin: React.FC = () => {
   };
 
   const handleToggleVisibility = async (image: ImageMeta) => {
+    if (!hasWriteAccess) {
+      showViewerError();
+      return;
+    }
+    
     try {
       const updatedImage = { ...image, selected: !image.selected };
 
@@ -404,6 +428,11 @@ const ImagesAdmin: React.FC = () => {
   };
 
   const handleSaveEdit = async (updatedImage: ImageMeta) => {
+    if (!hasWriteAccess) {
+      showViewerError();
+      return;
+    }
+    
     try {
       const response = await fetch(
         `${API_URL}/api/images/${updatedImage.id}?projectId=${PROJECT_ID}`,
@@ -491,6 +520,11 @@ const ImagesAdmin: React.FC = () => {
   };
 
   const handleSaveCrop = async () => {
+    if (!hasWriteAccess) {
+      showViewerError();
+      return;
+    }
+    
     if (!croppingImage) return;
 
     try {
@@ -544,12 +578,6 @@ const ImagesAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Images
                 </h1>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Déconnexion
-                </button>
               </div>
               {/* Zone blanche pendant le chargement */}
               <div className="bg-white rounded-lg shadow-md p-6 min-h-96"></div>
@@ -580,12 +608,6 @@ const ImagesAdmin: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Images ({filteredImages.length})
               </h1>
-              <button
-                onClick={logout}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-              >
-                Déconnexion
-              </button>
             </div>
 
             {/* Section Upload */}
@@ -854,7 +876,7 @@ const ImagesAdmin: React.FC = () => {
                     />
                     <div className="absolute top-2 right-2 flex gap-1">
                       <button
-                        onClick={() => setCroppingImage(image)}
+                        onClick={() => hasWriteAccess ? setCroppingImage(image) : showViewerError()}
                         className="p-1 bg-purple-600 text-white rounded-full hover:bg-purple-700"
                         title="Recadrer"
                       >
@@ -1058,7 +1080,7 @@ const ImagesAdmin: React.FC = () => {
                     ) : (
                       <div className="relative">
                         <button
-                          onClick={() => setEditingImage(image)}
+                          onClick={() => hasWriteAccess ? setEditingImage(image) : showViewerError()}
                           className="absolute top-0 left-0 p-1 bg-blue-600 text-white rounded-full hover:bg-blue-700 z-10"
                           title="Modifier les métadonnées"
                         >
@@ -1112,12 +1134,18 @@ const ImagesAdmin: React.FC = () => {
                     initialCrop={croppingImage.crop}
                     onCropChange={handleCropChange}
                     onDimensionChange={handleDimensionChange}
+                    readOnly={!hasWriteAccess}
                   />
 
                   <div className="flex gap-2 mt-6 pt-4 border-t">
                     <button
-                      onClick={handleSaveCrop}
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      onClick={() => hasWriteAccess ? handleSaveCrop() : showViewerError()}
+                      className={`flex-1 px-4 py-2 rounded-md transition-colors ${
+                        hasWriteAccess 
+                          ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                      disabled={!hasWriteAccess}
                     >
                       Sauvegarder le recadrage
                     </button>

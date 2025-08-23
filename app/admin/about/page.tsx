@@ -9,7 +9,7 @@ import NoSSR from '../../components/NoSSR';
 import PortfolioFooter from '../../components/PortfolioFooter';
 
 const AboutAdmin: React.FC = () => {
-  const { logout } = useAuth();
+  const { logout, user, hasWriteAccess } = useAuth();
   
   const [textData, setTextData] = useState<TextData>({
     id: '',
@@ -46,10 +46,20 @@ const AboutAdmin: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
+
+  // Fonction pour afficher l'erreur de permissions pour les viewers
+  const showViewerError = () => {
+    setNotification({
+      message: "Modification impossible en mode viewer",
+      type: 'error'
+    });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   // Charger les données au montage
   useEffect(() => {
@@ -80,11 +90,11 @@ const AboutAdmin: React.FC = () => {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Veuillez sélectionner une image");
+      setNotification({ message: "Veuillez sélectionner une image", type: 'error' });
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert("L'image ne doit pas dépasser 5MB");
+      setNotification({ message: "L'image ne doit pas dépasser 5MB", type: 'error' });
       return;
     }
 
@@ -122,12 +132,17 @@ const AboutAdmin: React.FC = () => {
       return imageUrl;
     } catch (error) {
       console.error('Erreur upload image:', error);
-      alert('Erreur lors de l\'upload de l\'image');
+      setNotification({ message: 'Erreur lors de l\'upload de l\'image', type: 'error' });
       return null;
     }
   };
 
   const handleSave = async () => {
+    if (!hasWriteAccess) {
+      showViewerError();
+      return;
+    }
+    
     if (!textData || !originalTextData) return;
 
     try {
@@ -163,7 +178,7 @@ const AboutAdmin: React.FC = () => {
       // console.log(`${fieldsToSave.length} champ(s) modifié(s) sur ${allFields.length}:`, fieldsToSave.map(f => f.key));
 
       if (fieldsToSave.length === 0) {
-        alert('Aucune modification détectée.');
+        setNotification({ message: 'Aucune modification détectée.', type: 'error' });
         setSaving(false);
         return;
       }
@@ -197,13 +212,16 @@ const AboutAdmin: React.FC = () => {
         await loadTextData();
         setSelectedImageFile(null);
         setImagePreview('');
-        alert(`${fieldsToSave.length} modification(s) sauvegardée(s) avec succès !`);
+        setNotification({ message: `${fieldsToSave.length} modification(s) sauvegardée(s) avec succès !`, type: 'success' });
+        setTimeout(() => setNotification(null), 3000);
       } else {
-        alert('Certaines données n\'ont pas pu être sauvegardées. Vérifiez la console pour plus de détails.');
+        setNotification({ message: 'Certaines données n\'ont pas pu être sauvegardées. Vérifiez la console pour plus de détails.', type: 'error' });
+        setTimeout(() => setNotification(null), 3000);
       }
     } catch (error) {
       console.error('Erreur sauvegarde:', error);
-      alert('Erreur lors de la sauvegarde');
+      setNotification({ message: 'Erreur lors de la sauvegarde', type: 'error' });
+      setTimeout(() => setNotification(null), 3000);
     } finally {
       setSaving(false);
     }
@@ -221,12 +239,6 @@ const AboutAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - À propos
                 </h1>
-                {/* <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Déconnexion
-                </button> */}
               </div>
               {/* Zone blanche pendant le chargement */}
               <div className="bg-white rounded-lg shadow-md p-6 min-h-96">
@@ -251,12 +263,6 @@ const AboutAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - À propos
                 </h1>
-                {/* <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Déconnexion
-                </button> */}
               </div>
               {/* Message d'erreur */}
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -275,18 +281,22 @@ const AboutAdmin: React.FC = () => {
       <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
         <Header />
         
+        {notification && (
+          <div
+            className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white text-center font-semibold transition-all ${
+              notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            }`}
+          >
+            {notification.message}
+          </div>
+        )}
+        
         <AdminLayout>
           <div className="max-w-4xl mx-auto p-6">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - À Propos
               </h1>
-              {/* <button
-                onClick={logout}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-              >
-                Déconnexion
-              </button> */}
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
@@ -300,8 +310,11 @@ const AboutAdmin: React.FC = () => {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleImageSelect}
-                      className="w-full p-2 border border-gray-300 rounded-md file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer text-gray-700 placeholder:text-gray-400"
+                      onChange={hasWriteAccess ? handleImageSelect : undefined}
+                      disabled={!hasWriteAccess}
+                      className={`w-full p-2 border border-gray-300 rounded-md file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer text-gray-700 placeholder:text-gray-400 ${
+                        !hasWriteAccess ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     />
                     {!selectedImageFile && !textData.about.image_url && (
                       <p className="mt-2 text-sm text-gray-800 font-medium">Aucun fichier choisi</p>
@@ -328,8 +341,11 @@ const AboutAdmin: React.FC = () => {
                 <input
                   type="text"
                   value={textData.about.image_alt}
-                  onChange={(e) => setTextData(prev => ({ ...prev, about: { ...prev.about, image_alt: e.target.value } }))}
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  onChange={(e) => hasWriteAccess && setTextData(prev => ({ ...prev, about: { ...prev.about, image_alt: e.target.value } }))}
+                  disabled={!hasWriteAccess}
+                  className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                    !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
 
@@ -340,9 +356,12 @@ const AboutAdmin: React.FC = () => {
                 </label>
                 <textarea
                   value={textData.about.main_text}
-                  onChange={(e) => setTextData(prev => ({ ...prev, about: { ...prev.about, main_text: e.target.value } }))}
+                  onChange={(e) => hasWriteAccess && setTextData(prev => ({ ...prev, about: { ...prev.about, main_text: e.target.value } }))}
                   rows={8}
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  disabled={!hasWriteAccess}
+                  className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                    !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
 
@@ -353,9 +372,12 @@ const AboutAdmin: React.FC = () => {
                 </label>
                 <textarea
                   value={textData.about.quote}
-                  onChange={(e) => setTextData(prev => ({ ...prev, about: { ...prev.about, quote: e.target.value } }))}
+                  onChange={(e) => hasWriteAccess && setTextData(prev => ({ ...prev, about: { ...prev.about, quote: e.target.value } }))}
                   rows={3}
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  disabled={!hasWriteAccess}
+                  className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                    !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
 
@@ -367,8 +389,11 @@ const AboutAdmin: React.FC = () => {
                 <input
                   type="text"
                   value={textData.about.quote_author}
-                  onChange={(e) => setTextData(prev => ({ ...prev, about: { ...prev.about, quote_author: e.target.value } }))}
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                  onChange={(e) => hasWriteAccess && setTextData(prev => ({ ...prev, about: { ...prev.about, quote_author: e.target.value } }))}
+                  disabled={!hasWriteAccess}
+                  className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                    !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
                 />
               </div>
 
@@ -384,14 +409,17 @@ const AboutAdmin: React.FC = () => {
                     <input
                       type="url"
                       value={textData.about.links.instagram}
-                      onChange={(e) => setTextData(prev => ({
+                      onChange={(e) => hasWriteAccess && setTextData(prev => ({
                         ...prev,
                         about: {
                           ...prev.about,
                           links: { ...prev.about.links, instagram: e.target.value }
                         }
                       }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                      disabled={!hasWriteAccess}
+                      className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                        !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
 
@@ -402,14 +430,17 @@ const AboutAdmin: React.FC = () => {
                     <input
                       type="url"
                       value={textData.about.links.facebook}
-                      onChange={(e) => setTextData(prev => ({
+                      onChange={(e) => hasWriteAccess && setTextData(prev => ({
                         ...prev,
                         about: {
                           ...prev.about,
                           links: { ...prev.about.links, facebook: e.target.value }
                         }
                       }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                      disabled={!hasWriteAccess}
+                      className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                        !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
 
@@ -420,14 +451,17 @@ const AboutAdmin: React.FC = () => {
                     <input
                       type="url"
                       value={textData.about.links.linkedin}
-                      onChange={(e) => setTextData(prev => ({
+                      onChange={(e) => hasWriteAccess && setTextData(prev => ({
                         ...prev,
                         about: {
                           ...prev.about,
                           links: { ...prev.about.links, linkedin: e.target.value }
                         }
                       }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                      disabled={!hasWriteAccess}
+                      className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                        !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
 
@@ -438,14 +472,17 @@ const AboutAdmin: React.FC = () => {
                     <input
                       type="url"
                       value={textData.about.links.website1}
-                      onChange={(e) => setTextData(prev => ({
+                      onChange={(e) => hasWriteAccess && setTextData(prev => ({
                         ...prev,
                         about: {
                           ...prev.about,
                           links: { ...prev.about.links, website1: e.target.value }
                         }
                       }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                      disabled={!hasWriteAccess}
+                      className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                        !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
 
@@ -456,14 +493,17 @@ const AboutAdmin: React.FC = () => {
                     <input
                       type="url"
                       value={textData.about.links.website2}
-                      onChange={(e) => setTextData(prev => ({
+                      onChange={(e) => hasWriteAccess && setTextData(prev => ({
                         ...prev,
                         about: {
                           ...prev.about,
                           links: { ...prev.about.links, website2: e.target.value }
                         }
                       }))}
-                      className="w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium"
+                      disabled={!hasWriteAccess}
+                      className={`w-full p-2 border border-gray-300 rounded-md text-gray-700 font-medium ${
+                        !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
                 </div>
@@ -472,9 +512,13 @@ const AboutAdmin: React.FC = () => {
               {/* Bouton de sauvegarde */}
               <div className="flex justify-end pt-6 border-t">
                 <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => hasWriteAccess ? handleSave() : showViewerError()}
+                  disabled={saving || !hasWriteAccess}
+                  className={`px-6 py-2 rounded-md transition-colors ${
+                    hasWriteAccess 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
                 >
                   {saving ? 'Sauvegarde...' : 'Sauvegarder'}
                 </button>
