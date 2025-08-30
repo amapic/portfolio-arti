@@ -1,0 +1,154 @@
+/* Styles pour les transitions Barba.js */
+
+/* Conteneur principal Barba */
+[data-barba="wrapper"] {
+  position: relative;
+  overflow-x: hidden;
+}
+
+[data-barba="container"] {
+  position: relative;
+  will-change: transform, opacity;
+}
+
+/* Styles pour empêcher le débordement pendant les transitions */
+.barba-transition-active {
+  overflow: hidden;
+}
+
+/* Animation de loading entre les pages */
+.barba-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transform: translateX(-100%);
+  animation: barba-progress 0.8s ease-in-out forwards;
+  z-index: 9999;
+}
+
+@keyframes barba-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(-20%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Préparation des transitions pour les pages admin */
+.admin-page-enter {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.admin-page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.4s ease-out;
+}
+
+.admin-page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.admin-page-exit-active {
+  opacity: 0;
+  transform: translateY(-30px);
+  transition: all 0.3s ease-in;
+}
+
+/* Transitions spécifiques pour les différentes pages admin */
+[data-barba-namespace="admin-dashboard"] {
+  --transition-color: #3b82f6;
+}
+
+[data-barba-namespace="admin-images"] {
+  --transition-color: #6366f1;
+}
+
+[data-barba-namespace="admin-contact"] {
+  --transition-color: #8b5cf6;
+}
+
+[data-barba-namespace="admin-about"] {
+  --transition-color: #06d6a0;
+}
+
+/* Styles pour éviter les conflits avec les autres transitions CSS */
+.barba-transitioning * {
+  pointer-events: none;
+}
+
+/* Amélioration des performances pendant les transitions */
+.barba-transitioning [data-barba="container"] {
+  will-change: transform, opacity;
+}
+
+/* Style pour les liens actifs pendant la transition */
+.barba-link-active {
+  position: relative;
+}
+
+.barba-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--transition-color, #3b82f6);
+  animation: barba-link-pulse 0.6s ease-in-out;
+}
+
+@keyframes barba-link-pulse {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 100%;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+/* Responsive pour les transitions sur mobile */
+@media (max-width: 768px) {
+  .admin-page-enter,
+  .admin-page-exit-active {
+    transform: translateX(30px);
+  }
+  
+  .admin-page-enter-active,
+  .admin-page-exit {
+    transform: translateX(0);
+  }
+}
+
+/* Debug styles (à supprimer en production) */
+.barba-debug [data-barba="container"] {
+  outline: 2px dashed red;
+}
+
+.barba-debug [data-barba-namespace] {
+  position: relative;
+}
+
+.barba-debug [data-barba-namespace]::before {
+  content: attr(data-barba-namespace);
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: red;
+  color: white;
+  padding: 2px 8px;
+  font-size: 12px;
+  z-index: 1000;
+}

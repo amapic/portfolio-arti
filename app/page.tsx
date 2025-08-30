@@ -218,14 +218,11 @@ const TestIsotopePage: React.FC = () => {
             layoutMode: layoutMode,
             percentPosition: true,
             transitionDuration: 400,
-            stagger: 30, // Décalage plus court entre les animations de chaque élément
             hiddenStyle: {
-              opacity: 0,
-              transform: 'scale(0.95)'
+              opacity: 0
             },
             visibleStyle: {
-              opacity: 1,
-              transform: 'scale(1)'
+              opacity: 1
             },
             packery:{
               columnWidth: ".grid-sizer",
@@ -267,23 +264,10 @@ const TestIsotopePage: React.FC = () => {
             console.log('Arrangement terminé, affichage des éléments');
             // Afficher la grille une fois que le layout est terminé
             $(".grid").animate({ opacity: 1 }, 300);
-            
-            // Si nous sommes en train de filtrer, chaque élément visible aura sa propre animation
-            if ($(".grid").hasClass("filtering") || $(".grid").hasClass("resizing")) {
-              // Les animations individuelles sont gérées par Isotope via hiddenStyle et visibleStyle
-            }
           });
           
           // Déclencher manuellement le layout initial
           $grid.isotope();
-          
-          // Cliquer sur le premier bouton de filtre actif pour s'assurer que le filtrage initial est correct
-          setTimeout(() => {
-            const $activeFilterBtn = $(".filter-btn.active");
-            if ($activeFilterBtn.length > 0) {
-              $activeFilterBtn.trigger("click");
-            }
-          }, 100);
 
           // Fonction pour enlever les accents
           const removeAccents = (str: string) => {
@@ -291,84 +275,36 @@ const TestIsotopePage: React.FC = () => {
           };
 
           // Gestion des filtres
-          // Variable pour stocker le filtre précédent
-          let previousFilter = "*";
-          
           $(".filter-btn")
             .off("click")
             .on("click", function (this: HTMLElement) {
-              // Obtenir la nouvelle valeur de filtre
-              let newFilterValue = $(this).attr("data-filter");
+              // alert(window.innerWidth)
+              let filterValue = $(this).attr("data-filter");
               
               // Enlever les accents potentiels dans filterValue
-              if (newFilterValue && newFilterValue !== "*") {
-                newFilterValue = removeAccents(newFilterValue);
+              if (filterValue && filterValue !== "*") {
+                filterValue = removeAccents(filterValue);
               }
-              
+              // alert(filterValue)
               // Mise à jour des boutons actifs
               $(".filter-btn").removeClass("active");
               $(this).addClass("active");
 
-              // Ajouter une classe pour indiquer que le filtrage est en cours
-              $(".grid").addClass("filtering");
+              // Cacher complètement la grille pendant le filtrage
+              $(".grid").css({ opacity: 0 });
               
-              // Obtenir tous les éléments de la grille
-              const $items = $grid.isotope('getItemElements');
-              
-              // Déterminer quels éléments doivent être cachés et lesquels doivent être affichés
-              const toHide: Element[] = [];
-              const toShow: Element[] = [];
-              
-              console.log("Previous filter:", previousFilter);
-              console.log("New filter:", newFilterValue);
-              
-              $items.forEach((item: Element) => {
-                const $item = $(item);
-                
-                // Vérifier si l'élément correspond aux filtres en utilisant la méthode matches() du DOM
-                const matchesPrevious = previousFilter === "*" || 
-                  (previousFilter !== "*" && item.matches(previousFilter));
-                
-                const matchesNew = newFilterValue === "*" || 
-                  (newFilterValue !== "*" && item.matches(newFilterValue));
-                
-                // Les éléments qui ne correspondent plus au nouveau filtre doivent être cachés
-                if (matchesPrevious && !matchesNew) {
-                  toHide.push(item);
-                }
-                // Les éléments qui n'étaient pas visibles avant mais qui correspondent maintenant doivent être montrés
-                else if (!matchesPrevious && matchesNew) {
-                  toShow.push(item);
-                }
-              });
-              
-              console.log(`Hiding ${toHide.length} items, showing ${toShow.length} items`);
-              
-              // D'abord cacher les éléments qui ne correspondent plus
-              if (toHide.length > 0) {
-                $grid.isotope('hideItemElements', toHide);
-              }
-              
-              // Ensuite montrer les nouveaux éléments correspondants
-              if (toShow.length > 0) {
-                setTimeout(() => {
-                  $grid.isotope('revealItemElements', toShow);
-                }, 50); // Petit délai pour laisser les éléments cachés disparaître d'abord
-              }
-              
-              // Mettre à jour le tri après avoir modifié les éléments visibles
-              $grid.isotope({
-                sortBy: 'position',
-                sortAscending: true
-              });
-              
-              // Stocker le filtre actuel pour la prochaine fois
-              previousFilter = newFilterValue;
-              
-              // Retirer la classe de filtrage une fois terminé
+              // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
               setTimeout(() => {
-                $(".grid").removeClass("filtering");
-              }, 500); // Après la fin de la transition + délai staggered
+                // Application du filtre avec maintien du tri
+                $grid.isotope({ 
+                  filter: filterValue,
+                  percentPosition: true,
+                  transitionDuration: 400,
+                  // Conserver les options de tri lorsqu'on filtre
+                  sortBy: 'position',
+                  sortAscending: true
+                });
+              }, 300); // Délai correspondant à la durée de la transition CSS sur .grid
             });
 
           // Réorganisation lors du redimensionnement
@@ -384,25 +320,18 @@ const TestIsotopePage: React.FC = () => {
               const currentFilter =
                 $(".filter-btn.active").attr("data-filter") || "*";
               
-              // Ajouter une classe pour indiquer que le redimensionnement est en cours
-              $(".grid").addClass("resizing");
+              // Cacher complètement la grille pendant le redimensionnement
+              $(".grid").css({ opacity: 0 });
               
-              // Mise à jour du tri pour refléter la nouvelle taille d'écran
-              $grid.isotope({
+              // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
+              setTimeout(() => {
+                // Mise à jour du tri pour refléter la nouvelle taille d'écran
+                $grid.isotope({
                 layoutMode: newLayoutMode,
                 // Force Isotope à recalculer les positions selon la nouvelle taille d'écran
                 sortBy: 'position', 
                 sortAscending: true,
                 filter: currentFilter,
-                // S'assurer que les animations individuelles sont utilisées
-                hiddenStyle: {
-                  opacity: 0,
-                  transform: 'scale(0.95)'
-                },
-                visibleStyle: {
-                  opacity: 1,
-                  transform: 'scale(1)'
-                },
                 // masonry: {
                 //   columnWidth: ".grid-sizer",
                 //   gutter: 0,
@@ -416,11 +345,7 @@ const TestIsotopePage: React.FC = () => {
               });
 
               $grid.isotope("layout");
-              
-              // Retirer la classe de redimensionnement une fois terminé
-              setTimeout(() => {
-                $(".grid").removeClass("resizing");
-              }, 500);
+              }, 300); // Délai correspondant à la durée de la transition CSS sur .grid
             });
         }
       };
@@ -567,38 +492,13 @@ const TestIsotopePage: React.FC = () => {
           min-height: 100vh;
         }
         
-        /* Style pour les éléments pendant le filtrage et le redimensionnement */
+        /* Style pour les éléments - transition simplifiée */
+        .grid {
+          transition: opacity 0.3s ease;
+        }
+        
         .grid-item {
-          transition: opacity 0.4s ease, transform 0.4s ease;
-          will-change: transform, opacity;
-        }
-        
-        /* Styles pour les éléments cachés et révélés */
-        .isotope-item {
-          z-index: 2;
-        }
-        
-        .isotope-hidden {
-          z-index: 1;
-          pointer-events: none;
-        }
-        
-        /* Animation pour les éléments qui disparaissent */
-        .isotope-item.isotope-hiding {
-          opacity: 0;
-          transform: scale(0.95);
-        }
-        
-        /* Animation pour les éléments qui apparaissent */
-        .isotope-item.isotope-revealing {
-          opacity: 1;
-          transform: scale(1);
-        }
-        
-        /* Effet de fondu pour chaque élément individuel */
-        .filtering .grid-item:not(.isotope-hidden),
-        .resizing .grid-item:not(.isotope-hidden) {
-          z-index: 2;
+          will-change: transform;
         }
 
         /* .container {

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import BarbaWrapper from '../../components/BarbaWrapper';
+import BarbaLink from '../../components/BarbaLink';
 
 interface SeoData {
   title: string;
@@ -98,11 +100,17 @@ export default function SeoAdminPage() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <BarbaWrapper namespace="admin-seo"><div>Loading...</div></BarbaWrapper>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">SEO Administration</h1>
+    <BarbaWrapper namespace="admin-seo">
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">SEO Administration</h1>
+          <BarbaLink href="/admin" className="text-blue-600 hover:text-blue-800">
+            ← Retour au dashboard
+          </BarbaLink>
+        </div>
       
       {message && (
         <div className={`p-4 mb-6 rounded-lg ${
@@ -300,6 +308,7 @@ export default function SeoAdminPage() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </BarbaWrapper>
   );
 } 

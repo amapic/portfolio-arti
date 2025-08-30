@@ -53,6 +53,8 @@ interface Category {
 }
 import PortfolioFooter from "../../components/PortfolioFooter";
 import ImageCropper from "../../components/ImageCropper";
+import BarbaWrapper from "../../components/BarbaWrapper";
+import BarbaLink from "../../components/BarbaLink";
 
 const ImagesAdmin: React.FC = () => {
   const searchParams = useSearchParams();
@@ -591,7 +593,8 @@ const ImagesAdmin: React.FC = () => {
 
   return (
     <NoSSR>
-      <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
+      <BarbaWrapper namespace="admin-images">
+        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
         <Header />
         {notification && (
           <div
@@ -1162,7 +1165,8 @@ const ImagesAdmin: React.FC = () => {
           </div>
         </AdminLayout>
         <PortfolioFooter />
-      </div>
+        </div>
+      </BarbaWrapper>
     </NoSSR>
   );
 };

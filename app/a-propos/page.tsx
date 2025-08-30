@@ -1,13 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import PortfolioHeader from '../../components/PortfolioHeader';
-import PortfolioFooter from '../../components/PortfolioFooter';
-import { TextData } from '../../types/text';
-type PortfolioHeaderProps = {
-  title: string;
-  currentPage: string;
-};
+import PortfolioHeader from '../components/PortfolioHeader';
+import PortfolioFooter from '../components/PortfolioFooter';
+import { TextData } from '../types/text';
+
 const AboutPage: React.FC = () => {
   const [textData, setTextData] = useState<TextData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,13 +54,14 @@ const AboutPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white font-exposure">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <PortfolioHeader 
-        title="Romain de Lagarde"
-        currentPage="about"
+        title="Pierre Besson"
+        showNavigation={true}
       />
-      {/* Contenu principal */}}
+
+      {/* Contenu principal */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">

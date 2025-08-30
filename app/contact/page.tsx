@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import PortfolioHeader from '../../components/PortfolioHeader';
-import { TextData } from '../../types/text';
+import PortfolioHeader from '../components/PortfolioHeader';
+import { TextData } from '../types/text';
 
 const ContactPage: React.FC = () => {
   const [contactData, setContactData] = useState<TextData | null>(null);
