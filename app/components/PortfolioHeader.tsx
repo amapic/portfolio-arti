@@ -27,7 +27,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
         }
       `}</style>
       <h1
-        className="text-5xl font-[10] tracking-wide text-black m-0"
+        className="text-5xl font-[10] tracking-wide text-black m-0 sm:ml-4 md:ml-0"
         style={{ fontFamily: "ExposureTrial, serif" }}
       >
         {title}

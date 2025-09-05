@@ -89,7 +89,33 @@ const LegoGallery: React.FC = () => {
   // Initialiser Isotope après le chargement
   useEffect(() => {
     if (!loading && galleryItems.length > 0) {
-      const initIsotope = () => {
+      // Fonction pour attendre que les scripts soient complètement chargés
+      const waitForScripts = () => {
+        return new Promise<void>((resolve) => {
+          const checkScripts = () => {
+            const $ = (window as any).$;
+            if ($ && typeof $.fn === 'object' && typeof $.fn.isotope === 'function') {
+              // Double vérification que jQuery et Isotope sont vraiment prêts
+              try {
+                // Test d'une fonction basique jQuery pour s'assurer qu'elle fonctionne
+                $('<div>').remove();
+                resolve();
+              } catch (e) {
+                // jQuery n'est pas encore complètement initialisé, réessayer
+                setTimeout(checkScripts, 100);
+              }
+            } else {
+              setTimeout(checkScripts, 100); // Réessayer toutes les 100ms
+            }
+          };
+          checkScripts();
+        });
+      };
+
+      const initIsotope = async () => {
+        // Attendre que les scripts soient complètement chargés
+        await waitForScripts();
+        
         const $ = (window as any).$;
         if ($ && typeof $.fn.isotope === 'function') {
           console.log("🎨 Initialisation d'Isotope avec les données API");
@@ -123,8 +149,16 @@ const LegoGallery: React.FC = () => {
         }
       };
 
-      // Attendre que les éléments soient rendus
-      setTimeout(initIsotope, 300);
+      // Lancer l'initialisation avec gestion d'erreurs
+      initIsotope().catch((error) => {
+        console.error('Erreur lors de l\'initialisation d\'Isotope:', error);
+        // Réessayer une fois après un délai plus long
+        setTimeout(() => {
+          initIsotope().catch((retryError) => {
+            console.error('Échec définitif de l\'initialisation d\'Isotope:', retryError);
+          });
+        }, 2000);
+      });
     }
   }, [loading, galleryItems]);
 

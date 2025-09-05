@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
   },
   // Supprime les erreurs d'hydration en production
   reactStrictMode: false,
+  // Configuration pour les images externes Strapi
+  images: {
+    domains: ['46.101.250.41', 'dev2site.net'],
+    unoptimized: true, // Nécessaire pour output: 'export'
+  },
   // generateRobotsTxt: false,
   // generateManifest: false
 };

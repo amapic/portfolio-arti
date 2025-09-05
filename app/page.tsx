@@ -166,6 +166,29 @@ const TestIsotopePage: React.FC = () => {
   // Initialiser Isotope après le chargement
   useEffect(() => {
     if (!loading && galleryItems.length > 0) {
+      // Fonction pour attendre que les scripts soient complètement chargés
+      const waitForScripts = () => {
+        return new Promise<void>((resolve) => {
+          const checkScripts = () => {
+            const $ = (window as any).$;
+            if ($ && typeof $.fn === 'object' && typeof $.fn.isotope === 'function') {
+              // Double vérification que jQuery et Isotope sont vraiment prêts
+              try {
+                // Test d'une fonction basique jQuery pour s'assurer qu'elle fonctionne
+                $('<div>').remove();
+                resolve();
+              } catch (e) {
+                // jQuery n'est pas encore complètement initialisé, réessayer
+                setTimeout(checkScripts, 100);
+              }
+            } else {
+              setTimeout(checkScripts, 100); // Réessayer toutes les 100ms
+            }
+          };
+          checkScripts();
+        });
+      };
+
       // Fonction pour attendre que toutes les images soient chargées
       const waitForImages = () => {
         return new Promise<void>((resolve) => {
@@ -201,6 +224,9 @@ const TestIsotopePage: React.FC = () => {
       };
 
       const initIsotope = async () => {
+        // Attendre que les scripts soient complètement chargés
+        await waitForScripts();
+        
         // Attendre que toutes les images soient chargées
         await waitForImages();
 
@@ -291,11 +317,12 @@ const TestIsotopePage: React.FC = () => {
               $(this).addClass("active");
 
               // Cacher complètement la grille pendant le filtrage
-              $(".grid").css({ opacity: 0 });
+              // $(".grid").css({ opacity: 0 });
               
               // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
               setTimeout(() => {
                 // Application du filtre avec maintien du tri
+                
                 $grid.isotope({ 
                   filter: filterValue,
                   percentPosition: true,
@@ -350,8 +377,16 @@ const TestIsotopePage: React.FC = () => {
         }
       };
 
-      // Lancer l'initialisation dès que possible
-      initIsotope();
+      // Lancer l'initialisation avec gestion d'erreurs
+      initIsotope().catch((error) => {
+        console.error('Erreur lors de l\'initialisation d\'Isotope:', error);
+        // Réessayer une fois après un délai plus long
+        setTimeout(() => {
+          initIsotope().catch((retryError) => {
+            console.error('Échec définitif de l\'initialisation d\'Isotope:', retryError);
+          });
+        }, 2000);
+      });
     }
   }, [loading]);
 
@@ -388,8 +423,11 @@ const TestIsotopePage: React.FC = () => {
       // Calculer les pourcentages pour background-position et background-size
       const bgSizeX = (originalWidth / cropWidth) * 100;
       const bgSizeY = (originalHeight / cropHeight) * 100;
-      const bgPosX = (cropX / (originalWidth - cropWidth)) * 100;
-      const bgPosY = (cropY / (originalHeight - cropHeight)) * 100;
+      
+      // Cas spécial : si le crop couvre 100% de l'image dans une dimension,
+      // alors il n'y a pas besoin de repositionnement dans cette dimension
+      const bgPosX = (originalWidth === cropWidth) ? 50 : (cropX / (originalWidth - cropWidth)) * 100;
+      const bgPosY = (originalHeight === cropHeight) ? 50 : (cropY / (originalHeight - cropHeight)) * 100;
 
       return {
         backgroundImage: `url(${item.imageUrl})`,
@@ -636,7 +674,7 @@ const TestIsotopePage: React.FC = () => {
         .item-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.4);
+          // background: rgba(0, 0, 0, 0.4);
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -645,7 +683,7 @@ const TestIsotopePage: React.FC = () => {
           padding: 20px;
           /* Style de hover comme ImageComponent */
           opacity: 0;
-          /* transition: opacity 0.3s ease; */
+          transition: opacity 0.3s ease;
           pointer-events: none;
         }
 
@@ -667,14 +705,15 @@ const TestIsotopePage: React.FC = () => {
         .grid-item:hover .item-title {
           /* transform: translateY(0); */
           opacity: 1;
-          transition-delay: 0.1s;
+          transition: all 0.5s ease-out;
         }
 
         /* Animation du sous-titre au hover avec délai */
         .grid-item:hover .item-desc {
           /* transform: translateY(0); */
           opacity: 1;
-          transition-delay: 0.2s;
+          ease
+          transition: all 0.5s ease-out;
         }
 
         .design {

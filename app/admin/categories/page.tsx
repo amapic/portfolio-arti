@@ -6,8 +6,7 @@ import { Header } from '../../components/Header';
 import { useAuth } from '../../components/AuthProvider';
 import NoSSR from '../../components/NoSSR';
 import PortfolioFooter from '../../components/PortfolioFooter';
-import BarbaWrapper from '../../components/BarbaWrapper';
-import BarbaLink from '../../components/BarbaLink';
+import Link from 'next/link';
 
 interface Category {
   id: string;
@@ -199,7 +198,7 @@ const CategoriesAdmin: React.FC = () => {
 
   if (loading) {
     return (
-      <BarbaWrapper namespace="admin-categories">
+      <NoSSR>
         <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
           <Header />
           
@@ -209,9 +208,9 @@ const CategoriesAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Catégories
                 </h1>
-                <BarbaLink href="/admin" className="text-blue-600 hover:text-blue-800">
+                <Link href="/admin" className="text-blue-600 hover:text-blue-800">
                   ← Retour au dashboard
-                </BarbaLink>
+                </Link>
               </div>
               {/* Zone blanche pendant le chargement */}
               <div className="bg-white rounded-lg shadow-md p-6 min-h-96">
@@ -223,12 +222,12 @@ const CategoriesAdmin: React.FC = () => {
           </AdminLayout>
           <PortfolioFooter />
         </div>
-      </BarbaWrapper>
+      </NoSSR>
     );
   }
 
   return (
-    <BarbaWrapper namespace="admin-categories">
+    <NoSSR>
       <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
         <Header />
         
@@ -238,9 +237,9 @@ const CategoriesAdmin: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Catégories
               </h1>
-              <BarbaLink href="/admin" className="text-blue-600 hover:text-blue-800">
+              <Link href="/admin" className="text-blue-600 hover:text-blue-800">
                 ← Retour au dashboard
-              </BarbaLink>
+              </Link>
             </div>
 
             <div className="space-y-6">
@@ -316,7 +315,7 @@ const CategoriesAdmin: React.FC = () => {
         </AdminLayout>
         <PortfolioFooter />
       </div>
-    </BarbaWrapper>
+    </NoSSR>
   );
 };
 

@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { TextData } from '../../types/text';
-import BarbaWrapper from '../../components/BarbaWrapper';
-import BarbaLink from '../../components/BarbaLink';
+import Link from 'next/link';
 
 // Composant NoSSR pour éviter l'erreur d'hydratation
 const NoSSR: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -175,7 +174,7 @@ const TextAdmin: React.FC = () => {
   }
 
   return (
-    <BarbaWrapper namespace="admin-texts">
+    <div suppressHydrationWarning={true}>
       <div className="min-h-screen bg-gray-50 py-8">
         {notification && (
           <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white text-center font-semibold transition-all ${notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
@@ -186,9 +185,9 @@ const TextAdmin: React.FC = () => {
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h1 className="text-2xl font-bold text-gray-900">Administration - Textes (Contact & À propos)</h1>
-              <BarbaLink href="/admin" className="text-blue-600 hover:text-blue-800">
+              <Link href="/admin" className="text-blue-600 hover:text-blue-800">
                 ← Retour au dashboard
-              </BarbaLink>
+              </Link>
             </div>
 
             <div className="p-6 space-y-8">
@@ -520,7 +519,7 @@ const TextAdmin: React.FC = () => {
           </div>
         </div>
       </div>
-    </BarbaWrapper>
+    </div>
   );
 };
 

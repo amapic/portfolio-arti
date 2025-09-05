@@ -7,8 +7,7 @@ import { useAuth } from '../../components/AuthProvider';
 import AdminLayout from '../../components/AdminLayout';
 import NoSSR from '../../components/NoSSR';
 import PortfolioFooter from '../../components/PortfolioFooter';
-import BarbaWrapper from '../../components/BarbaWrapper';
-import BarbaLink from '../../components/BarbaLink';
+import Link from 'next/link';
 
 const AboutAdmin: React.FC = () => {
   const { logout, user, hasWriteAccess } = useAuth();
@@ -74,7 +73,7 @@ const AboutAdmin: React.FC = () => {
       const response = await fetch(`https://dev2site.net:4000/api/texts?projectId=${PROJECT_ID}`);
       if (response.ok) {
         const data: TextData = await response.json();
-        // console.log("get text", data);
+        console.log("Données about API 4000:", data);
         setTextData(data);
         setOriginalTextData(JSON.parse(JSON.stringify(data))); // Deep copy pour comparaison
       } else {
@@ -177,7 +176,7 @@ const AboutAdmin: React.FC = () => {
       // Filtrer uniquement les champs qui ont changé
       const fieldsToSave = allFields.filter(field => field.current !== field.original);
       
-      // console.log(`${fieldsToSave.length} champ(s) modifié(s) sur ${allFields.length}:`, fieldsToSave.map(f => f.key));
+      console.log(`${fieldsToSave.length} champ(s) modifié(s) sur ${allFields.length}:`, fieldsToSave.map(f => f.key));
 
       if (fieldsToSave.length === 0) {
         setNotification({ message: 'Aucune modification détectée.', type: 'error' });
@@ -215,15 +214,12 @@ const AboutAdmin: React.FC = () => {
         setSelectedImageFile(null);
         setImagePreview('');
         setNotification({ message: `${fieldsToSave.length} modification(s) sauvegardée(s) avec succès !`, type: 'success' });
-        setTimeout(() => setNotification(null), 3000);
       } else {
         setNotification({ message: 'Certaines données n\'ont pas pu être sauvegardées. Vérifiez la console pour plus de détails.', type: 'error' });
-        setTimeout(() => setNotification(null), 3000);
       }
     } catch (error) {
       console.error('Erreur sauvegarde:', error);
       setNotification({ message: 'Erreur lors de la sauvegarde', type: 'error' });
-      setTimeout(() => setNotification(null), 3000);
     } finally {
       setSaving(false);
     }
@@ -279,10 +275,10 @@ const AboutAdmin: React.FC = () => {
   }
 
   return (
-    <BarbaWrapper namespace="admin-about">
+    <NoSSR>
       <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
         <Header />
-        
+          
         {notification && (
           <div
             className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white text-center font-semibold transition-all ${
@@ -292,16 +288,16 @@ const AboutAdmin: React.FC = () => {
             {notification.message}
           </div>
         )}
-        
+          
         <AdminLayout>
           <div className="max-w-4xl mx-auto p-6">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - À Propos
               </h1>
-              <BarbaLink href="/admin" className="text-blue-600 hover:text-blue-800">
+              <Link href="/admin" className="text-blue-600 hover:text-blue-800">
                 ← Retour au dashboard
-              </BarbaLink>
+              </Link>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
@@ -533,7 +529,7 @@ const AboutAdmin: React.FC = () => {
         </AdminLayout>
         <PortfolioFooter />
       </div>
-    </BarbaWrapper>
+    </NoSSR>
   );
 };
 

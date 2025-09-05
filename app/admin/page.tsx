@@ -1,8 +1,7 @@
 "use client";
 
 import React from 'react';
-import BarbaLink from '../components/BarbaLink';
-import BarbaWrapper from '../components/BarbaWrapper';
+import Link from 'next/link';
 import { Header } from '../components/Header';
 import { useAuth } from '../components/AuthProvider';
 import AdminLayout from '../components/AdminLayout';
@@ -14,7 +13,7 @@ const AdminHomePage: React.FC = () => {
 
   return (
     <NoSSR>
-      <BarbaWrapper namespace="admin-dashboard">
+      <div suppressHydrationWarning={true}>
         <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
           <Header />
           
@@ -34,7 +33,7 @@ const AdminHomePage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Card Images */}
-                <BarbaLink
+                <Link
                   href="/admin/images"
                   className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
                 >
@@ -49,10 +48,10 @@ const AdminHomePage: React.FC = () => {
                   <p className="text-gray-600">
                     Gérer le portfolio d'images, ajouter, modifier ou supprimer des œuvres
                   </p>
-                </BarbaLink>
+                </Link>
 
                 {/* Card À propos */}
-                <BarbaLink
+                <Link
                   href="/admin/about"
                   className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
                 >
@@ -67,10 +66,10 @@ const AdminHomePage: React.FC = () => {
                   <p className="text-gray-600">
                     Modifier les informations de la page à propos, textes et liens
                   </p>
-                </BarbaLink>
+                </Link>
 
                 {/* Card Contact */}
-                <BarbaLink
+                <Link
                   href="/admin/contact"
                   className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
                 >
@@ -85,34 +84,34 @@ const AdminHomePage: React.FC = () => {
                   <p className="text-gray-600">
                     Gérer les informations de contact et l'image associée
                   </p>
-                </BarbaLink>
+                </Link>
               </div>
 
               {/* Statistiques rapides */}
               <div className="mt-12 bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Accès rapide</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <BarbaLink
+                  <Link
                     href="/admin/images"
                     className="text-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
                     <div className="text-2xl font-bold text-blue-600">📸</div>
                     <div className="text-sm text-gray-600 mt-1">Portfolio</div>
-                  </BarbaLink>
-                  <BarbaLink
+                  </Link>
+                  <Link
                     href="/admin/about"
                     className="text-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
                     <div className="text-2xl font-bold text-green-600">👤</div>
                     <div className="text-sm text-gray-600 mt-1">Profil</div>
-                  </BarbaLink>
-                  <BarbaLink
+                  </Link>
+                  <Link
                     href="/admin/contact"
                     className="text-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
                     <div className="text-2xl font-bold text-purple-600">📧</div>
                     <div className="text-sm text-gray-600 mt-1">Contact</div>
-                  </BarbaLink>
+                  </Link>
                   <a
                     href="/romain"
                     target="_blank"
@@ -128,7 +127,7 @@ const AdminHomePage: React.FC = () => {
           </AdminLayout>
           <PortfolioFooter />
         </div>
-      </BarbaWrapper>
+      </div>
     </NoSSR>
   );
 };

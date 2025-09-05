@@ -7,8 +7,7 @@ import { useAuth } from '../../components/AuthProvider';
 import AdminLayout from '../../components/AdminLayout';
 import NoSSR from '../../components/NoSSR';
 import PortfolioFooter from '../../components/PortfolioFooter';
-import BarbaWrapper from '../../components/BarbaWrapper';
-import BarbaLink from '../../components/BarbaLink';
+import Link from 'next/link';
 
 const ContactAdmin: React.FC = () => {
   const { logout, user, hasWriteAccess } = useAuth();
@@ -274,7 +273,7 @@ const ContactAdmin: React.FC = () => {
   }
 
   return (
-    <BarbaWrapper namespace="admin-contact">
+    <div suppressHydrationWarning={true}>
       <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
         <Header />
         
@@ -294,9 +293,9 @@ const ContactAdmin: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Contact
               </h1>
-              <BarbaLink href="/admin" className="text-blue-600 hover:text-blue-800">
+              <Link href="/admin" className="text-blue-600 hover:text-blue-800">
                 ← Retour au dashboard
-              </BarbaLink>
+              </Link>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
@@ -472,7 +471,7 @@ const ContactAdmin: React.FC = () => {
         </AdminLayout>
         <PortfolioFooter />
       </div>
-    </BarbaWrapper>
+    </div>
   );
 };
 
