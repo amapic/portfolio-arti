@@ -61,12 +61,17 @@ const ContactPage: React.FC = () => {
 
   if (loading) {
     return (
+      // <div className="min-h-screen flex items-center justify-center">
+      //   <div className="text-center">
+      //     <div className="animate-pulse">
+      //       <div className="h-4 bg-gray-300 rounded w-32 mx-auto"></div>
+      //     </div>
+      //     <p className="mt-4 text-gray-600">Chargement...</p>
+      //   </div>
+      // </div>
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-300 rounded w-32 mx-auto"></div>
-          </div>
-          <p className="mt-4 text-gray-600">Chargement...</p>
+          <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
     );

@@ -280,20 +280,21 @@ const TestIsotopePage: React.FC = () => {
           };
           
           // Masquer la grille avant l'initialisation
-          $(".grid").css({ opacity: 0 });
+          // $(".grid").css({ opacity: 0 });
           
           // Initialiser Isotope avec toutes les options, mais sans layout initial
           const $grid = $(".grid").isotope(isotopeOptions);
           
           // Lier l'événement arrangeComplete pour afficher les éléments seulement quand tout est bien positionné
-          $grid.isotope('on', 'arrangeComplete', function(filteredItems: Element[]) {
-            console.log('Arrangement terminé, affichage des éléments');
-            // Afficher la grille une fois que le layout est terminé
-            $(".grid").animate({ opacity: 1 }, 300);
-          });
+          // $grid.isotope('on', 'arrangeComplete', function(filteredItems: Element[]) {
+          //   console.log('Arrangement terminé, affichage des éléments');
+          //   // Afficher la grille une fois que le layout est terminé
+          //   $(".grid").animate({ opacity: 1 }, 300);
+          // });
           
           // Déclencher manuellement le layout initial
           $grid.isotope();
+          $(".grid").css({ opacity: 1 });
 
           // Fonction pour enlever les accents
           const removeAccents = (str: string) => {
@@ -317,7 +318,7 @@ const TestIsotopePage: React.FC = () => {
               $(this).addClass("active");
 
               // Cacher complètement la grille pendant le filtrage
-              // $(".grid").css({ opacity: 0 });
+              // $(".grid").css({ opacity: 1 });
               
               // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
               setTimeout(() => {
@@ -331,6 +332,7 @@ const TestIsotopePage: React.FC = () => {
                   sortBy: 'position',
                   sortAscending: true
                 });
+                // $(".grid").css({ opacity: 1 });
               }, 300); // Délai correspondant à la durée de la transition CSS sur .grid
             });
 
@@ -348,7 +350,7 @@ const TestIsotopePage: React.FC = () => {
                 $(".filter-btn.active").attr("data-filter") || "*";
               
               // Cacher complètement la grille pendant le redimensionnement
-              $(".grid").css({ opacity: 0 });
+              // $(".grid").css({ opacity: 0 });
               
               // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
               setTimeout(() => {
@@ -502,7 +504,7 @@ const TestIsotopePage: React.FC = () => {
       {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" /> */}
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js" />
       <Script src="https://npmcdn.com/isotope-layout@3/dist/isotope.pkgd.js" />
-      <Script src="https://npmcdn.com/isotope-packery@2/packery-mode.pkgd.js" />
+      <Script src="/scripts/isotope-packery.pkgd.js" />
       {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" /> */}
       {/* CSS exactement comme dans ton HTML */}
       <style jsx global>{`
@@ -749,7 +751,7 @@ const TestIsotopePage: React.FC = () => {
 
         .item-desc {
           color: rgba(255, 255, 255, 0.9);
-          font-size: 0.9em;
+          font-size: 1em;
           line-height: 1.4;
           z-index: 2;
           /* Style similaire à ImageComponent */
