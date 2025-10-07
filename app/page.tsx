@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Script from "next/script";
 import PortfolioHeader from "./components/PortfolioHeader"; // Assurez-vous que ce composant existe
+import SimpleLightbox from "./components/SimpleLightbox";
 interface ApiCategory {
   id: string;
   value: string;
@@ -66,6 +67,11 @@ const TestIsotopePage: React.FC = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // États pour le lightbox
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<GalleryItem[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
@@ -92,6 +98,30 @@ const TestIsotopePage: React.FC = () => {
     return [...items].sort((a, b) => {
       return a.positions[positionKey] - b.positions[positionKey];
     });
+  };
+
+  // Fonction pour ouvrir le lightbox avec les images du filtre actuel
+  const openLightbox = (clickedImageId: string) => {
+    // Déterminer quel filtre est actuellement actif
+    const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || '*';
+    
+    // Obtenir les images filtrées selon le filtre actuel
+    const filteredImages = activeFilter === '*' 
+      ? galleryItems 
+      : galleryItems.filter(item => 
+          item.categories.some(cat => activeFilter.includes(`category-${cat}`))
+        );
+    
+    // Trier les images selon le filtre actuel
+    const sortedImages = sortItems(filteredImages, activeFilter);
+    
+    // Trouver l'index de l'image cliquée dans la liste filtrée
+    const clickedIndex = sortedImages.findIndex(item => item.id === clickedImageId);
+    
+    // Ouvrir le lightbox
+    setLightboxImages(sortedImages);
+    setCurrentImageIndex(clickedIndex >= 0 ? clickedIndex : 0);
+    setLightboxOpen(true);
   };
 
   // Charger les données depuis l'API
@@ -500,10 +530,12 @@ const TestIsotopePage: React.FC = () => {
     <>
       {/* Chargement de jQuery et Isotope */}
       {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" /> */}
+      <Script src="/scripts/jquery360.js" />
       {/* <Script src="https://raw.githubusercontent.com/metafizzy/isotope-packery/master/packery-mode.pkgd.min.js" /> */}
       {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" /> */}
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js" />
-      <Script src="https://npmcdn.com/isotope-layout@3/dist/isotope.pkgd.js" />
+      {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js" /> */}
+       <Script src="/scripts/isotope.pkgd.min.js" />
+      {/* <Script src="https://npmcdn.com/isotope-layout@3/dist/isotope.pkgd.js" /> */}
       <Script src="/scripts/isotope-packery.pkgd.js" />
       {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" /> */}
       {/* CSS exactement comme dans ton HTML */}
@@ -922,7 +954,7 @@ const TestIsotopePage: React.FC = () => {
               ))}
             </div>
 
-            <div className="grid xl:w-[1200px]" style={{ opacity: 0 }}>
+            <div className="grid w-full xl:w-[1200px]" style={{ opacity: 0 }}>
               {/* Élément invisible pour définir la largeur de base */}
               <div className="grid-sizer"></div>
 
@@ -943,7 +975,8 @@ const TestIsotopePage: React.FC = () => {
                   <div
                     key={item.id}
                     data-id={item.id}
-                    className={`grid-item ${categoryClasses} ${dimensionClass}`}
+                    className={`grid-item ${categoryClasses} ${dimensionClass} cursor-pointer`}
+                    onClick={() => openLightbox(item.id)}
                   >
                     <div className={`item-content`} style={cropStyle}>
                       <div className="item-overlay">
@@ -984,6 +1017,15 @@ const TestIsotopePage: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* SimpleLightbox */}
+      <SimpleLightbox
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        images={lightboxImages}
+        currentIndex={currentImageIndex}
+        onIndexChange={setCurrentImageIndex}
+      />
     </>
   );
 };

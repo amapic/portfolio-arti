@@ -12,9 +12,7 @@ const PortfolioFooter: React.FC<PortfolioFooterProps> = ({ aboutData }) => {
 
   // Données par défaut si aucune donnée n'est fournie
   const defaultFooterData = {
-    copyrightText: "© 2025 - Pierre Besson - Photographe - Tous droits réservés",
-    designBy: "Renom",
-    designUrl: "https://renom.design",
+    copyrightText: "© 2025 - Pierre Bazin - Photographe - Tous droits réservés",
     realisationBy: "dev2site",
     realisationUrl: "https://dev2site.net",
     mentionsLegalesUrl: "/mentions-legales"
@@ -33,18 +31,6 @@ const PortfolioFooter: React.FC<PortfolioFooterProps> = ({ aboutData }) => {
           
           {/* Liens à droite */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            {/* <span>Design :</span>
-            <a 
-              href={currentFooterData.designUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-800 hover:text-black transition-colors underline decoration-1 underline-offset-2"
-            >
-              {currentFooterData.designBy}
-            </a> */}
-            
-            <span className="mx-2 text-gray-400">|</span>
-            
             <span>Réalisation :</span>
             <a 
               href={currentFooterData.realisationUrl}

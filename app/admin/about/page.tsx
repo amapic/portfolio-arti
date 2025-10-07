@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextData } from '../../types/text';
 import { Header } from '../../components/Header';
-import { useAuth } from '../../components/AuthProvider';
+import { useAuth } from '../../components/SimpleAuthProvider';
 import AdminLayout from '../../components/AdminLayout';
 import NoSSR from '../../components/NoSSR';
 import PortfolioFooter from '../../components/PortfolioFooter';
@@ -295,9 +295,9 @@ const AboutAdmin: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - À Propos
               </h1>
-              <Link href="/admin" className="text-blue-600 hover:text-blue-800">
+              {/* <Link href="/admin" className="text-blue-600 hover:text-blue-800">
                 ← Retour au dashboard
-              </Link>
+              </Link> */}
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 space-y-6">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from './AuthProvider';
+import { useAuth } from './SimpleAuthProvider';
 
 interface WriteProtectedProps {
   children: React.ReactNode;

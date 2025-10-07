@@ -10,7 +10,7 @@
     "static": "next build"
   },
   "dependencies": {
-    "@barba/core": "^2.10.3",
+    "firebase": "^10.14.1",
     "gsap": "^3.13.0",
     "isotope-layout": "^3.0.6",
     "isotope-packery": "^2.0.1",

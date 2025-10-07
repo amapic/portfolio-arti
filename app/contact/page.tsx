@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import PortfolioHeader from '../components/PortfolioHeader';
+import PortfolioFooter from '@components/PortfolioFooter';
 
 interface ContactData {
   contact: {
@@ -19,6 +20,9 @@ interface ContactData {
 const ContactPage: React.FC = () => {
   const [contactData, setContactData] = useState<ContactData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
+  const [showDataLoadingIndicator, setShowDataLoadingIndicator] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
@@ -52,6 +56,38 @@ const ContactPage: React.FC = () => {
     loadContactData();
   }, [PROJECT_ID]);
 
+  // Délai pour afficher l'indicateur de chargement seulement après 1 seconde
+  useEffect(() => {
+    if (!imageLoaded && contactData?.contact.image_url) {
+      const timer = setTimeout(() => {
+        setShowLoadingIndicator(true);
+      }, 2000);
+
+      return () => {
+        clearTimeout(timer);
+        setShowLoadingIndicator(false);
+      };
+    } else {
+      setShowLoadingIndicator(false);
+    }
+  }, [imageLoaded, contactData]);
+
+  // Délai pour afficher l'indicateur de chargement des données après 1 seconde
+  useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => {
+        setShowDataLoadingIndicator(true);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+        setShowDataLoadingIndicator(false);
+      };
+    } else {
+      setShowDataLoadingIndicator(false);
+    }
+  }, [loading]);
+
   const getImageUrl = (imageUrl?: string) => {
     if (!imageUrl) return '';
     
@@ -59,7 +95,7 @@ const ContactPage: React.FC = () => {
     return `${imageUrl}?v=${Date.now()}`;
   };
 
-  if (loading) {
+  if (loading && showDataLoadingIndicator) {
     return (
       // <div className="min-h-screen flex items-center justify-center">
       //   <div className="text-center">
@@ -71,10 +107,15 @@ const ContactPage: React.FC = () => {
       // </div>
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Chargement...</p>
+          <p className="text-gray-600 font-exposure">Chargement...</p>
         </div>
       </div>
     );
+  }
+
+  if (loading && !showDataLoadingIndicator) {
+    // Chargement silencieux pendant la première seconde
+    return null;
   }
 
   if (error) {
@@ -105,12 +146,22 @@ const ContactPage: React.FC = () => {
     <div className="min-h-screen bg-white flex flex-col font-exposure">
       {/* Header */}
       <PortfolioHeader 
-        title="Pierre Besson"
+        title="Pierre Bazin"
         showNavigation={true}
       />
 
+      {/* Indicateur de chargement d'image */}
+      {showLoadingIndicator && !imageLoaded && contactData?.contact.image_url && (
+        <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+          <div className="text-center">
+            {/* <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div> */}
+            <p className="text-gray-600 font-exposure">Chargement...</p>
+          </div>
+        </div>
+      )}
+
       {/* Contenu principal */}
-      <section className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+      <section className={`flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full transition-opacity duration-500 ${!imageLoaded && contactData?.contact.image_url ? 'opacity-0' : 'opacity-100'}`}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Image à gauche */}
           <div className="order-2 lg:order-1">
@@ -120,10 +171,13 @@ const ContactPage: React.FC = () => {
                   src={getImageUrl(contactData.contact.image_url)}
                   alt={contactData.contact.image_alt || 'Photo de contact'}
                   className="w-full h-full object-cover"
-                  onLoad={() => console.log('Image chargée')}
+                  onLoad={() => {
+                    console.log('Image chargée');
+                    setImageLoaded(true);
+                  }}
                   onError={(e) => {
                     console.error('Erreur de chargement image:', e);
-                    // Fallback vers une image par défaut ou un placeholder
+                    setImageLoaded(true); // Afficher le contenu même en cas d'erreur
                   }}
                 />
               ) : (
@@ -183,6 +237,8 @@ const ContactPage: React.FC = () => {
           </div>
         </div>
       </section>
+      {/* Footer */}
+      <PortfolioFooter />
     </div>
   );
 };

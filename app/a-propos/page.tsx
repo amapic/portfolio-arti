@@ -8,6 +8,9 @@ import { TextData } from '../types/text';
 const AboutPage: React.FC = () => {
   const [textData, setTextData] = useState<TextData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
+  const [showDataLoadingIndicator, setShowDataLoadingIndicator] = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const PROJECT_ID = process.env.NEXT_PUBLIC_ID_PROJET;
@@ -34,14 +37,51 @@ const AboutPage: React.FC = () => {
     loadTextData();
   }, [PROJECT_ID]);
 
-  if (loading) {
+  // Délai pour afficher l'indicateur de chargement seulement après 1 seconde
+  useEffect(() => {
+    if (!imageLoaded && textData?.about.image_url) {
+      const timer = setTimeout(() => {
+        setShowLoadingIndicator(true);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+        setShowLoadingIndicator(false);
+      };
+    } else {
+      setShowLoadingIndicator(false);
+    }
+  }, [imageLoaded, textData]);
+
+  // Délai pour afficher l'indicateur de chargement des données après 1 seconde
+  useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => {
+        setShowDataLoadingIndicator(true);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+        setShowDataLoadingIndicator(false);
+      };
+    } else {
+      setShowDataLoadingIndicator(false);
+    }
+  }, [loading]);
+
+  if (loading && showDataLoadingIndicator) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Chargement...</p>
+          <p className="text-gray-600 font-exposure">Chargement...</p>
         </div>
       </div>
     );
+  }
+
+  if (loading && !showDataLoadingIndicator) {
+    // Chargement silencieux pendant la première seconde
+    return null;
   }
 
   if (!textData) {
@@ -58,12 +98,22 @@ const AboutPage: React.FC = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <PortfolioHeader 
-        title="Pierre Besson"
+        title="Pierre Bazin"
         showNavigation={true}
       />
 
+      {/* Indicateur de chargement d'image */}
+      {showLoadingIndicator && !imageLoaded && textData?.about.image_url && (
+        <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+          <div className="text-center">
+            {/* <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div> */}
+            <p className="text-gray-600 font-exposure">Chargement...</p>
+          </div>
+        </div>
+      )}
+
       {/* Contenu principal */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section className={`py-16 px-4 sm:px-6 lg:px-8 transition-opacity duration-500 ${!imageLoaded && textData?.about.image_url ? 'opacity-0' : 'opacity-100'}`}>
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             
@@ -74,9 +124,13 @@ const AboutPage: React.FC = () => {
                   src={textData.about.image_url}
                   alt={textData.about.image_alt || 'Portrait'}
                   className="w-full h-auto object-cover rounded-lg shadow-lg"
-                  onLoad={() => console.log('Image about chargée')}
+                  onLoad={() => {
+                    console.log('Image about chargée');
+                    setImageLoaded(true);
+                  }}
                   onError={(e) => {
                     console.error('Erreur de chargement image about:', e);
+                    setImageLoaded(true); // Afficher le contenu même en cas d'erreur
                   }}
                 />
               ) : (

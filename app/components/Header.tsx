@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { CategoryNavigation } from './CategoryNavigation';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
-import { useAuth } from './AuthProvider';
+import { useAuth } from './SimpleAuthProvider';
 
 export const Header = () => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);

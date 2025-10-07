@@ -41,7 +41,7 @@ import {
 import { HiOutlinePhotograph, HiOutlineX } from "react-icons/hi";
 import NoSSR from "../../components/NoSSR";
 import { Header } from "../../components/Header";
-import { useAuth } from "../../components/AuthProvider";
+import { useAuth } from "../../components/SimpleAuthProvider";
 import AdminLayout from "../../components/AdminLayout";
 // Types pour les catégories (maintenant chargées dynamiquement)
 interface Category {

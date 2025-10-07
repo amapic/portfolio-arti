@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from './components/ThemeProvider';
 // import { AuthProvider } from './components/AuthProvider';
+// import { AuthProvider } from './components/FirebaseAuthProvider';
 import { Metadata } from 'next';
 import localFont from "next/font/local";
 import "./globals.css";
@@ -76,7 +77,7 @@ export default function RootLayout({
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
-        <meta name="title" content="Pierre BBesson - Photographe" />
+        <meta name="title" content="Pierre Bazin - Photographe" />
         <link rel="icon" type="image/x-icon" href="/sgd.png?v=3" />
       </head>
       <body>

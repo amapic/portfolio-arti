@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { Header } from '../../components/Header';
-import { useAuth } from '../../components/AuthProvider';
+import { useAuth } from '../../components/SimpleAuthProvider';
 import NoSSR from '../../components/NoSSR';
 import PortfolioFooter from '../../components/PortfolioFooter';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ interface Category {
   isActive: boolean;
 }
 
-const CategoriesAdmin: React.FC = () => {
+const CategoriesAdminContent: React.FC = () => {
   const { logout, user, hasWriteAccess } = useAuth();
   
   const [categories, setCategories] = useState<Category[]>([]);
@@ -208,9 +208,9 @@ const CategoriesAdmin: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Catégories
                 </h1>
-                <Link href="/admin" className="text-blue-600 hover:text-blue-800">
+                {/* <Link href="/admin" className="text-blue-600 hover:text-blue-800">
                   ← Retour au dashboard
-                </Link>
+                </Link> */}
               </div>
               {/* Zone blanche pendant le chargement */}
               <div className="bg-white rounded-lg shadow-md p-6 min-h-96">
@@ -237,9 +237,9 @@ const CategoriesAdmin: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Catégories
               </h1>
-              <Link href="/admin" className="text-blue-600 hover:text-blue-800">
+              {/* <Link href="/admin" className="text-blue-600 hover:text-blue-800">
                 ← Retour au dashboard
-              </Link>
+              </Link> */}
             </div>
 
             <div className="space-y-6">
@@ -501,6 +501,14 @@ const CategoryForm: React.FC<{
         </div>
       </form>
     </div>
+  );
+};
+
+const CategoriesAdmin: React.FC = () => {
+  return (
+    <NoSSR>
+      <CategoriesAdminContent />
+    </NoSSR>
   );
 };
 

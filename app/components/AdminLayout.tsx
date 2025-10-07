@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useAuth } from './AuthProvider';
+import { useAuth } from './SimpleAuthProvider';
 
 interface AdminLayoutProps {
   children: React.ReactNode;

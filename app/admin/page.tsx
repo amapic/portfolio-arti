@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Header } from '../components/Header';
-import { useAuth } from '../components/AuthProvider';
+import { useAuth } from '../components/SimpleAuthProvider';
 import AdminLayout from '../components/AdminLayout';
 import NoSSR from '../components/NoSSR';
 import PortfolioFooter from '../components/PortfolioFooter';
@@ -23,12 +23,12 @@ const AdminHomePage: React.FC = () => {
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Tableau de bord
                 </h1>
-                <button
+                {/* <button
                   onClick={logout}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 >
                   Déconnexion
-                </button>
+                </button> */}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

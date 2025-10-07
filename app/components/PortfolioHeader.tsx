@@ -9,7 +9,7 @@ interface PortfolioHeaderProps {
 }
 
 const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
-  title = "Pierre Besson",
+  title = "Pierre Bazin",
   showNavigation = true,
 }) => {
   return (
