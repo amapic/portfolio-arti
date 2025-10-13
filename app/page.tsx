@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Script from "next/script";
 import PortfolioHeader from "./components/PortfolioHeader"; // Assurez-vous que ce composant existe
 import SimpleLightbox from "./components/SimpleLightbox";
+import { Analytics } from "@vercel/analytics/next"
 interface ApiCategory {
   id: string;
   value: string;
@@ -196,26 +196,69 @@ const TestIsotopePage: React.FC = () => {
   // Initialiser Isotope après le chargement
   useEffect(() => {
     if (!loading && galleryItems.length > 0) {
-      // Fonction pour attendre que les scripts soient complètement chargés
-      const waitForScripts = () => {
-        return new Promise<void>((resolve) => {
-          const checkScripts = () => {
+      // Fonction pour charger les scripts dynamiquement
+      const loadScripts = async () => {
+        try {
+          // Chargement séquentiel des scripts
+          await loadScript('/scripts/jquery360.js');
+          await loadScript('/scripts/isotope.pkgd.min.js');
+          await loadScript('/scripts/isotope-packery.pkgd.js');
+          
+          console.log('✅ Tous les scripts sont chargés');
+          return true;
+        } catch (error) {
+          console.error('❌ Erreur lors du chargement des scripts:', error);
+          throw error;
+        }
+      };
+
+      // Fonction utilitaire pour charger un script
+      const loadScript = (src: string): Promise<void> => {
+        return new Promise((resolve, reject) => {
+          // Vérifier si le script est déjà chargé
+          const existingScript = document.querySelector(`script[src="${src}"]`);
+          if (existingScript) {
+            resolve();
+            return;
+          }
+
+          const script = document.createElement('script');
+          script.src = src;
+          script.async = true;
+          
+          script.onload = () => {
+            console.log(`✅ Script chargé: ${src}`);
+            resolve();
+          };
+          
+          script.onerror = () => {
+            console.error(`❌ Erreur de chargement: ${src}`);
+            reject(new Error(`Failed to load script: ${src}`));
+          };
+          
+          document.head.appendChild(script);
+        });
+      };
+
+      // Fonction pour vérifier que jQuery et Isotope sont disponibles
+      const waitForLibraries = (): Promise<void> => {
+        return new Promise((resolve) => {
+          const checkLibraries = () => {
             const $ = (window as any).$;
             if ($ && typeof $.fn === 'object' && typeof $.fn.isotope === 'function') {
-              // Double vérification que jQuery et Isotope sont vraiment prêts
+              // Double vérification que jQuery fonctionne
               try {
-                // Test d'une fonction basique jQuery pour s'assurer qu'elle fonctionne
                 $('<div>').remove();
+                console.log('✅ jQuery et Isotope sont prêts');
                 resolve();
               } catch (e) {
-                // jQuery n'est pas encore complètement initialisé, réessayer
-                setTimeout(checkScripts, 100);
+                setTimeout(checkLibraries, 100);
               }
             } else {
-              setTimeout(checkScripts, 100); // Réessayer toutes les 100ms
+              setTimeout(checkLibraries, 100);
             }
           };
-          checkScripts();
+          checkLibraries();
         });
       };
 
@@ -254,158 +297,166 @@ const TestIsotopePage: React.FC = () => {
       };
 
       const initIsotope = async () => {
-        // Attendre que les scripts soient complètement chargés
-        await waitForScripts();
+        try {
+          // Charger les scripts d'abord
+          await loadScripts();
+          
+          // Attendre que les librairies soient disponibles
+          await waitForLibraries();
         
-        // Attendre que toutes les images soient chargées
-        await waitForImages();
+          // Attendre que toutes les images soient chargées
+          await waitForImages();
 
-        const $ = (window as any).$;
-        if ($ && typeof $.fn.isotope === "function") {
-          console.log("🎨 Initialisation d'Isotope avec les données API");
+          const $ = (window as any).$;
+          if ($ && typeof $.fn.isotope === "function") {
+            console.log("🎨 Initialisation d'Isotope avec les données API");
 
-          // Détecter la taille d'écran pour choisir le bon layout
-          const screenWidth = window.innerWidth;
-          const layoutMode = screenWidth <= 768 ? "packery" : "packery";
+            // Détecter la taille d'écran pour choisir le bon layout
+            const screenWidth = window.innerWidth;
+            const layoutMode = screenWidth <= 768 ? "packery" : "packery";
 
-          // Créer un objet avec toutes les options Isotope pour la réutilisation
-          const isotopeOptions = {
-            itemSelector: ".grid-item",
-            layoutMode: layoutMode,
-            percentPosition: true,
-            transitionDuration: 400,
-            hiddenStyle: {
-              opacity: 0
-            },
-            visibleStyle: {
-              opacity: 1
-            },
-            packery:{
-              columnWidth: ".grid-sizer",
-              gutter: 0
-            },
-            // Configuration du tri par position
-            getSortData: {
-              position: function(itemElem: Element) {
-                const id = $(itemElem).attr('data-id');
-                const item = galleryItems.find(item => item.id === id);
-                // Déterminer quelle position utiliser selon la taille d'écran
-                const screenWidth = window.innerWidth;
-                let positionKey: keyof GalleryItem["positions"] = "all";
-                
-                if (screenWidth <= 480) {
-                  positionKey = "categorySmall";
-                } else if (screenWidth <= 768) {
-                  positionKey = "categoryMedium";
-                } else {
-                  positionKey = "categoryLarge";
+            // Créer un objet avec toutes les options Isotope pour la réutilisation
+            const isotopeOptions = {
+              itemSelector: ".grid-item",
+              layoutMode: layoutMode,
+              percentPosition: true,
+              transitionDuration: 400,
+              hiddenStyle: {
+                opacity: 0
+              },
+              visibleStyle: {
+                opacity: 1
+              },
+              packery:{
+                columnWidth: ".grid-sizer",
+                gutter: 0
+              },
+              // Configuration du tri par position
+              getSortData: {
+                position: function(itemElem: Element) {
+                  const id = $(itemElem).attr('data-id');
+                  const item = galleryItems.find(item => item.id === id);
+                  // Déterminer quelle position utiliser selon la taille d'écran
+                  const screenWidth = window.innerWidth;
+                  let positionKey: keyof GalleryItem["positions"] = "all";
+                  
+                  if (screenWidth <= 480) {
+                    positionKey = "categorySmall";
+                  } else if (screenWidth <= 768) {
+                    positionKey = "categoryMedium";
+                  } else {
+                    positionKey = "categoryLarge";
+                  }
+                  
+                  return item ? item.positions[positionKey] : 0;
                 }
+              },
+              sortBy: 'position',
+              sortAscending: true,
+              initLayout: false // Désactiver le layout initial pour contrôler l'apparition des éléments
+            };
+            
+            // Masquer la grille avant l'initialisation
+            // $(".grid").css({ opacity: 0 });
+            
+            // Initialiser Isotope avec toutes les options, mais sans layout initial
+            const $grid = $(".grid").isotope(isotopeOptions);
+            
+            // Lier l'événement arrangeComplete pour afficher les éléments seulement quand tout est bien positionné
+            // $grid.isotope('on', 'arrangeComplete', function(filteredItems: Element[]) {
+            //   console.log('Arrangement terminé, affichage des éléments');
+            //   // Afficher la grille une fois que le layout est terminé
+            //   $(".grid").animate({ opacity: 1 }, 300);
+            // });
+            
+            // Déclencher manuellement le layout initial
+            $grid.isotope();
+            $(".grid").css({ opacity: 1 });
+
+            // Fonction pour enlever les accents
+            const removeAccents = (str: string) => {
+              return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            };
+
+            // Gestion des filtres
+            $(".filter-btn")
+              .off("click")
+              .on("click", function (this: HTMLElement) {
+                // alert(window.innerWidth)
+                let filterValue = $(this).attr("data-filter");
                 
-                return item ? item.positions[positionKey] : 0;
-              }
-            },
-            sortBy: 'position',
-            sortAscending: true,
-            initLayout: false // Désactiver le layout initial pour contrôler l'apparition des éléments
-          };
-          
-          // Masquer la grille avant l'initialisation
-          // $(".grid").css({ opacity: 0 });
-          
-          // Initialiser Isotope avec toutes les options, mais sans layout initial
-          const $grid = $(".grid").isotope(isotopeOptions);
-          
-          // Lier l'événement arrangeComplete pour afficher les éléments seulement quand tout est bien positionné
-          // $grid.isotope('on', 'arrangeComplete', function(filteredItems: Element[]) {
-          //   console.log('Arrangement terminé, affichage des éléments');
-          //   // Afficher la grille une fois que le layout est terminé
-          //   $(".grid").animate({ opacity: 1 }, 300);
-          // });
-          
-          // Déclencher manuellement le layout initial
-          $grid.isotope();
-          $(".grid").css({ opacity: 1 });
+                // Enlever les accents potentiels dans filterValue
+                if (filterValue && filterValue !== "*") {
+                  filterValue = removeAccents(filterValue);
+                }
+                // alert(filterValue)
+                // Mise à jour des boutons actifs
+                $(".filter-btn").removeClass("active");
+                $(this).addClass("active");
 
-          // Fonction pour enlever les accents
-          const removeAccents = (str: string) => {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          };
-
-          // Gestion des filtres
-          $(".filter-btn")
-            .off("click")
-            .on("click", function (this: HTMLElement) {
-              // alert(window.innerWidth)
-              let filterValue = $(this).attr("data-filter");
-              
-              // Enlever les accents potentiels dans filterValue
-              if (filterValue && filterValue !== "*") {
-                filterValue = removeAccents(filterValue);
-              }
-              // alert(filterValue)
-              // Mise à jour des boutons actifs
-              $(".filter-btn").removeClass("active");
-              $(this).addClass("active");
-
-              // Cacher complètement la grille pendant le filtrage
-              // $(".grid").css({ opacity: 1 });
-              
-              // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
-              setTimeout(() => {
-                // Application du filtre avec maintien du tri
-                
-                $grid.isotope({ 
-                  filter: filterValue,
-                  percentPosition: true,
-                  transitionDuration: 400,
-                  // Conserver les options de tri lorsqu'on filtre
-                  sortBy: 'position',
-                  sortAscending: true
-                });
+                // Cacher complètement la grille pendant le filtrage
                 // $(".grid").css({ opacity: 1 });
-              }, 300); // Délai correspondant à la durée de la transition CSS sur .grid
-            });
-
-          // Réorganisation lors du redimensionnement
-          $(window)
-            .off("resize.isotope")
-            .on("resize.isotope", function (this: Window) {
-              // console.log("coucou");
-              // Changer le layout selon la taille d'écran
-              const screenWidth = window.innerWidth;
-              const newLayoutMode = screenWidth <= 768 ? "packery" : "packery";
-
-              // Réappliquer le filtre et le tri avec les bonnes options selon la taille d'écran
-              const currentFilter =
-                $(".filter-btn.active").attr("data-filter") || "*";
-              
-              // Cacher complètement la grille pendant le redimensionnement
-              // $(".grid").css({ opacity: 0 });
-              
-              // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
-              setTimeout(() => {
-                // Mise à jour du tri pour refléter la nouvelle taille d'écran
-                $grid.isotope({
-                layoutMode: newLayoutMode,
-                // Force Isotope à recalculer les positions selon la nouvelle taille d'écran
-                sortBy: 'position', 
-                sortAscending: true,
-                filter: currentFilter,
-                // masonry: {
-                //   columnWidth: ".grid-sizer",
-                //   gutter: 0,
-                // },
-                packery: {
-                  columnWidth: ".grid-sizer",
-                  gutter: 0,
-                },
-                // itemSelector: '.mini-item',
-                percentPosition: true
+                
+                // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
+                setTimeout(() => {
+                  // Application du filtre avec maintien du tri
+                  
+                  $grid.isotope({ 
+                    filter: filterValue,
+                    percentPosition: true,
+                    transitionDuration: 400,
+                    // Conserver les options de tri lorsqu'on filtre
+                    sortBy: 'position',
+                    sortAscending: true
+                  });
+                  // $(".grid").css({ opacity: 1 });
+                }, 300); // Délai correspondant à la durée de la transition CSS sur .grid
               });
 
-              $grid.isotope("layout");
-              }, 300); // Délai correspondant à la durée de la transition CSS sur .grid
-            });
+            // Réorganisation lors du redimensionnement
+            $(window)
+              .off("resize.isotope")
+              .on("resize.isotope", function (this: Window) {
+                // console.log("coucou");
+                // Changer le layout selon la taille d'écran
+                const screenWidth = window.innerWidth;
+                const newLayoutMode = screenWidth <= 768 ? "packery" : "packery";
+
+                // Réappliquer le filtre et le tri avec les bonnes options selon la taille d'écran
+                const currentFilter =
+                  $(".filter-btn.active").attr("data-filter") || "*";
+                
+                // Cacher complètement la grille pendant le redimensionnement
+                // $(".grid").css({ opacity: 0 });
+                
+                // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
+                setTimeout(() => {
+                  // Mise à jour du tri pour refléter la nouvelle taille d'écran
+                  $grid.isotope({
+                  layoutMode: newLayoutMode,
+                  // Force Isotope à recalculer les positions selon la nouvelle taille d'écran
+                  sortBy: 'position', 
+                  sortAscending: true,
+                  filter: currentFilter,
+                  // masonry: {
+                  //   columnWidth: ".grid-sizer",
+                  //   gutter: 0,
+                  // },
+                  packery: {
+                    columnWidth: ".grid-sizer",
+                    gutter: 0,
+                  },
+                  // itemSelector: '.mini-item',
+                  percentPosition: true
+                });
+
+                $grid.isotope("layout");
+                }, 300); // Délai correspondant à la durée de la transition CSS sur .grid
+              });
+          }
+        } catch (error) {
+          console.error('Erreur lors de l\'initialisation d\'Isotope:', error);
+          throw error;
         }
       };
 
@@ -528,16 +579,6 @@ const TestIsotopePage: React.FC = () => {
 
   return (
     <>
-      {/* Chargement de jQuery et Isotope */}
-      {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" /> */}
-      <Script src="/scripts/jquery360.js" />
-      {/* <Script src="https://raw.githubusercontent.com/metafizzy/isotope-packery/master/packery-mode.pkgd.min.js" /> */}
-      {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" /> */}
-      {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js" /> */}
-       <Script src="/scripts/isotope.pkgd.min.js" />
-      {/* <Script src="https://npmcdn.com/isotope-layout@3/dist/isotope.pkgd.js" /> */}
-      <Script src="/scripts/isotope-packery.pkgd.js" />
-      {/* <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" /> */}
       {/* CSS exactement comme dans ton HTML */}
       <style jsx global>{`
         /* Import font and text-shadow from PortfolioHeader */
@@ -667,7 +708,7 @@ const TestIsotopePage: React.FC = () => {
           /* border-radius: 15px; */
           overflow: hidden;
           /* Transition uniquement pour les propriétés hover */
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition: transform 0.3s ease;
         }
 
         .grid-item:hover > .item-content {
@@ -768,12 +809,12 @@ const TestIsotopePage: React.FC = () => {
           font-weight: bold;
           color: white;
           margin-bottom: 10px;
-          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          // text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
           z-index: 2;
           /* Style similaire à ImageComponent */
           font-weight: 600;
           letter-spacing: 0.05em;
-          drop-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+          // drop-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
           /* Animation initiale - caché */
           /* transform: translateY(20px); */
           opacity: 0;
@@ -789,7 +830,7 @@ const TestIsotopePage: React.FC = () => {
           /* Style similaire à ImageComponent */
           margin-top: 0.25rem;
           font-weight: 300;
-          drop-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+          // drop-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
           /* Animation initiale - caché */
           /* transform: translateY(20px); */
           opacity: 0;
@@ -923,7 +964,7 @@ const TestIsotopePage: React.FC = () => {
           }
         }
       `}</style>
-
+        <Analytics />
       <div className="min-h-screen bg-white font-serif p-0 m-0 w-full">
         {/* <h1>🎨 Portfolio avec API</h1> */}
         <PortfolioHeader />
@@ -989,6 +1030,7 @@ const TestIsotopePage: React.FC = () => {
                           className={`item-title ${
                             item.isForcedSquare ? "text-red-400" : ""
                           }`}
+                          style={{ fontFamily: "ExposureTrial, serif" }}
                         >
                           {item.titre}
                         </div>
@@ -997,17 +1039,18 @@ const TestIsotopePage: React.FC = () => {
                             className={`item-desc ${
                               item.isForcedSquare ? "text-red-300" : ""
                             }`}
+                            style={{ fontFamily: "ExposureTrial, serif" }}
                           >
                             {item.sousTitre}
                           </div>
                         )}
-                        {item.isForcedSquare && (
+                        {/* {item.isForcedSquare && (
                           <div className="item-forced-indicator">
                             <span className="text-red-500 text-xs font-bold bg-white bg-opacity-20 px-2 py-1 rounded">
                               Forcé 1x1
                             </span>
                           </div>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </div>

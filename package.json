@@ -10,6 +10,7 @@
     "static": "next build"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "firebase": "^10.14.1",
     "gsap": "^3.13.0",
     "isotope-layout": "^3.0.6",

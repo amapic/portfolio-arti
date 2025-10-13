@@ -9,6 +9,7 @@ import {
   User as FirebaseUser
 } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
+import { useRouter } from 'next/navigation';
 
 interface User {
   uid: string;
@@ -57,6 +58,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(true); // Commencer connecté par défaut
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -177,8 +179,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoggedIn(true);
       setIsDefaultMode(true);
       setShowLoginModal(false);
+      
+      // Redirection vers la page de login admin après déconnexion
+      router.push('/admin/login');
     } catch (error: any) {
       console.error('Erreur de déconnexion:', error);
+      // Même en cas d'erreur, rediriger vers la page de login
+      router.push('/admin/login');
       throw new Error(error.message);
     }
   };

@@ -60,6 +60,7 @@ const SimpleLightbox: React.FC<SimpleLightboxProps> = ({
       // Appliquer les styles pour masquer la scrollbar et bloquer le scroll
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollbarWidth}px`;
+      document.body.style.fontFamily = "ExposureTrial, serif";
       
       // Bloquer le scroll tactile sur mobile
       document.body.style.position = 'fixed';
@@ -215,11 +216,13 @@ const SimpleLightbox: React.FC<SimpleLightboxProps> = ({
           )}
           
           {/* Compteur d'images */}
-          {images.length > 1 && (
-            <p className="text-sm text-gray-400 mt-2">
+          {/* {images.length > 1 && (
+            <p className="text-sm text-gray-400 mt-2"
+              style={{ fontFamily: "ExposureTrial, serif" }}
+            >
               {currentIndex + 1} / {images.length}
             </p>
-          )}
+          )} */}
         </div>
       </div>
 
