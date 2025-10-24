@@ -33,7 +33,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
         {title}
       </h1>
       {showNavigation && (
-        <nav className="flex items-center justify-center gap-4">
+        <nav className="flex items-center justify-center sm:gap-3 md:gap-4">
            <a 
             href="/" 
             className="w-[100px] text-md lg:text-lg text-black no-underline font-[400]  tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"

@@ -593,7 +593,7 @@ const ImagesAdmin: React.FC = () => {
   return (
     <NoSSR>
       <div suppressHydrationWarning={true}>
-        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
+        <div suppressHydrationWarning={true} className="min-h-screen">
         <Header />
         {notification && (
           <div

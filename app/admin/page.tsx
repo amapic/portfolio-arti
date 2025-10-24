@@ -14,11 +14,11 @@ const AdminHomePage: React.FC = () => {
   return (
     <NoSSR>
       <div suppressHydrationWarning={true}>
-        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
+        <div suppressHydrationWarning={true} className="min-h-screen">
           <Header />
           
           <AdminLayout>
-            <div className="max-w-4xl mx-auto p-6">
+            <div className="max-w-4xl mx-auto p-6 pt-12">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Tableau de bord
@@ -95,22 +95,34 @@ const AdminHomePage: React.FC = () => {
                     href="/admin/images"
                     className="text-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="text-2xl font-bold text-blue-600">📸</div>
-                    <div className="text-sm text-gray-600 mt-1">Portfolio</div>
+                    <div className="flex justify-center mb-2">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="text-sm text-gray-600">Portfolio</div>
                   </Link>
                   <Link
                     href="/admin/about"
                     className="text-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="text-2xl font-bold text-green-600">👤</div>
-                    <div className="text-sm text-gray-600 mt-1">Profil</div>
+                    <div className="flex justify-center mb-2">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <div className="text-sm text-gray-600">Profil</div>
                   </Link>
                   <Link
                     href="/admin/contact"
                     className="text-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="text-2xl font-bold text-purple-600">📧</div>
-                    <div className="text-sm text-gray-600 mt-1">Contact</div>
+                    <div className="flex justify-center mb-2">
+                      <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="text-sm text-gray-600">Contact</div>
                   </Link>
                   <a
                     href="/romain"
@@ -118,14 +130,20 @@ const AdminHomePage: React.FC = () => {
                     rel="noopener noreferrer"
                     className="text-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="text-2xl font-bold text-gray-600">🌐</div>
-                    <div className="text-sm text-gray-600 mt-1">Voir le site</div>
+                    <div className="flex justify-center mb-2">
+                      <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </div>
+                    <div className="text-sm text-gray-600">Voir le site</div>
                   </a>
                 </div>
               </div>
             </div>
           </AdminLayout>
-          <PortfolioFooter />
+          <div className="absolute bottom-0 w-full">
+            <PortfolioFooter />
+          </div>
         </div>
       </div>
     </NoSSR>

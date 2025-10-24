@@ -252,7 +252,7 @@ const AboutAdmin: React.FC = () => {
   if (!textData) {
     return (
       <NoSSR>
-        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
+        <div suppressHydrationWarning={true} className="min-h-screen">
           <Header />
           
           <AdminLayout>
@@ -276,7 +276,7 @@ const AboutAdmin: React.FC = () => {
 
   return (
     <NoSSR>
-      <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
+      <div suppressHydrationWarning={true} className="">
         <Header />
           
         {notification && (

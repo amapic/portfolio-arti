@@ -195,6 +195,7 @@ const TestIsotopePage: React.FC = () => {
 
   // Initialiser Isotope après le chargement
   useEffect(() => {
+    // alert(window.innerWidth)
     if (!loading && galleryItems.length > 0) {
       // Fonction pour charger les scripts dynamiquement
       const loadScripts = async () => {
@@ -483,7 +484,20 @@ const TestIsotopePage: React.FC = () => {
 
   // Obtenir le style de crop intelligent pour l'image
   const getImageCropStyle = (item: GalleryItem) => {
+    // Pour les images sans données de crop, utiliser un comportement intelligent
     if (!item.crop && !item.cropData) {
+      // Si c'est une image rectangulaire (2x1 ou 1x2), utiliser contain pour éviter la déformation
+      const [w, h] = item.dimension || [1, 1];
+      if (w === 2 || h === 2) {
+        return {
+          backgroundImage: `url(${item.imageUrl})`,
+          backgroundSize: "contain",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        };
+      }
+      
+      // Pour les images carrées (1x1), utiliser cover
       return {
         backgroundImage: `url(${item.imageUrl})`,
         backgroundSize: "cover",
@@ -914,7 +928,7 @@ const TestIsotopePage: React.FC = () => {
           .filter-btn {
             /* min-width: 60px; */
             padding: 8px 1px;
-            margin: 3px;
+            margin: 1px;
             font-size: 14px;
             text-align:center;
             display: inline-block;
@@ -971,13 +985,13 @@ const TestIsotopePage: React.FC = () => {
         {!loading && (
           <>
             <div
-              className="filters justify-center gap-4 lg:gap-12 pt-12 bg-transparent mx-auto sm:max-w-[100%] md:max-w-[1152px]"
+              className="filters justify-center gap-0 md:gap-4 lg:gap-12 pt-12 bg-transparent mx-auto sm:max-w-[100%] md:max-w-[1152px]"
               style={{
                 // maxWidth: "1152px",
               }}
             >
               <button
-                className="filter-btn  active bg-none border-none text-sm lg:text-xl font-light text-black cursor-pointer py-0 md:py-1 tracking-wide relative text-center w-[30px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
+                className="filter-btn  active bg-none border-none text-sm lg:text-xl font-light text-black cursor-pointer py-0 md:py-1 tracking-wide relative text-center max-w-[70px] md:max-w-none md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
                 data-filter="*"
                 style={{ fontFamily: "ExposureTrial, serif" }}
               >
@@ -986,7 +1000,7 @@ const TestIsotopePage: React.FC = () => {
               {categories.map((category) => (
                 <button
                   key={category.id}
-                  className="filter-btn  bg-none border-none text-sm lg:text-xl  text-black cursor-pointer py-0 md:py-1 tracking-wide relative text-center w-[30px] md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
+                  className="filter-btn  bg-none border-none text-sm lg:text-xl  text-black cursor-pointer py-0 md:py-1 tracking-wide relative text-center max-w-[70px] md:max-w-none md:w-[90px] hover:font-[600] transition-all duration-200 hover:text-shadow"
                   data-filter={`.category-${category.value}`}
                   style={{ fontFamily: "ExposureTrial, serif" }}
                 >

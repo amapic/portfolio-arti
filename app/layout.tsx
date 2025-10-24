@@ -60,7 +60,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <head>  
+      <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -79,6 +79,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
         <meta name="title" content="Pierre Bazin - Photographe" />
         <link rel="icon" type="image/x-icon" href="/sgd.png?v=3" />
+        <meta property="og:title" content="Pierre Bazin - Photographe" />
+        <meta property="og:description" content="Pierre Bazin - Photographe" />
+        <meta property="og:image" content="https://pierrebazin.fr/images/dev2site.jpg" />
+        <meta property="og:url" content="https://dev2site.net" />
       </head>
       <body>
         <ThemeProvider>

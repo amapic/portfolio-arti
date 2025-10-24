@@ -18,7 +18,7 @@ interface Category {
 
 const CategoriesAdminContent: React.FC = () => {
   const { logout, user, hasWriteAccess } = useAuth();
-  
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -67,11 +67,11 @@ const CategoriesAdminContent: React.FC = () => {
       showViewerError();
       return;
     }
-    
+
     try {
       const isNew = !('id' in category);
       const method = isNew ? 'POST' : 'PUT';
-      const url = isNew 
+      const url = isNew
         ? `${API_URL}/api/categories?projectId=${PROJECT_ID}`
         : `${API_URL}/api/categories/${(category as Category).id}?projectId=${PROJECT_ID}`;
 
@@ -101,7 +101,7 @@ const CategoriesAdminContent: React.FC = () => {
       showViewerError();
       return;
     }
-    
+
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) return;
 
     try {
@@ -127,7 +127,7 @@ const CategoriesAdminContent: React.FC = () => {
       showViewerError();
       return;
     }
-    
+
     const updatedCategories = newOrder.map((cat, index) => ({
       ...cat,
       order: index
@@ -162,7 +162,7 @@ const CategoriesAdminContent: React.FC = () => {
   const moveCategory = (index: number, direction: 'up' | 'down') => {
     const newCategories = [...categories];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    
+
     if (targetIndex >= 0 && targetIndex < newCategories.length) {
       [newCategories[index], newCategories[targetIndex]] = [newCategories[targetIndex], newCategories[index]];
       reorderCategories(newCategories);
@@ -175,7 +175,7 @@ const CategoriesAdminContent: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent, category: Category | Omit<Category, 'id'>) => {
     e.preventDefault();
-    
+
     // Validation
     if (!category.value.trim() || !category.label.trim()) {
       showMessage('error', 'Veuillez remplir tous les champs obligatoires');
@@ -183,8 +183,8 @@ const CategoriesAdminContent: React.FC = () => {
     }
 
     // Vérifier l'unicité de la valeur
-    const isDuplicate = categories.some(cat => 
-      cat.value.toLowerCase() === category.value.toLowerCase() && 
+    const isDuplicate = categories.some(cat =>
+      cat.value.toLowerCase() === category.value.toLowerCase() &&
       ('id' in category ? cat.id !== category.id : true)
     );
 
@@ -199,9 +199,9 @@ const CategoriesAdminContent: React.FC = () => {
   if (loading) {
     return (
       <NoSSR>
-        <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
+        <div suppressHydrationWarning={true} className="">
           <Header />
-          
+
           <AdminLayout>
             <div className="max-w-4xl mx-auto p-6">
               <div className="flex justify-between items-center mb-6">
@@ -220,7 +220,9 @@ const CategoriesAdminContent: React.FC = () => {
               </div>
             </div>
           </AdminLayout>
-          <PortfolioFooter />
+          <div className="absolute bottom-0 w-full">
+            <PortfolioFooter />
+          </div>
         </div>
       </NoSSR>
     );
@@ -228,9 +230,9 @@ const CategoriesAdminContent: React.FC = () => {
 
   return (
     <NoSSR>
-      <div suppressHydrationWarning={true} className="min-h-screen bg-gray-50">
+      <div suppressHydrationWarning={true} className="">
         <Header />
-        
+
         <AdminLayout>
           <div className="max-w-4xl mx-auto p-6">
             <div className="flex justify-between items-center mb-6">
@@ -248,68 +250,66 @@ const CategoriesAdminContent: React.FC = () => {
                 <button
                   onClick={() => setIsAddingNew(true)}
                   disabled={!hasWriteAccess}
-                  className={`px-4 py-2 rounded-md transition-colors ${
-                    hasWriteAccess 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
+                  className={`px-4 py-2 rounded-md transition-colors ${hasWriteAccess
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                 >
                   + Nouvelle Catégorie
                 </button>
               </div>
 
-        {/* Messages */}
-        {message && (
-          <div className={`p-4 rounded-md ${
-            message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-          }`}>
-            {message.text}
-          </div>
-        )}
+              {/* Messages */}
+              {message && (
+                <div className={`p-4 rounded-md ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  }`}>
+                  {message.text}
+                </div>
+              )}
 
-        {/* Formulaire d'ajout */}
-        {isAddingNew && (
-          <CategoryForm
-            category={newCategoryTemplate}
-            onSubmit={(e, cat) => handleSubmit(e, cat)}
-            onCancel={() => setIsAddingNew(false)}
-            title="Nouvelle Catégorie"
-            hasWriteAccess={hasWriteAccess}
-          />
-        )}
+              {/* Formulaire d'ajout */}
+              {isAddingNew && (
+                <CategoryForm
+                  category={newCategoryTemplate}
+                  onSubmit={(e, cat) => handleSubmit(e, cat)}
+                  onCancel={() => setIsAddingNew(false)}
+                  title="Nouvelle Catégorie"
+                  hasWriteAccess={hasWriteAccess}
+                />
+              )}
 
-        {/* Liste des catégories */}
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="px-6 py-4 bg-gray-50 border-b">
-            <h2 className="text-lg font-semibold text-gray-900">Catégories existantes</h2>
-          </div>
-          
-          <div className="divide-y divide-gray-200">
-            {categories.map((category, index) => (
-              <div key={category.id}>
-                {editingCategory?.id === category.id ? (
-                  <CategoryForm
-                    category={editingCategory}
-                    onSubmit={(e, cat) => handleSubmit(e, cat)}
-                    onCancel={() => setEditingCategory(null)}
-                    title="Modifier la Catégorie"
-                    hasWriteAccess={hasWriteAccess}
-                  />
-                ) : (
-                  <CategoryRow
-                    category={category}
-                    index={index}
-                    totalCount={categories.length}
-                    onEdit={() => hasWriteAccess ? setEditingCategory(category) : showViewerError()}
-                    onDelete={() => hasWriteAccess ? deleteCategory(category.id) : showViewerError()}
-                    onMove={(direction) => hasWriteAccess ? moveCategory(index, direction) : showViewerError()}
-                    hasWriteAccess={hasWriteAccess}
-                  />
-                )}
+              {/* Liste des catégories */}
+              <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                <div className="px-6 py-4 bg-gray-50 border-b">
+                  <h2 className="text-lg font-semibold text-gray-900">Catégories existantes</h2>
+                </div>
+
+                <div className="divide-y divide-gray-200">
+                  {categories.map((category, index) => (
+                    <div key={category.id}>
+                      {editingCategory?.id === category.id ? (
+                        <CategoryForm
+                          category={editingCategory}
+                          onSubmit={(e, cat) => handleSubmit(e, cat)}
+                          onCancel={() => setEditingCategory(null)}
+                          title="Modifier la Catégorie"
+                          hasWriteAccess={hasWriteAccess}
+                        />
+                      ) : (
+                        <CategoryRow
+                          category={category}
+                          index={index}
+                          totalCount={categories.length}
+                          onEdit={() => hasWriteAccess ? setEditingCategory(category) : showViewerError()}
+                          onDelete={() => hasWriteAccess ? deleteCategory(category.id) : showViewerError()}
+                          onMove={(direction) => hasWriteAccess ? moveCategory(index, direction) : showViewerError()}
+                          hasWriteAccess={hasWriteAccess}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
             </div>
           </div>
         </AdminLayout>
@@ -335,27 +335,25 @@ const CategoryRow: React.FC<{
         <button
           onClick={() => onMove('up')}
           disabled={index === 0 || !hasWriteAccess}
-          className={`p-1 transition-colors ${
-            hasWriteAccess && index !== 0 
-              ? 'text-gray-400 hover:text-gray-600' 
-              : 'text-gray-300 cursor-not-allowed'
-          }`}
+          className={`p-1 transition-colors ${hasWriteAccess && index !== 0
+            ? 'text-gray-400 hover:text-gray-600'
+            : 'text-gray-300 cursor-not-allowed'
+            }`}
         >
           ↑
         </button>
         <button
           onClick={() => onMove('down')}
           disabled={index === totalCount - 1 || !hasWriteAccess}
-          className={`p-1 transition-colors ${
-            hasWriteAccess && index !== totalCount - 1 
-              ? 'text-gray-400 hover:text-gray-600' 
-              : 'text-gray-300 cursor-not-allowed'
-          }`}
+          className={`p-1 transition-colors ${hasWriteAccess && index !== totalCount - 1
+            ? 'text-gray-400 hover:text-gray-600'
+            : 'text-gray-300 cursor-not-allowed'
+            }`}
         >
           ↓
         </button>
       </div>
-      
+
       <div className="flex items-center space-x-3">
         <span className="px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-800">
           {category.label}
@@ -368,32 +366,29 @@ const CategoryRow: React.FC<{
     </div>
 
     <div className="flex items-center space-x-2">
-      <span className={`px-2 py-1 text-xs rounded ${
-        category.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-      }`}>
+      <span className={`px-2 py-1 text-xs rounded ${category.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
         {category.isActive ? 'Actif' : 'Inactif'}
       </span>
-      
+
       <button
         onClick={onEdit}
         disabled={!hasWriteAccess}
-        className={`px-3 py-1 rounded transition-colors ${
-          hasWriteAccess 
-            ? 'text-blue-600 hover:text-blue-800' 
-            : 'text-gray-400 cursor-not-allowed'
-        }`}
+        className={`px-3 py-1 rounded transition-colors ${hasWriteAccess
+          ? 'text-blue-600 hover:text-blue-800'
+          : 'text-gray-400 cursor-not-allowed'
+          }`}
       >
         Modifier
       </button>
-      
+
       <button
         onClick={onDelete}
         disabled={!hasWriteAccess}
-        className={`px-3 py-1 rounded transition-colors ${
-          hasWriteAccess 
-            ? 'text-red-600 hover:text-red-800' 
-            : 'text-gray-400 cursor-not-allowed'
-        }`}
+        className={`px-3 py-1 rounded transition-colors ${hasWriteAccess
+          ? 'text-red-600 hover:text-red-800'
+          : 'text-gray-400 cursor-not-allowed'
+          }`}
       >
         Supprimer
       </button>
@@ -424,7 +419,7 @@ const CategoryForm: React.FC<{
   return (
     <div className="px-6 py-4 bg-gray-50">
       <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
-      
+
       <form onSubmit={(e) => onSubmit(e, formData)} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -434,11 +429,10 @@ const CategoryForm: React.FC<{
             <input
               type="text"
               value={formData.value}
-              onChange={(e) => hasWriteAccess && setFormData({...formData, value: e.target.value})}
+              onChange={(e) => hasWriteAccess && setFormData({ ...formData, value: e.target.value })}
               disabled={!hasWriteAccess}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
-              }`}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${!hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
               placeholder="ex: Theater, Dance..."
               required
             />
@@ -451,11 +445,10 @@ const CategoryForm: React.FC<{
             <input
               type="text"
               value={formData.label}
-              onChange={(e) => hasWriteAccess && setFormData({...formData, label: e.target.value})}
+              onChange={(e) => hasWriteAccess && setFormData({ ...formData, label: e.target.value })}
               disabled={!hasWriteAccess}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
-              }`}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${!hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
               placeholder="ex: Théâtre, Danse..."
               required
             />
@@ -467,11 +460,10 @@ const CategoryForm: React.FC<{
             </label>
             <select
               value={formData.isActive ? 'true' : 'false'}
-              onChange={(e) => hasWriteAccess && setFormData({...formData, isActive: e.target.value === 'true'})}
+              onChange={(e) => hasWriteAccess && setFormData({ ...formData, isActive: e.target.value === 'true' })}
               disabled={!hasWriteAccess}
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                !hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
-              }`}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${!hasWriteAccess ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
             >
               <option value="true">Actif</option>
               <option value="false">Inactif</option>
@@ -490,11 +482,10 @@ const CategoryForm: React.FC<{
           <button
             type="submit"
             disabled={!hasWriteAccess}
-            className={`px-4 py-2 rounded-md transition-colors ${
-              hasWriteAccess 
-                ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
+            className={`px-4 py-2 rounded-md transition-colors ${hasWriteAccess
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
           >
             Sauvegarder
           </button>
