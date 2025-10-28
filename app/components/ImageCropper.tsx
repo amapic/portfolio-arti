@@ -279,7 +279,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
                 disabled={readOnly}
                 className={`p-2 text-sm border rounded-md transition-colors ${readOnly ? 'opacity-50 cursor-not-allowed' : ''} ${
                   dimension[0] === dim.value[0] && dimension[1] === dim.value[1]
-                    ? 'bg-blue-100 border-blue-500 text-blue-700'
+                    ? 'bg-customblue border-customblue text-white'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >

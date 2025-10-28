@@ -184,8 +184,8 @@ export const AddExperienceModal = ({ onClose, onAdd }: { onClose: () => void, on
                         setPreviewUrl("");
                         setExperience((prev) => ({ ...prev, logoUrl: "" }));
                       }}
-                      className="absolute top-1 right-1 p-1 bg-red-500 rounded-full 
-                        text-white hover:bg-red-600 transition-colors"
+                      className="absolute top-1 right-1 p-1 bg-custom-red rounded-full 
+                        text-white hover:bg-custom-red transition-colors"
                     >
                       <HiOutlineX className="w-4 h-4" />
                     </button>
@@ -362,7 +362,7 @@ export const AddExperienceModal = ({ onClose, onAdd }: { onClose: () => void, on
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 bg-customblue text-white rounded-lg hover:bg-customblue"
             >
               Ajouter
             </button>

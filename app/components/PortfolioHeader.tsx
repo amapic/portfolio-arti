@@ -41,7 +41,7 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({
           >
             home
           </a> 
-           <span className="text-gray-400 font-light">|</span> 
+           <span className="text-black font-light">|</span> 
           <a
             href="/a-propos"
             className="w-[100px] text-md lg:text-lg text-black no-underline font-[400]  tracking-wide hover:font-[600] transition-all duration-200 hover:text-shadow"

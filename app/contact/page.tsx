@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import PortfolioHeader from '../components/PortfolioHeader';
 import PortfolioFooter from '@components/PortfolioFooter';
 
 interface ContactData {
@@ -125,7 +124,7 @@ const ContactPage: React.FC = () => {
           <p className="text-red-600 mb-4">Erreur: {error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-customblue text-white rounded hover:bg-customblue"
           >
             Réessayer
           </button>
@@ -144,12 +143,6 @@ const ContactPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-exposure">
-      {/* Header */}
-      <PortfolioHeader 
-        title="Pierre Bazin"
-        showNavigation={true}
-      />
-
       {/* Indicateur de chargement d'image */}
       {showLoadingIndicator && !imageLoaded && contactData?.contact.image_url && (
         <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">

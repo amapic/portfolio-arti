@@ -5,7 +5,7 @@ export const Breadcrumbs = ({ items }: { items: Array<{ label: string; href: str
         {items.map((item, index) => (
           <li key={item.href} className="flex items-center">
             {index > 0 && <span className="mx-2">/</span>}
-            <a href={item.href} className="hover:text-blue-600">
+            <a href={item.href} className="hover:text-customblue">
               {item.label}
             </a>
           </li>

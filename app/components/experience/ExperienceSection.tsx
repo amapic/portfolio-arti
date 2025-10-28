@@ -41,7 +41,7 @@ export const ExperienceSection = ({
                 <button
                   onClick={() => onDelete(experience.id)}
                   className="absolute top-4 right-4 p-2 text-red-500
-                    transition-colors hover:text-red-700 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50"
+                    transition-colors hover:text-red-700 rounded-full hover:bg-custom-red dark:hover:bg-custom-red"
                   aria-label="Supprimer l'expérience"
                 >
                   <HiOutlineTrash className="w-5 h-5" />
@@ -61,14 +61,14 @@ export const ExperienceSection = ({
                             setExperienceToEdit(experience);
                             setIsEditingExperience(true);
                           }}
-                          className="ml-2 p-2 text-blue-500 transition-colors hover:text-blue-700 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                          className="ml-2 p-2 text-customblue transition-colors hover:text-customblue rounded-full hover:bg-customblue dark:hover:bg-customblue"
                           aria-label="Éditer l'expérience"
                         >
                           <HiOutlinePencil className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => onDelete(experience.id)}
-                          className="ml-2 p-2 text-red-500 transition-colors hover:text-red-700 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50"
+                          className="ml-2 p-2 text-red-500 transition-colors hover:text-red-700 rounded-full hover:bg-custom-red dark:hover:bg-custom-red"
                           aria-label="Supprimer l'expérience"
                         >
                           <HiOutlineTrash className="w-5 h-5" />
@@ -131,7 +131,7 @@ export const ExperienceSection = ({
                       {experience.technologies.map((tech) => (
                         <span
                           key={tech}
-                          className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm"
+                          className="px-3 py-1 bg-customblue dark:bg-customblue text-white dark:text-white rounded-full text-sm"
                         >
                           {tech}
                         </span>

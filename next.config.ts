@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  // Suppression de 'output: export' pour le mode app complet
   // basePath: '/projets/demo',
   /* config options here */
   eslint: {
@@ -21,7 +21,8 @@ const nextConfig: NextConfig = {
   // Configuration pour les images externes Strapi
   images: {
     domains: ['46.101.250.41', 'dev2site.net'],
-    unoptimized: true, // Nécessaire pour output: 'export'
+    // Suppression de 'unoptimized' pour profiter de l'optimisation Next.js
+    formats: ['image/webp', 'image/avif'],
   },
   // generateRobotsTxt: false,
   // generateManifest: false

@@ -28,7 +28,7 @@ const Card: React.FC<CardProps> = ({ id, icon, title, content, isLoggedIn, onDel
         <button
           onClick={() => onDelete(id)}
           className="absolute top-2 right-2 p-2 text-red-500 opacity-0 group-hover:opacity-100 
-            transition-opacity hover:text-red-700 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50"
+            transition-opacity hover:text-red-700 rounded-full hover:bg-custom-red dark:hover:bg-custom-red"
           aria-label="Supprimer la carte"
         >
           <HiOutlineTrash className="w-5 h-5" />

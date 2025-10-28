@@ -22,7 +22,7 @@ export default function ConfirmationModal({
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
       <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl">
         <div className="flex items-center gap-4 mb-4">
-          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-custom-red flex items-center justify-center">
             <HiExclamation className="h-6 w-6 text-red-600" />
           </div>
           <div className="flex-1">
@@ -43,7 +43,7 @@ export default function ConfirmationModal({
               onConfirm();
               onClose();
             }}
-            className="px-4 py-2 text-white font-medium bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+            className="px-4 py-2 text-white font-medium bg-custom-red rounded-lg hover:bg-custom-red transition-colors"
           >
             Supprimer
           </button>

@@ -204,7 +204,7 @@ const CategoriesAdminContent: React.FC = () => {
 
           <AdminLayout>
             <div className="max-w-4xl mx-auto p-6">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-6 mt-6">
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Catégories
                 </h1>
@@ -235,7 +235,7 @@ const CategoriesAdminContent: React.FC = () => {
 
         <AdminLayout>
           <div className="max-w-4xl mx-auto p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-6 mt-6">
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Catégories
               </h1>
@@ -261,7 +261,7 @@ const CategoriesAdminContent: React.FC = () => {
 
               {/* Messages */}
               {message && (
-                <div className={`p-4 rounded-md ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                <div className={`p-4 rounded-md ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-custom-red text-red-700'
                   }`}>
                   {message.text}
                 </div>
@@ -279,8 +279,8 @@ const CategoriesAdminContent: React.FC = () => {
               )}
 
               {/* Liste des catégories */}
-              <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                <div className="px-6 py-4 bg-gray-50 border-b">
+              <div className="bg-white  rounded-lg overflow-hidden border-gray-100 border-2">
+                <div className="px-6 py-4 border-b">
                   <h2 className="text-lg font-semibold text-gray-900">Catégories existantes</h2>
                 </div>
 
@@ -366,7 +366,7 @@ const CategoryRow: React.FC<{
     </div>
 
     <div className="flex items-center space-x-2">
-      <span className={`px-2 py-1 text-xs rounded ${category.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+      <span className={`px-2 py-1 text-xs rounded ${category.isActive ? 'bg-green-100 text-green-800' : 'bg-custom-red text-red-800'
         }`}>
         {category.isActive ? 'Actif' : 'Inactif'}
       </span>
@@ -409,7 +409,7 @@ const CategoryForm: React.FC<{
   const colorOptions = [
     { value: 'bg-black text-white', label: 'Noir' },
     { value: 'bg-blue-600 text-white', label: 'Bleu' },
-    { value: 'bg-red-600 text-white', label: 'Rouge' },
+    { value: 'bg-custom-red text-white', label: 'Rouge' },
     { value: 'bg-green-600 text-white', label: 'Vert' },
     { value: 'bg-purple-600 text-white', label: 'Violet' },
     { value: 'bg-orange-600 text-white', label: 'Orange' },

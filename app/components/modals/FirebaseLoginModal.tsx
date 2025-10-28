@@ -57,7 +57,7 @@ export const FirebaseLoginModal: React.FC<FirebaseLoginModalProps> = ({ onClose 
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-customred border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
@@ -72,7 +72,7 @@ export const FirebaseLoginModal: React.FC<FirebaseLoginModalProps> = ({ onClose 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-customblue"
               placeholder="votre@email.com"
             />
           </div>
@@ -128,7 +128,7 @@ export const FirebaseLoginModal: React.FC<FirebaseLoginModalProps> = ({ onClose 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-customblue text-white py-2 px-4 rounded-md hover:bg-customblue focus:outline-none focus:ring-2 focus:ring-customblue disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Chargement...' : (isRegistering ? 'Créer le compte' : 'Se connecter')}
           </button>

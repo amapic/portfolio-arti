@@ -30,14 +30,14 @@ export const SimpleAdminRoute: React.FC<SimpleAdminRouteProps> = ({ children }) 
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#f8f8fb]">
       {/* Barre d'information en mode viewer par défaut */}
       {isDefaultMode && (
-        <div className="bg-blue-50 border-b border-blue-200 px-4 py-3">
+        <div className="bg-customblue border-b border-customblue px-4 py-3">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
-                <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span className="inline-block w-2 h-2 bg-customblue rounded-full"></span>
                 <span className="text-sm text-blue-700 font-medium">
                   Mode consultation
                 </span>
@@ -48,7 +48,7 @@ export const SimpleAdminRoute: React.FC<SimpleAdminRouteProps> = ({ children }) 
             </div>
             <button
               onClick={switchToEditMode}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md transition-colors"
+              className="bg-customblue hover:bg-customblue text-white text-sm px-4 py-2 rounded-md transition-colors"
             >
               Passer en mode édition
             </button>

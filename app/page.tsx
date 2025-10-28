@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import PortfolioHeader from "./components/PortfolioHeader"; // Assurez-vous que ce composant existe
 import SimpleLightbox from "./components/SimpleLightbox";
 import { Analytics } from "@vercel/analytics/next"
 interface ApiCategory {
@@ -981,7 +980,6 @@ const TestIsotopePage: React.FC = () => {
         <Analytics />
       <div className="min-h-screen bg-white font-serif p-0 m-0 w-full">
         {/* <h1>🎨 Portfolio avec API</h1> */}
-        <PortfolioHeader />
         {!loading && (
           <>
             <div

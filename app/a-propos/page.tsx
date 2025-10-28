@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import PortfolioHeader from '../components/PortfolioHeader';
 import PortfolioFooter from '../components/PortfolioFooter';
 import { TextData } from '../types/text';
 
@@ -96,12 +95,6 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <PortfolioHeader 
-        title="Pierre Bazin"
-        showNavigation={true}
-      />
-
       {/* Indicateur de chargement d'image */}
       {showLoadingIndicator && !imageLoaded && textData?.about.image_url && (
         <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">

@@ -1,63 +1,44 @@
-'use client';
-
+import React from 'react';
 import { ThemeProvider } from './components/ThemeProvider';
-// import { AuthProvider } from './components/AuthProvider';
-// import { AuthProvider } from './components/FirebaseAuthProvider';
-import { Metadata } from 'next';
-import localFont from "next/font/local";
+import { AuthProvider } from './components/SimpleAuthProvider';
+import { ConditionalHeader } from './components/ConditionalHeader';
+import type { Metadata } from 'next';
 import "./globals.css";
 
-// const geistSans = localFont({
-//   src: "./fonts/GeistVF.woff",
-//   variable: "--font-geist-sans",
-//   weight: "100 900",
-// });
-// const geistMono = localFont({
-//   src: "./fonts/GeistMonoVF.woff",
-//   variable: "--font-geist-mono",
-//   weight: "100 900",
-// });
+export const metadata: Metadata = {
+  title: 'Pierre Bazin - Photographe',
+  description: 'Pierre Bazin - Photographe professionnel',
+  keywords: ['photographie', 'photographe', 'Pierre Bazin'],
+  authors: [{ name: 'Pierre Bazin' }],
+  creator: 'Pierre Bazin',
+  publisher: 'Pierre Bazin',
+  robots: 'index, follow',
+  icons: {
+    icon: '/sgd.png?v=3'
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    url: 'https://dev2site.net',
+    siteName: 'Pierre Bazin - Photographe',
+    title: 'Pierre Bazin - Photographe',
+    description: 'Pierre Bazin - Photographe professionnel',
+    images: [
+      {
+        url: 'https://pierrebazin.fr/images/dev2site.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Pierre Bazin - Photographe',
+      },
+    ],
+  },
+};
 
-// export const metadata: Metadata = {
-//   title: 'Amaury Pichat - Consultant GED',
-//   description: 'Expert en gestion électronique de documents (GED) et solutions documentaires. Consultant indépendant spécialisé en OpenText Documentum.',
-//   keywords: ['GED', 'Documentum', 'OpenText', 'consultant', 'gestion documentaire', 'ECM'],
-//   authors: [{ name: 'Amaury Pichat' }],
-//   creator: 'Amaury Pichat',
-//   publisher: 'Amaury Pichat',
-//   robots: 'index, follow',
-//   icons: {
-//     icon: '/icon.ico?v=3'
-//   },
-//   openGraph: {
-//     type: 'website',
-//     locale: 'fr_FR',
-//     url: 'https://www.amaurypichat.fr',
-//     siteName: 'Amaury Pichat - Consultant GED',
-//     title: 'Amaury Pichat - Expert GED & Documentum',
-//     description: 'Consultant indépendant spécialisé en solutions GED et Documentum',
-//     // images: [
-//     //   {
-//     //     url: '/images/og-image.jpg', // Créez une image attractive pour les réseaux sociaux
-//     //     width: 1200,
-//     //     height: 630,
-//     //     alt: 'Amaury Pichat - Consultant GED',
-//     //   },
-//     // ],
-//   },
-//   // twitter: {
-//   //   card: 'summary_large_image',
-//   //   title: 'Amaury Pichat - Expert GED & Documentum',
-//   //   description: 'Consultant indépendant spécialisé en solutions GED et Documentum',
-//   //   images: ['/images/og-image.jpg'],
-//   // }
-// }
-
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
@@ -77,17 +58,17 @@ export default function RootLayout({
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
-        <meta name="title" content="Pierre Bazin - Photographe" />
         <link rel="icon" type="image/x-icon" href="/sgd.png?v=3" />
-        <meta property="og:title" content="Pierre Bazin - Photographe" />
-        <meta property="og:description" content="Pierre Bazin - Photographe" />
-        <meta property="og:image" content="https://pierrebazin.fr/images/dev2site.jpg" />
-        <meta property="og:url" content="https://dev2site.net" />
       </head>
       <body>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <ConditionalHeader />
+            <main className="pt-0">
+              {children}
+            </main>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

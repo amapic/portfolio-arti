@@ -231,7 +231,7 @@ const ContactAdmin: React.FC = () => {
           
           <AdminLayout>
             <div className="max-w-4xl mx-auto p-6">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-6 mt-6">
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Contact
                 </h1>
@@ -255,7 +255,7 @@ const ContactAdmin: React.FC = () => {
           
           <AdminLayout>
             <div className="max-w-4xl mx-auto p-6">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-6 mt-6   ">
                 <h1 className="text-2xl font-bold text-gray-900">
                   Administration - Contact
                 </h1>
@@ -280,7 +280,7 @@ const ContactAdmin: React.FC = () => {
         {notification && (
           <div
             className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white text-center font-semibold transition-all ${
-              notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              notification.type === 'success' ? 'bg-green-600' : 'bg-custom-red'
             }`}
           >
             {notification.message}
@@ -289,7 +289,7 @@ const ContactAdmin: React.FC = () => {
         
         <AdminLayout>
           <div className="max-w-4xl mx-auto p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-6 mt-6">
               <h1 className="text-2xl font-bold text-gray-900">
                 Administration - Contact
               </h1>
@@ -298,7 +298,7 @@ const ContactAdmin: React.FC = () => {
               </Link> */}
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+            <div className="bg-white rounded-lg p-6 space-y-6 border-gray-100 border-2">
               {/* Image */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">

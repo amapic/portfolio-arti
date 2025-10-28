@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: 'ExposureTrial';
   src: url('/ExposureTrial-0.woff2') format('woff2');
@@ -9,10 +13,8 @@
 .font-exposure {
   font-family: 'ExposureTrial', serif !important;
 }
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
+/* @import "tailwindcss"; */
 /* Force la barre de défilement pour éviter le hochement lors des transitions */
 /* Et assure que html/body prennent toujours 100% de la largeur */
 html {
@@ -25,6 +27,8 @@ body {
   width: 100%;
   min-width: 100%;
 }
+
+
 
 /* Ajoutez une transition douce pour les changements de thème */
 /* * {

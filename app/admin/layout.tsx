@@ -9,15 +9,15 @@ import "../globals.css";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <NoSSR>
-      <ThemeProvider>
+      {/* <ThemeProvider> */}
         <AuthProvider>
           <SimpleAdminRoute>
-            <div suppressHydrationWarning={true}>
+            <div suppressHydrationWarning={true} className='font-admin'>
               {children}
             </div>
           </SimpleAdminRoute>
         </AuthProvider>
-      </ThemeProvider>
+      {/* </ThemeProvider> */}
     </NoSSR>
   );
 }

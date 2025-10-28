@@ -91,7 +91,7 @@ export const ContactSection = ({
             <a
               href={`mailto:${texts.contactEmail}`}
               className="inline-flex items-center gap-2 px-6 py-3 
-                bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                bg-customblue text-white rounded-lg hover:bg-customblue 
                 transition-colors"
             >
               <HiOutlineEnvelope className="text-xl" />

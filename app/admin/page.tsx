@@ -25,7 +25,7 @@ const AdminHomePage: React.FC = () => {
                 </h1>
                 {/* <button
                   onClick={logout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  className="px-4 py-2 bg-custom-red text-white rounded-md hover:bg-custom-red"
                 >
                   Déconnexion
                 </button> */}
@@ -88,7 +88,7 @@ const AdminHomePage: React.FC = () => {
               </div>
 
               {/* Statistiques rapides */}
-              <div className="mt-12 bg-white rounded-lg shadow-md p-6">
+              {/* <div className="mt-12 bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Accès rapide</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Link
@@ -138,7 +138,7 @@ const AdminHomePage: React.FC = () => {
                     <div className="text-sm text-gray-600">Voir le site</div>
                   </a>
                 </div>
-              </div>
+              </div> */}
             </div>
           </AdminLayout>
           <div className="absolute bottom-0 w-full">

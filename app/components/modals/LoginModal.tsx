@@ -73,7 +73,7 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
                 onChange={(e) => setUserType(e.target.value as 'admin' | 'viewer')}
                 className={`w-full pl-10 pr-4 py-2 border rounded-lg 
                   bg-black text-white border-gray-300
-                  focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                  focus:ring-2 focus:ring-customblue focus:border-transparent
                   ${error ? 'border-red-500' : 'border-gray-300'}`}
                 required
               >
@@ -95,7 +95,7 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
                 onChange={(e) => setPassword(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 border rounded-lg 
                   bg-black text-white border-gray-300
-                  focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                  focus:ring-2 focus:ring-customblue focus:border-transparent
                   ${error ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="Mot de passe"
                 required
@@ -122,8 +122,8 @@ export const LoginModal = ({ onClose, onLogin }: LoginModalProps) => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`px-4 py-2 bg-blue-600 text-white rounded-lg 
-                hover:bg-blue-700 transition-colors
+              className={`px-4 py-2 bg-customblue text-white rounded-lg 
+                hover:bg-customblue transition-colors
                 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isLoading ? 'Connexion...' : 'Se connecter'}
