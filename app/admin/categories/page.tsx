@@ -251,7 +251,7 @@ const CategoriesAdminContent: React.FC = () => {
                   onClick={() => setIsAddingNew(true)}
                   disabled={!hasWriteAccess}
                   className={`px-4 py-2 rounded-md transition-colors ${hasWriteAccess
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    ? 'bg-customblue hover:bg-custombluedark text-white'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                 >

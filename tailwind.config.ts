@@ -14,6 +14,7 @@ const config: Config = {
         foreground: "var(--foreground)",
         customred: '#f87957',
         customblue: '#3688fa',
+        custombluedark:'#2c6f9c',
         paleblue: '#9cc9f5',
         bgheader: '#2d394b',
         customyellow: '#ffae1f',

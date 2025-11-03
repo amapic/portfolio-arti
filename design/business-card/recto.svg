@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Recto — Inspired minimalist card, 85×54mm + 3mm bleed (total 91×60mm) -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="91mm" height="60mm" viewBox="0 0 91 60" version="1.1">
+  <title>Business Card – Recto (Front)</title>
+  <desc>Print-ready SVG with bleed and crop marks. Edit texts in the TRIM group. Measurements in mm.</desc>
+
+  <defs>
+    <style type="text/css"><![CDATA[
+      .bg { fill: #c9d7d7; } /* soft desaturated blue/green */
+      .ink { fill: #2f3a40; } /* dark slate */
+      .accent { stroke: #2f3a40; stroke-width: 0.35; stroke-linecap: round; }
+      .logo-stroke { stroke: #a6bcbc; stroke-width: 0.6; fill: none; }
+	  .logo-stroke2 { stroke: #a6bcbc; stroke-width: 0.1; fill: #a6bcbc; transform:scale(1,0.95) }
+      .name { font: 600	 1.30mm/1.1 'Segoe UI', 'Montserrat', Arial, sans-serif; letter-spacing: 0.3mm; }
+      .role { font: italic 400 1.1mm/1.2 'Georgia', 'Times New Roman', serif; fill: #3b454b; }
+      .safe { fill: none; stroke: #00aaff; stroke-width: 0.2; stroke-dasharray: 1.2 1.2; opacity: .35; }
+      .trim { fill: none; stroke: #ff3b30; stroke-width: 0.25; opacity: .5; }
+      .crops { stroke: #000; stroke-width: 0.2; fill: none; }
+      .hide { display: none; }
+    ]]></style>
+  </defs>
+
+  <!-- BLEED BACKGROUND (extends to full 91×60mm) -->
+  <rect class="bg" x="0" y="0" width="91" height="60"/>
+
+  <!-- TRIM area (85×54mm inside 3mm bleed) -->
+  <g id="TRIM" transform="translate(3,3)">
+    <!-- Optional visual guides: safe area and trim outline. Toggle class 'hide' off to display. -->
+    <rect class="safe hide" x="4" y="4" width="77" height="46" rx="1"/>
+    <rect class="trim hide" x="0" y="0" width="85" height="54" rx="1.5"/>
+
+    <!-- Logo mark: two overlapping circles -->
+    <g transform="translate(42.5,16)">
+      <!-- <circle class="logo-stroke" r="6.6" cx="-4.2" cy="0"/> -->
+      <circle class="logo-stroke" r="6.6" cx="4.2" cy="0"/>
+	   <text class="logo-stroke2" x="-14.5" y="3.8" >@</text>
+    </g>
+
+    <!-- Name & role -->
+    <g text-anchor="middle">
+      <text class="ink name" x="42.5" y="31">AMAURY PICHAT</text>
+      <text class="role" x="42.5" y="38">Développeur web</text>
+    </g>
+
+    <!-- Accent line -->
+    <line class="accent" x1="35" x2="50" y1="41" y2="41"/>
+  </g>
+
+  <!-- Crop marks (5mm length) -->
+  <g id="CROPS" class="crops">
+    <!-- left-top -->
+    <path d="M3 0 v3 M0 3 h3"/>
+    <!-- right-top -->
+    <path d="M88 0 v3 M91 3 h-3"/>
+    <!-- left-bottom -->
+    <path d="M3 60 v-3 M0 57 h3"/>
+    <!-- right-bottom -->
+    <path d="M88 60 v-3 M91 57 h-3"/>
+  </g>
+</svg>

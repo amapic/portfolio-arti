@@ -30,7 +30,7 @@ export const SimpleAdminRoute: React.FC<SimpleAdminRouteProps> = ({ children }) 
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f8fb]">
+    <div className="min-h-screen bg-[#f8f8fb] w-full">
       {/* Barre d'information en mode viewer par défaut */}
       {isDefaultMode && (
         <div className="bg-customblue border-b border-customblue px-4 py-3">

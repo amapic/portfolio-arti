@@ -85,6 +85,25 @@ const AdminHomePage: React.FC = () => {
                     Gérer les informations de contact et l'image associée
                   </p>
                 </Link>
+
+                {/* Card Catégories */}
+                <Link
+                  href="/admin/categories"
+                  className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center mb-4">
+                    <div className="p-3 bg-yellow-100 rounded-lg">
+                      <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h3l2 2h7a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8M8 9h8M8 15h5" />
+                      </svg>
+                    </div>
+                    <h3 className="ml-4 text-lg font-semibold text-gray-900">Catégories</h3>
+                  </div>
+                  <p className="text-gray-600">
+                    Créer, renommer et organiser les catégories du portfolio
+                  </p>
+                </Link>
               </div>
 
               {/* Statistiques rapides */}

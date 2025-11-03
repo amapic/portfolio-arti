@@ -67,6 +67,14 @@ const TestIsotopePage: React.FC = () => {
   const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // Réserver l'espace du scrollbar uniquement sur la page d'accueil publique
+  useEffect(() => {
+    document.body.classList.add('reserve-scrollbar');
+    return () => {
+      document.body.classList.remove('reserve-scrollbar');
+    };
+  }, []);
+  
   // États pour le lightbox
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImages, setLightboxImages] = useState<GalleryItem[]>([]);
@@ -396,6 +404,16 @@ const TestIsotopePage: React.FC = () => {
 
                 // Cacher complètement la grille pendant le filtrage
                 // $(".grid").css({ opacity: 1 });
+                // Verrouiller temporairement la hauteur pour éviter l'apparition d'une seconde barre de scroll
+                const $gridElem = $(".grid");
+                const currentHeight = $gridElem.height() || 0;
+                $gridElem
+                  .addClass("is-arranging")
+                  .css({ minHeight: currentHeight, maxHeight: currentHeight, overflow: "hidden" });
+                // Déverrouiller après l'arrangement
+                $grid.one('arrangeComplete', function(){
+                  $gridElem.removeClass('is-arranging').css({ minHeight: '', maxHeight: '', overflow: '' });
+                });
                 
                 // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
                 setTimeout(() => {
@@ -428,6 +446,15 @@ const TestIsotopePage: React.FC = () => {
                 
                 // Cacher complètement la grille pendant le redimensionnement
                 // $(".grid").css({ opacity: 0 });
+                // Verrouiller temporairement la hauteur pendant le recalcul
+                const $gridElem = $(".grid");
+                const currentHeight = $gridElem.height() || 0;
+                $gridElem
+                  .addClass("is-arranging")
+                  .css({ minHeight: currentHeight, maxHeight: currentHeight, overflow: "hidden" });
+                $grid.one('arrangeComplete', function(){
+                  $gridElem.removeClass('is-arranging').css({ minHeight: '', maxHeight: '', overflow: '' });
+                });
                 
                 // Attendre que la transition d'opacité soit terminée avant de réarranger les éléments
                 setTimeout(() => {

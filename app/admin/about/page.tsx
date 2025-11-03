@@ -517,7 +517,7 @@ const AboutAdmin: React.FC = () => {
                   disabled={saving || !hasWriteAccess}
                   className={`px-6 py-2 rounded-md transition-colors ${
                     hasWriteAccess 
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed' 
+                      ? 'bg-customblue text-white hover:bg-custombluedark disabled:opacity-50 disabled:cursor-not-allowed' 
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >

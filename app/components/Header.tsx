@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { BsBoxArrowRight, BsPersonCircle } from "react-icons/bs";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 // import { CategoryNavigation } from './CategoryNavigation';
@@ -11,10 +12,10 @@ export const Header = () => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith('/admin');
-  const { logout, user } = useAuth();
+  const { logout, user, loading } = useAuth();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-bgheader dark:bg-gray-900 text-white min-h-[60px]">
+    <header className="z-10 fixed top-0 left-0 right-0 z-50 bg-bgheader dark:bg-gray-900 text-white min-h-[60px]">
       <div className="w-[100%] mx-auto px-6 py-[10px] flex justify-around items-center ">
         <div className="flex items-center gap-4">
           <Link
@@ -70,20 +71,43 @@ export const Header = () => {
 
         <div className="flex items-center gap-4 h-full">
           {/* Informations utilisateur et déconnexion pour les pages admin */}
-          {isAdminPage && user && (
+          {isAdminPage && (
             <>
-              <span className={`px-4 py-2 text-center rounded-md text-sm font-medium ${user.role === 'admin'
-                  ? 'bg-customgreen text-green-800'
-                  : 'bg-customyellow text-white'
-                }`}>
-                {user.role === 'admin' ? 'Mon statut : Administrateur' : 'Mon statut : Viewer (Lecture seule)'}
-              </span>
-              <button
-                onClick={logout}
-                className="px-4 py-2 bg-customred text-white rounded-sm hover:bg-custom-red transition-colors"
-              >
-                Déconnexion
-              </button>
+              {loading ? (
+                // Affichage pendant le chargement (zones grisées)
+                <>
+                  <span className="px-4 py-2 text-center rounded-md text-sm font-medium flex items-center gap-2 bg-gray-300 text-gray-500 animate-pulse">
+                    <BsPersonCircle className="w-5 h-5 mr-2" />
+                    Vérification du statut...
+                  </span>
+                  <button
+                    disabled
+                    className="px-4 py-2 rounded-sm flex items-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed"
+                  >
+                    <BsBoxArrowRight className="w-4 h-4" />
+                    ...
+                  </button>
+                </>
+              ) : user ? (
+                // Affichage une fois le statut vérifié
+                <>
+                  <span className={`px-4 py-2 text-center rounded-md text-sm font-medium flex items-center gap-2 ${user.role === 'admin'
+                      ? 'bg-customgreen text-white'
+                      : 'bg-customyellow text-white'
+                    }`}>
+                    <BsPersonCircle className="w-5 h-5 mr-2" />
+                    {user.role === 'admin' ? 'Mon statut : Administrateur' : 'Mon statut : Viewer (Lecture seule)'}
+                  </span>
+                  <button
+                    onClick={logout}
+                    className={`px-4 py-2 rounded-sm transition-colors flex items-center gap-2
+                      ${user.role === 'admin' ? 'bg-customred text-white hover:bg-custom-red' : 'bg-customgreen text-white hover:bg-customgreendark'}`}
+                  >
+                    <BsBoxArrowRight className="w-4 h-4" />
+                    {user.role === 'admin' ? 'Déconnexion' : 'Se connecter'}
+                  </button>
+                </>
+              ) : null}
             </>
           )}
         </div>

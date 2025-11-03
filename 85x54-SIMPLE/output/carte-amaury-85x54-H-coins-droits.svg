@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Carte de visite 85x54 mm, document avec fond perdu 3 mm (total 91x60 mm) -->
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="91mm" height="60mm" viewBox="0 0 910 600">
+  <!-- Conventions: 10 units = 1 mm. Trim area: 85x54 mm, positioned at (30,30) to leave 3 mm bleed. -->
+  <defs>
+    <style type="text/css"><![CDATA[
+      .text-large { font-family: Arial, Helvetica, sans-serif; font-size: 44px; fill: #000000; letter-spacing: 0.5px; }
+      .text-medium { font-family: Arial, Helvetica, sans-serif; font-size: 24px; fill: #000000; }
+      .text-small { font-family: Arial, Helvetica, sans-serif; font-size: 22px; fill: #000000; }
+      .muted { fill: #444444; }
+      .accent { fill: #3688FA; }
+      .separator { stroke: #E5E7EB; stroke-width: 1; }
+      .crop { stroke: #000000; stroke-width: 0.75; fill: none; }
+    ]]></style>
+  </defs>
+
+  <!-- Fond total jusqu'au bleed (blanc) -->
+  <rect x="0" y="0" width="910" height="600" fill="#FFFFFF" />
+
+  <!-- Zone de coupe (trim) 85x54mm, positionnée après 3mm de bleed: x=30,y=30,w=850,h=540 -->
+  <!-- Rectangle invisible juste pour repère; ne pas imprimer de trait de coupe ici -->
+  <!-- <rect x="30" y="30" width="850" height="540" fill="none" stroke="#EEEEEE"/> -->
+
+  <!-- Safe zone (marge intérieure 5mm depuis le trim) -> 70 units (7mm) de marge totale horizontale? On choisit 5mm. -->
+  <!-- trim: 30..880 / 30..570; safe: +50/-50 => 80..830 / 80..520 -->
+  <!-- Nous n'affichons pas la zone de sécurité; juste en tenir compte pour placer le texte. -->
+
+  <!-- Contenu carte (recto, simple) -->
+  <!-- Bloc texte à gauche, logo/initiales à droite (optionnel) -->
+
+  <!-- Nom -->
+  <text x="80" y="150" class="text-large">Amaury PICHAT</text>
+
+  <!-- Titre / activité -->
+  <text x="80" y="195" class="text-medium muted">Développement web</text>
+
+  <!-- Séparateur -->
+  <line x1="80" y1="215" x2="830" y2="215" class="separator" />
+
+  <!-- Coordonnées -->
+  <text x="80" y="260" class="text-small">06 88 91 80 19</text>
+  <text x="80" y="295" class="text-small">amo@dev2Site.net</text>
+  <text x="80" y="330" class="text-small">dev2site.net</text>
+  <text x="80" y="365" class="text-small">8 rue Sully</text>
+
+  <!-- Accent graphique discret (barre verticale à gauche) -->
+  <rect x="60" y="120" width="6" height="260" class="accent" />
+
+  <!-- Option espace pour logo à droite -->
+  <!-- <circle cx="760" cy="200" r="40" fill="#3688FA" opacity="0.08"/> -->
+
+  <!-- Traits de coupe (crop marks) de 5mm = 50 units -->
+  <!-- Coin haut-gauche -->
+  <path class="crop" d="M30,0 L30,50 M0,30 L50,30"/>
+  <!-- Coin haut-droit -->
+  <path class="crop" d="M880,0 L880,50 M910,30 L860,30"/>
+  <!-- Coin bas-gauche -->
+  <path class="crop" d="M30,600 L30,550 M0,570 L50,570"/>
+  <!-- Coin bas-droit -->
+  <path class="crop" d="M880,600 L880,550 M910,570 L860,570"/>
+
+  <!-- (Optionnel) Lignes de fond perdu (bleed) non imprimées -->
+  <!-- <rect x="0" y="0" width="910" height="600" fill="none" stroke="#FFAAAA" stroke-dasharray="4,4"/> -->
+</svg>

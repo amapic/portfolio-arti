@@ -1,5 +1,42 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { ImageMeta } from "../../types/imageMeta";
+import {
+  HiOutlinePencil,
+} from "react-icons/hi2";
+import { HiOutlineX } from "react-icons/hi";
+// Bootstrap Icons
+import {
+  BsCloudUpload,
+  BsImages,
+  BsGrid3X3Gap,
+  BsCardImage,
+  BsInfoCircle,
+  BsCheckCircle,
+  BsXCircle,
+  BsCrop,
+  BsEye,
+  BsEyeSlash,
+  BsTrash
+} from "react-icons/bs";
+import NoSSR from "../../components/NoSSR";
+import { Header } from "../../components/Header";
+import { useAuth } from "../../components/SimpleAuthProvider";
+import PortfolioFooter from "../../components/PortfolioFooter";
+import ImageCropper from "../../components/ImageCropper";
+import Link from 'next/link';
+
+// Types pour les catégories (maintenant chargées dynamiquement)
+interface Category {
+  id: string;
+  value: string;
+  label: string;
+  order: number;
+  isActive: boolean;
+}
+
 // Calcule le crop maximal centré pour un ratio donné et des dimensions d'image
 function getCenteredMaxCrop(
   imageWidth: number,
@@ -26,42 +63,6 @@ function getCenteredMaxCrop(
   const size = 100;
   return { x, y, size };
 }
-
-import React, { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { ImageMeta } from "../../types/imageMeta";
-import {
-  HiOutlinePencil,
-} from "react-icons/hi2";
-import { HiOutlineX } from "react-icons/hi";
-// Bootstrap Icons
-import {
-  BsCloudUpload,
-  BsImages,
-  BsGrid3X3Gap,
-  BsCardImage,
-  BsInfoCircle,
-  BsCheckCircle,
-  BsXCircle,
-  BsCrop,
-  BsEye,
-  BsEyeSlash,
-  BsTrash
-} from "react-icons/bs";
-import NoSSR from "../../components/NoSSR";
-import { Header } from "../../components/Header";
-import { useAuth } from "../../components/SimpleAuthProvider";
-// Types pour les catégories (maintenant chargées dynamiquement)
-interface Category {
-  id: string;
-  value: string;
-  label: string;
-  order: number;
-  isActive: boolean;
-}
-import PortfolioFooter from "../../components/PortfolioFooter";
-import ImageCropper from "../../components/ImageCropper";
-import Link from 'next/link';
 
 const ImagesAdmin: React.FC = () => {
   const searchParams = useSearchParams();
@@ -193,7 +194,7 @@ const ImagesAdmin: React.FC = () => {
         const data = await response.json();
         setImages(data);
       } else {
-        console.error("Erreur lors du chargement des images");
+        console.error("Erreur lors du chargement des images", response.status);
       }
     } catch (error) {
       console.error("Erreur lors du chargement des images:", error);
@@ -413,7 +414,7 @@ const ImagesAdmin: React.FC = () => {
       <NoSSR>
         <div
           suppressHydrationWarning={true}
-          className="min-h-screen bg-gray-50"
+          className="min-h-[calc(100vh-60px)] bg-gray-50 overflow-x-hidden"
         >
           <Header />
           {notification && (
@@ -452,10 +453,9 @@ const ImagesAdmin: React.FC = () => {
   // Main interface
   return (
     <NoSSR>
-      <div suppressHydrationWarning={true}>
-        <div suppressHydrationWarning={true} className="min-h-screen">
-          <Header />
-          {notification && (
+      <div suppressHydrationWarning={true} className="min-h-screen overflow-x-hidden">
+        <Header />
+        {notification && (
             <div
               className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white text-center font-semibold transition-all flex items-center gap-2 ${notification.type === "success" ? "bg-customgreen" : "bg-customred"
                 }`}
@@ -470,72 +470,84 @@ const ImagesAdmin: React.FC = () => {
           )}
           
           {/* Layout avec sidebar */}
-          <div className="flex w-full">
+          <div className="flex w-full overflow-x-hidden ">
             {/* Sidebar gauche */}
-            <div className="w-80 bg-white border-r border-gray-200 h-[calc(100vh-60px)] flex flex-col fixed left-0 top-[60px] z-30 shadow-lg">
+            <div className="ml-2 mt-2 w-80 bg-white border-r border-gray-200 h-[calc(100vh-100px)] flex flex-col fixed left-0 top-[61px] z-0 shadow-lg">
               {/* Header du sidebar */}
               <div className="p-6 border-b border-gray-200">
                 <h1 className="text-xl font-bold text-gray-900 flex items-center">
                   <BsImages className="mr-3 w-6 h-6 text-blue-600" />
-                  Images ({filteredImages.length})
+                  Images { !showUploadForm && `(${filteredImages.length})` }
                 </h1>
               </div>
 
               {/* Filtres */}
-              <div className="flex-1 p-6">
+              <div className="flex-1 p-6 overflow-y-auto">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Filtres</h2>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => handleCategoryChange("All")}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${selectedCategory === "All"
-                        ? "bg-customblue text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                  >
-                    Toutes ({images.length})
-                  </button>
-                  {categories
-                    .filter((cat) => cat.isActive)
-                    .map((category) => {
-                      const count = images.filter((img) =>
-                        imageMatchesCategory(img.category, category.value)
-                      ).length;
-                      return (
-                        <button
-                          key={category.value}
-                          onClick={() => handleCategoryChange(category.value)}
-                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${selectedCategory === category.value
-                              ? "bg-customblue text-white"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            }`}
-                        >
-                          {category.label} ({count})
-                        </button>
-                      );
-                    })}
-                  {/* Catégories supprimées */}
-                  {categories
-                    .filter((cat) => !cat.isActive)
-                    .map((category) => {
-                      const count = images.filter((img) =>
-                        imageMatchesCategory(img.category, category.value)
-                      ).length;
-                      if (count === 0) return null;
-                      return (
-                        <button
-                          key={category.value}
-                          onClick={() => handleCategoryChange(category.value)}
-                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors opacity-50 ${selectedCategory === category.value
-                              ? "bg-customred text-white"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            }`}
-                          title="Catégorie supprimée - contient encore des images"
-                        >
-                          {category.label} ({count}) [Supprimée]
-                        </button>
-                      );
-                    })}
-                </div>
+                {!showUploadForm && (loading ? (
+                  // Skeleton loader pour les filtres
+                  <div className="space-y-2">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div
+                        key={i}
+                        className="w-full h-10 bg-gray-200 rounded-md animate-pulse"
+                      ></div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleCategoryChange("All")}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${selectedCategory === "All"
+                          ? "bg-customblue text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                    >
+                      Toutes ({images.length})
+                    </button>
+                    {categories
+                      .filter((cat) => cat.isActive)
+                      .map((category) => {
+                        const count = images.filter((img) =>
+                          imageMatchesCategory(img.category, category.value)
+                        ).length;
+                        return (
+                          <button
+                            key={category.value}
+                            onClick={() => handleCategoryChange(category.value)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${selectedCategory === category.value
+                                ? "bg-customblue text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
+                          >
+                            {category.label} ({count})
+                          </button>
+                        );
+                      })}
+                    {/* Catégories supprimées */}
+                    {categories
+                      .filter((cat) => !cat.isActive)
+                      .map((category) => {
+                        const count = images.filter((img) =>
+                          imageMatchesCategory(img.category, category.value)
+                        ).length;
+                        if (count === 0) return null;
+                        return (
+                          <button
+                            key={category.value}
+                            onClick={() => handleCategoryChange(category.value)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors opacity-50 ${selectedCategory === category.value
+                                ? "bg-customred text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
+                            title="Catégorie supprimée - contient encore des images"
+                          >
+                            {category.label} ({count}) [Supprimée]
+                          </button>
+                        );
+                      })}
+                  </div>
+                ))}
               </div>
 
               {/* Bouton ajouter image en bas */}
@@ -564,10 +576,15 @@ const ImagesAdmin: React.FC = () => {
             </div>
 
             {/* Contenu principal */}
-            <div className="flex-1 p-8 ml-80">
-              {showUploadForm ? (
-                /* Section Upload */
-                <div className="bg-white rounded-lg shadow-md p-6 relative overflow-hidden">
+            <div className={`flex-1 pl-[4px] p-8 pt-12 ml-80 relative overflow-x-hidden ${showUploadForm ? 'h-[calc(100vh-100px)] overflow-y-hidden' : ''}`}>
+              {/* Section Upload avec transition */}
+              <div 
+                className={`bg-white rounded-lg h-full shadow-md ml-8 p-6 transition-all ease-in-out will-change-transform ${
+                  showUploadForm 
+                    ? 'relative opacity-100 translate-x-0 duration-500'
+                    : 'absolute inset-0 opacity-0 -translate-x-full pointer-events-none duration-0'
+                }`}
+              >
                   <h2 className="text-lg font-semibold mb-6 flex items-center text-gray-900">
                     <BsCloudUpload className="mr-3 w-6 h-6" />
                     Ajouter une nouvelle image
@@ -609,11 +626,11 @@ const ImagesAdmin: React.FC = () => {
                     {/* Métadonnées */}
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-2">
-                          <span className="mr-2 text-xl h-full text-customyellow">●</span>
+                        <label className="inline-flex items-center text-sm rounded-t-md font-medium text-gray-900 bg-customyellow mb-0 pr-6">
+                          <span className="mx-2 text-2xl text-white pb-1">●</span>
                           Catégories
                         </label>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2 w-full px-3 py-1 border-[5px] border-customyellow rounded-b-md rounded-tr-md focus:outline-none focus:ring-0 focus:border-customyellow text-gray-900 bg-customyellow mt-0">
                           {categories
                             .filter((cat) => cat.isActive)
                             .map((cat) => (
@@ -762,16 +779,47 @@ const ImagesAdmin: React.FC = () => {
                       {uploading ? "Upload en cours..." : "Uploader l'image"}
                     </button>
                   </div>
-                </div>
-              ) : (
-                /* Grille d'images */
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                  </div>
+
+              {/* Grille d'images avec transition */}
+              <div 
+                className={`mt-2 pl-8 transition-all ease-in-out will-change-transform  ${
+                  !showUploadForm 
+                    ? 'relative opacity-100 translate-x-0 duration-500' 
+                    : 'absolute inset-0 opacity-0 translate-x-full pointer-events-none duration-0 '
+                }`}
+              >
+                  {/* <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
                     <BsGrid3X3Gap className="mr-3 w-6 h-6" />
-                    Images ({filteredImages.length})
-                  </h2>
+                    Images ({loading ? "..." : filteredImages.length})
+                  </h2> */}
                   
-                  {filteredImages.length === 0 ? (
+                  {loading ? (
+                    // Skeleton loader pour la grille d'images
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                        <div
+                          key={i}
+                          className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse"
+                        >
+                          <div className="w-full h-48 bg-gray-300"></div>
+                          <div className="p-4 space-y-3">
+                            <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                            <div className="flex gap-2">
+                              <div className="h-6 bg-gray-200 rounded w-16"></div>
+                              <div className="h-6 bg-gray-200 rounded w-16"></div>
+                            </div>
+                            <div className="flex gap-2">
+                              <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                              <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                              <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : filteredImages.length === 0 ? (
                     <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                       <BsImages className="mx-auto h-16 w-16 text-gray-400 mb-4" />
                       <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -798,7 +846,7 @@ const ImagesAdmin: React.FC = () => {
                         >
                           <div className="relative">
                             <img
-                              src={`${IMAGE_API_URL}/${image.filename || image.image_url}`}
+                              src={image.filename ? `${IMAGE_API_URL}/${image.filename}` : image.image_url}
                               alt={image.alt || "Image"}
                               className="w-full h-48 object-cover"
                             />
@@ -867,7 +915,7 @@ const ImagesAdmin: React.FC = () => {
                     </div>
                   )}
                 </div>
-              )}
+              
 
               {/* Modal de recadrage */}
               {croppingImage && (
@@ -885,7 +933,7 @@ const ImagesAdmin: React.FC = () => {
                       </button>
                     </div>
                     <ImageCropper
-                      imageUrl={`${IMAGE_API_URL}/${croppingImage.filename || croppingImage.image_url}`}
+                      imageUrl={croppingImage.filename ? `${IMAGE_API_URL}/${croppingImage.filename}` : croppingImage.image_url}
                       dimension={croppingImage.dimension}
                       initialCrop={croppingImage.crop}
                       onCropChange={(crop) => setCropToSave(crop)}
@@ -913,10 +961,9 @@ const ImagesAdmin: React.FC = () => {
               )}
             </div>
           </div>
+          <PortfolioFooter />
         </div>
-        <PortfolioFooter />
-      </div>
-    </NoSSR>
+      </NoSSR>
   );
 };
 
