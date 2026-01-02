@@ -472,7 +472,7 @@ const ImagesAdmin: React.FC = () => {
           {/* Layout avec sidebar */}
           <div className="flex w-full overflow-x-hidden ">
             {/* Sidebar gauche */}
-            <div className="ml-2 mt-2 w-80 bg-white border-r border-gray-200 h-[calc(100vh-100px)] flex flex-col fixed left-0 top-[61px] z-0 shadow-lg">
+            <div className="ml-2 mt-2 max-w-80 w-1/4 bg-white border-r border-gray-200 h-[calc(100vh-100px)] flex flex-col fixed left-0 top-[61px] z-0 shadow-lg">
               {/* Header du sidebar */}
               <div className="p-6 border-b border-gray-200">
                 <h1 className="text-xl font-bold text-gray-900 flex items-center">
@@ -576,7 +576,7 @@ const ImagesAdmin: React.FC = () => {
             </div>
 
             {/* Contenu principal */}
-            <div className={`flex-1 pl-[4px] p-8 pt-12 ml-80 relative overflow-x-hidden ${showUploadForm ? 'h-[calc(100vh-100px)] overflow-y-hidden' : ''}`}>
+            <div className={`flex-1 pl-[4px] p-8 pt-12 ml-[min(20rem,25%)] relative overflow-x-hidden ${showUploadForm ? 'h-[calc(100vh-100px)] overflow-y-hidden' : ''}`}>
               {/* Section Upload avec transition */}
               <div 
                 className={`bg-white rounded-lg h-full shadow-md ml-8 p-6 transition-all ease-in-out will-change-transform ${
