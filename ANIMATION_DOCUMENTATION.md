@@ -112,3 +112,5 @@ cellSize: 150px
 // Courbe d'easing
 cubic-bezier(0.4, 0, 0.2, 1)
 ```
+
+<!-- Mise à jour test Vercel - 2026-09-28 19:39:48 -->
