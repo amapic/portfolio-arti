@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BsBoxArrowRight, BsPersonCircle } from "react-icons/bs";
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
 import Link from 'next/link';
@@ -13,6 +13,36 @@ export const Header = () => {
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith('/admin');
   const { logout, user, loading } = useAuth();
+
+  // Prevent layout shift when showing/hiding menus by locking scroll
+  useEffect(() => {
+    const lock = showMobileMenu || showCategoryMenu;
+    try {
+      if (lock) {
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        // store previous padding-right to restore later
+        (document.body as any).datasetPrevPaddingRight = document.body.style.paddingRight || '';
+        if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+        const prev = (document.body as any).datasetPrevPaddingRight || '';
+        document.body.style.paddingRight = prev;
+        try { delete (document.body as any).datasetPrevPaddingRight; } catch (e) {}
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    return () => {
+      try {
+        document.body.style.overflow = '';
+        const prev = (document.body as any).datasetPrevPaddingRight || '';
+        document.body.style.paddingRight = prev;
+        try { delete (document.body as any).datasetPrevPaddingRight; } catch (e) {}
+      } catch (e) {}
+    };
+  }, [showMobileMenu, showCategoryMenu]);
 
   return (
     <header className="z-10 fixed top-0 left-0 right-0 z-50 bg-bgheader dark:bg-gray-900 text-white pt-[10px] lg:pt-0 h-[80px] lg:h-[60px]">

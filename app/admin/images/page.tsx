@@ -247,7 +247,7 @@ const ImagesAdmin: React.FC = () => {
       formData.append("dimension", JSON.stringify(newImageMeta.dimension));
       formData.append("position", newImageMeta.position.toString());
 
-      const response = await fetch(`${API_URL}/api/images`, {
+      const response = await fetch(`${API_URL}/api/images?projectId=${PROJECT_ID}`, {
         method: "POST",
         body: formData,
       });
@@ -338,7 +338,7 @@ const ImagesAdmin: React.FC = () => {
       const response = await fetch(
         `${API_URL}/api/images/${image.id}?projectId=${PROJECT_ID}`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -379,7 +379,7 @@ const ImagesAdmin: React.FC = () => {
       const response = await fetch(
         `${API_URL}/api/images/${imageId}?projectId=${PROJECT_ID}`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },

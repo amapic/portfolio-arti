@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { GalleryItem } from '../types/GalleryItem';
 
 interface SimpleLightboxProps {
@@ -30,6 +30,31 @@ const SimpleLightbox: React.FC<SimpleLightboxProps> = ({
 
   // Vitesse de défilement en pixels par seconde (vous pouvez ajuster cette valeur)
   const scrollSpeed = 20  ; // pixels par seconde
+
+  const finalizeImageLoad = useCallback((naturalWidth: number, naturalHeight: number) => {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const imageAspectRatio = naturalWidth / naturalHeight;
+    const screenAspectRatio = screenWidth / screenHeight;
+
+    if (imageAspectRatio > screenAspectRatio) {
+      const scaledWidth = screenHeight * imageAspectRatio;
+      const overflowDistance = scaledWidth - screenWidth;
+      const calculatedDuration = overflowDistance / scrollSpeed;
+
+      setAnimationDuration(Math.max(calculatedDuration, 2));
+      setImageOverflows(scaledWidth > screenWidth);
+      setImageDimensions({ width: scaledWidth, height: screenHeight });
+    } else {
+      setImageOverflows(false);
+      setImageDimensions({ width: screenWidth, height: screenHeight });
+    }
+
+    setIsLoaded(true);
+    setAnimationEnabled(true);
+    setIsTransitioning(false);
+    stopLoadingIndicator();
+  }, []);
 
 
 
@@ -144,39 +169,56 @@ const SimpleLightbox: React.FC<SimpleLightboxProps> = ({
     }
   }, [currentIndex]);
 
+  useEffect(() => {
+    if (!isOpen || !images.length) {
+      return;
+    }
+
+    const currentImage = images[currentIndex];
+    if (!currentImage) {
+      return;
+    }
+
+    let cancelled = false;
+    const preloadedImage = new window.Image();
+
+    const applyLoadedState = () => {
+      if (cancelled) {
+        return;
+      }
+
+      finalizeImageLoad(
+        preloadedImage.naturalWidth || window.innerWidth,
+        preloadedImage.naturalHeight || window.innerHeight
+      );
+    };
+
+    preloadedImage.onload = applyLoadedState;
+    preloadedImage.onerror = () => {
+      if (cancelled) {
+        return;
+      }
+
+      setIsLoaded(true);
+      setIsTransitioning(false);
+      setAnimationEnabled(false);
+      stopLoadingIndicator();
+    };
+    preloadedImage.src = currentImage.imageUrl;
+
+    if (preloadedImage.complete) {
+      applyLoadedState();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentIndex, images, isOpen, finalizeImageLoad]);
+
   // Fonction pour détecter si l'image déborde en largeur
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
-    const naturalWidth = img.naturalWidth;
-    const naturalHeight = img.naturalHeight;
-    
-    // Calculer les dimensions de l'image si elle était redimensionnée pour couvrir l'écran
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const imageAspectRatio = naturalWidth / naturalHeight;
-    const screenAspectRatio = screenWidth / screenHeight;
-    
-    // Si l'image est plus large que l'écran une fois redimensionnée pour couvrir la hauteur
-    if (imageAspectRatio > screenAspectRatio) {
-      // L'image va déborder en largeur
-      const scaledWidth = screenHeight * imageAspectRatio;
-      const overflowDistance = scaledWidth - screenWidth;
-      
-      // Calculer la durée basée sur la distance et la vitesse
-      const calculatedDuration = overflowDistance / scrollSpeed;
-      setAnimationDuration(Math.max(calculatedDuration, 2)); // Minimum 2 secondes
-      
-      setImageOverflows(scaledWidth > screenWidth);
-      setImageDimensions({ width: scaledWidth, height: screenHeight });
-    } else {
-      setImageOverflows(false);
-      setImageDimensions({ width: screenWidth, height: screenHeight });
-    }
-    
-    setIsLoaded(true);
-    setAnimationEnabled(true); // Réactiver l'animation pour la nouvelle image
-    setIsTransitioning(false); // Fin de la transition
-    stopLoadingIndicator();
+    finalizeImageLoad(img.naturalWidth, img.naturalHeight);
   };
 
   // Fonction pour gérer le délai de chargement

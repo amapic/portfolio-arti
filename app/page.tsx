@@ -270,37 +270,45 @@ const TestIsotopePage: React.FC = () => {
         });
       };
 
-      // Fonction pour attendre que toutes les images soient chargées
-      const waitForImages = () => {
-        return new Promise<void>((resolve) => {
-          const images = document.querySelectorAll(".grid-item .item-content");
-          let loadedCount = 0;
-          const totalImages = images.length;
+      // Révéler progressivement chaque image dès qu'elle est chargée (sans attendre tout le monde)
+      const progressiveRevealImages = ($grid: any) => {
+        const elements = Array.from(
+          document.querySelectorAll<HTMLElement>(".grid-item .item-content")
+        );
 
-          if (totalImages === 0) {
-            resolve();
+        const reveal = (element: HTMLElement) => {
+          const gridItem = element.closest<HTMLElement>(".grid-item");
+          if (gridItem && !gridItem.classList.contains("is-loaded")) {
+            gridItem.classList.add("is-loaded");
+          }
+          // Re-layout léger: utile si des ressources tardives changent le rendu
+          try {
+            $grid?.isotope?.("layout");
+          } catch {
+            // ignore
+          }
+        };
+
+        elements.forEach((element) => {
+          const bgImage = window.getComputedStyle(element).backgroundImage;
+          if (!bgImage || bgImage === "none") {
+            reveal(element);
             return;
           }
 
-          const checkComplete = () => {
-            loadedCount++;
-            if (loadedCount >= totalImages) {
-              resolve();
-            }
-          };
+          const imageUrl = bgImage.replace(/url\(['"]?(.*?)['"]?\)/i, "$1");
+          if (!imageUrl) {
+            reveal(element);
+            return;
+          }
 
-          images.forEach((element) => {
-            const bgImage = window.getComputedStyle(element).backgroundImage;
-            if (bgImage && bgImage !== "none") {
-              const imageUrl = bgImage.replace(/url\(['"]?(.*?)['"]?\)/i, "$1");
-              const img = new Image();
-              img.onload = checkComplete;
-              img.onerror = checkComplete; // Même en cas d'erreur, on continue
-              img.src = imageUrl;
-            } else {
-              checkComplete(); // Pas d'image de fond
-            }
-          });
+          const img = new Image();
+          img.onload = () => reveal(element);
+          img.onerror = () => reveal(element);
+          img.src = imageUrl;
+          if (img.complete) {
+            reveal(element);
+          }
         });
       };
 
@@ -312,9 +320,6 @@ const TestIsotopePage: React.FC = () => {
           // Attendre que les librairies soient disponibles
           await waitForLibraries();
         
-          // Attendre que toutes les images soient chargées
-          await waitForImages();
-
           const $ = (window as any).$;
           if ($ && typeof $.fn.isotope === "function") {
             console.log("🎨 Initialisation d'Isotope avec les données API");
@@ -380,6 +385,9 @@ const TestIsotopePage: React.FC = () => {
             // Déclencher manuellement le layout initial
             $grid.isotope();
             $(".grid").css({ opacity: 1 });
+
+            // Révélation progressive des tuiles au fil du chargement des images
+            progressiveRevealImages($grid);
 
             // Fonction pour enlever les accents
             const removeAccents = (str: string) => {
@@ -748,7 +756,12 @@ const TestIsotopePage: React.FC = () => {
           /* border-radius: 15px; */
           overflow: hidden;
           /* Transition uniquement pour les propriétés hover */
-          transition: transform 0.3s ease;
+          opacity: 0;
+          transition: transform 0.3s ease, opacity 0.35s ease;
+        }
+
+        .grid-item.is-loaded > .item-content {
+          opacity: 1;
         }
 
         .grid-item:hover > .item-content {
@@ -1034,7 +1047,7 @@ const TestIsotopePage: React.FC = () => {
               ))}
             </div>
 
-            <div className="grid w-full xl:w-[1200px]" style={{ opacity: 0 }}>
+            <div className="grid w-full xl:w-[1200px]" style={{ opacity: 1 }}>
               {/* Élément invisible pour définir la largeur de base */}
               <div className="grid-sizer"></div>
 

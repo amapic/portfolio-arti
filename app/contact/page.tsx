@@ -113,8 +113,7 @@ const ContactPage: React.FC = () => {
   }
 
   if (loading && !showDataLoadingIndicator) {
-    // Chargement silencieux pendant la première seconde
-    return null;
+    return <div className="min-h-screen bg-white w-full" aria-hidden="true" />;
   }
 
   if (error) {

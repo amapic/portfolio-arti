@@ -70,7 +70,7 @@ const AboutPage: React.FC = () => {
 
   if (loading && showDataLoadingIndicator) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center w-full">
         <div className="text-center">
           <p className="text-gray-600 font-exposure">Chargement...</p>
         </div>
@@ -79,8 +79,7 @@ const AboutPage: React.FC = () => {
   }
 
   if (loading && !showDataLoadingIndicator) {
-    // Chargement silencieux pendant la première seconde
-    return null;
+    return <div className="min-h-screen bg-white w-full" aria-hidden="true" />;
   }
 
   if (!textData) {
@@ -94,7 +93,7 @@ const AboutPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full">
       {/* Indicateur de chargement d'image */}
       {showLoadingIndicator && !imageLoaded && textData?.about.image_url && (
         <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">

@@ -56,6 +56,31 @@ export default function RootLayout({ children }: RootLayoutProps) {
             `,
           }}
         />
+        <link rel="preload" href="/ExposureTrial-0.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                try {
+                  if (document && document.fonts && document.fonts.load) {
+                    document.fonts.load('1rem "ExposureTrial"').then(function(){
+                      document.documentElement.classList.add('exposure-loaded');
+                    }).catch(function(){
+                      document.documentElement.classList.add('exposure-loaded');
+                    });
+                  } else {
+                    // Fallback: mark loaded after short delay
+                    setTimeout(function(){
+                      document.documentElement.classList.add('exposure-loaded');
+                    }, 300);
+                  }
+                } catch(e) {
+                  try { document.documentElement.classList.add('exposure-loaded'); } catch(_){}
+                }
+              })();
+            `,
+          }}
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
         <link rel="icon" type="image/x-icon" href="/sgd.png?v=3" />

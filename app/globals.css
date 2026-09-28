@@ -4,7 +4,7 @@
 
 /* Prevent horizontal overflow across the site */
 html, body {
-  max-width: 100vw;
+  max-width: 100%;
   /* Use clip to avoid creating a scroll range while still hiding overflow */
   overflow-x: clip;
 }
@@ -28,8 +28,8 @@ html {
   height: 100%;
   width: 100%;
   min-width: 100%;
-  /* No vertical scrolling at the root to avoid double scroll contexts */
-  overflow-y: visible;
+  /* Keep a stable root scrollbar and avoid body/root double-scroll setups */
+  overflow-y: scroll;
   /* Match body background to avoid any visible band on the right */
   background: #fff;
 }
@@ -37,13 +37,8 @@ html {
 body {
   width: 100%;
   min-width: 100%;
-  /* Single scroll owner */
-  overflow-y: auto;
-}
-
-/* Optional: reserve scrollbar space only when explicitly enabled on the page */
-body.reserve-scrollbar {
-  scrollbar-gutter: stable;
+  margin: 0;
+  overflow-y: visible;
 }
 
 
@@ -83,4 +78,17 @@ body {
   color: #000;
   background: #fff;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Hide elements that require the ExposureTrial font until it's loaded */
+.requires-exposure {
+  visibility: hidden;
+}
+.exposure-loaded .requires-exposure {
+  visibility: visible;
+}
+
+/* Hover text shadow helper (used by header links) */
+.hover\:text-shadow:hover {
+  text-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 1px 0 #fff;
 }

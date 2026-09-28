@@ -307,7 +307,7 @@ const LegoGallery: React.FC = () => {
             className="lego-grid p-8 pt-2 mx-auto"
             style={{ 
               width: '1152px',
-              maxWidth: '100vw'
+              maxWidth: '100%'
             }}
           >
             {/* Élément invisible pour définir la largeur de base */}
